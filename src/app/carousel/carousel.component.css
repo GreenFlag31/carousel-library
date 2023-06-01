@@ -1,0 +1,111 @@
+.carousel-container {
+  position: relative;
+  max-width: 1100px;
+  margin: auto;
+  padding: 0.625em;
+  margin-top: 20em;
+}
+.carousel {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: calc((100% / 3) - 0.7em);
+  gap: 1em;
+  overflow: hidden;
+  scroll-behavior: smooth;
+}
+
+.carousel.dragging {
+  cursor: grab;
+  scroll-behavior: auto;
+}
+.previous,
+.next {
+  position: absolute;
+  background: #b00000;
+  text-align: center;
+  border-radius: 50%;
+  cursor: pointer;
+  top: 45%;
+  transform: translateY(-50%);
+  box-shadow: 0px 0px 7px 0px rgb(121 121 121 / 75%);
+  z-index: 1;
+  border: none;
+}
+.previous {
+  left: 0;
+}
+.next {
+  right: 0;
+}
+.previous:disabled,
+.next:disabled {
+  cursor: not-allowed;
+}
+.previous i,
+.next i {
+  padding: 0.7em 0.9em;
+  color: #fff;
+}
+.card {
+  width: 100%;
+  border-radius: 1em;
+  background: #dcdcdc;
+  user-select: none;
+}
+.card img {
+  display: block;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 1em;
+  height: 200px;
+}
+.content {
+  padding: 0.625em;
+}
+.content h3 {
+  text-align: center;
+}
+.data {
+  margin-top: 3em;
+  display: flex;
+  justify-content: center;
+  gap: 2em;
+}
+.param {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.4em;
+  background: rgb(225, 225, 225);
+  border-radius: 0.3em;
+}
+.param i {
+  color: rgb(44, 44, 44);
+}
+.progress {
+  display: flex;
+  justify-content: center;
+  gap: 0.8em;
+  margin-top: 2.5em;
+}
+.progress span {
+  display: block;
+  width: 0.7em;
+  height: 0.7em;
+  background: #000;
+  border-radius: 50%;
+  transition: 0.5s ease-out;
+}
+.progress span.active {
+  background: #b00000;
+}
+@media (max-width: 900px) {
+  .carousel {
+    grid-auto-columns: calc((100% / 2) - 0.5em);
+  }
+}
+@media (max-width: 600px) {
+  .carousel {
+    grid-auto-columns: 100%;
+  }
+}
