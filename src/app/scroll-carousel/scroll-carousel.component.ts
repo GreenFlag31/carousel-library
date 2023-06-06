@@ -9,11 +9,13 @@ import {
 import { Subscription, debounceTime, fromEvent } from 'rxjs';
 
 @Component({
-  selector: 'app-carousel',
-  templateUrl: './carousel.component.html',
-  styleUrls: ['./carousel.component.css'],
+  selector: 'app-scroll-carousel',
+  templateUrl: './scroll-carousel.component.html',
+  styleUrls: ['./scroll-carousel.component.css'],
 })
-export class CarouselComponent implements OnInit, AfterViewInit, OnDestroy {
+export class ScrollCarouselComponent
+  implements OnInit, AfterViewInit, OnDestroy
+{
   isDragging = false;
   startX = 0;
   startScrollLeft = 0;

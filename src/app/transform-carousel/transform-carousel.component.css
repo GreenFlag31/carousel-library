@@ -1,0 +1,143 @@
+.carousel {
+  position: relative;
+  max-width: 800px;
+  overflow: hidden;
+  margin: 10em auto;
+}
+.projects-container {
+  display: flex;
+  justify-content: space-around;
+  transform: translate3d(0, 0, 0);
+  width: 500%;
+}
+.section-title {
+  text-align: center;
+  padding: 0.625em;
+}
+
+.card.dragging {
+  cursor: grab;
+}
+
+.previous,
+.next {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  padding: 0.25em;
+  cursor: pointer;
+  z-index: 1;
+  transition: opacity 0.3s;
+  border: none;
+  outline: none;
+  background: none;
+}
+.previous.limit,
+.next.limit {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+.next {
+  right: 0;
+  left: auto;
+}
+.bullets-container {
+  display: flex;
+  justify-content: center;
+  gap: 1em;
+  margin-top: 2em;
+}
+.bullet {
+  display: block;
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 50%;
+  background: #dbdada;
+  cursor: pointer;
+  transition: background-color 0.4s;
+}
+.bullet.current {
+  background: var(--primary-color-3);
+}
+.card {
+  width: 100%;
+  border-radius: 1em;
+  box-shadow: 0px 2px 4px 0px rgb(158 158 158 / 83%);
+  max-width: 600px;
+  user-select: none;
+}
+.card img {
+  display: block;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 1em;
+  height: 200px;
+}
+.content {
+  padding: 0.625em;
+}
+.content h3 {
+  text-align: center;
+}
+.data {
+  margin-top: 3em;
+  display: flex;
+  justify-content: center;
+  gap: 2em;
+}
+.param {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.4em;
+  background: rgb(225, 225, 225);
+  border-radius: 0.3em;
+}
+.param i {
+  color: rgb(44, 44, 44);
+}
+.progress {
+  display: flex;
+  justify-content: center;
+  gap: 0.8em;
+  margin-top: 2.5em;
+}
+.progress span {
+  display: block;
+  width: 0.7em;
+  height: 0.7em;
+  background: #000;
+  border-radius: 50%;
+  transition: 0.5s ease-out;
+}
+.progress span.active {
+  background: #b00000;
+}
+
+@media (min-width: 650px) {
+  .previous,
+  .next {
+    display: inline-block;
+    background: var(--primary-color-3);
+    padding: 0.4em 0.5em;
+    color: white;
+    border-radius: 0.3em;
+    box-shadow: 0px 2px 4px 0px rgb(158 158 158 / 83%);
+  }
+  .previous {
+    margin-left: 2em;
+  }
+  .next {
+    margin-right: 2em;
+  }
+}
+@media (min-width: 800px) {
+  .previous {
+    margin-left: 3em;
+  }
+  .next {
+    margin-right: 3em;
+  }
+}

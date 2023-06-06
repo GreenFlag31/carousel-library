@@ -1,0 +1,44 @@
+<div class="carousel-container">
+  <h2 class="section-title">Carousel Librairy</h2>
+
+  <button
+    class="previous"
+    *ngIf="arrows"
+    (click)="carousel.previous()"
+    [disabled]="carousel.currentSlide === 0 && carousel.currentTranslation >= 0"
+  >
+    <i class="fa-solid fa-arrow-left-long"></i>
+  </button>
+  <div
+    class="slides-container"
+    [style.width.%]="slideToShow === 1 ? carousel.numberDots * 100 : undefined"
+    [style.justifyContent.spaceAround]="slideToShow === 1"
+    (mousedown)="carousel.dragStart($event)"
+    (touchstart)="carousel.dragStart($event)"
+    (mousemove)="carousel.dragMove($event)"
+    (touchmove)="carousel.dragMove($event)"
+    (touchend)="carousel.dragStop()"
+  >
+    <ng-content></ng-content>
+    <ng-template></ng-template>
+  </div>
+  <button
+    class="next"
+    *ngIf="arrows"
+    (click)="carousel.next()"
+    [disabled]="
+      carousel.currentSlide === carousel.numberDots - 1 &&
+      carousel.currentTranslation <= -carousel.maxScrollableContent
+    "
+  >
+    <i class="fa-solid fa-arrow-right-long"></i>
+  </button>
+  <div class="bullets-container" *ngIf="dots">
+    <span
+      class="bullet"
+      *ngFor="let bullet of carousel.arrayNumberDots"
+      [class.current]="bullet === carousel.currentSlide"
+      (click)="carousel.goTo(bullet)"
+    ></span>
+  </div>
+</div>
