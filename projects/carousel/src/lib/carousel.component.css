@@ -3,16 +3,15 @@
   overflow: hidden;
   margin: 10em auto;
   padding: 0.625em;
+  width: 100%;
 }
 .slides-container {
-  display: flex;
+  /* display: flex; */
   /* justify-content: space-around; */
   display: grid;
   grid-auto-flow: column;
-  /* grid-auto-columns: 316px; */
-  gap: 1em;
+  /* gap: 1em; */
   transform: translate3d(0, 0, 0);
-  /* will-change: transform; */
 }
 .section-title {
   text-align: center;

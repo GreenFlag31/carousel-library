@@ -1,32 +1,36 @@
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  Input,
-  OnInit,
-} from '@angular/core';
-import { Subscription, debounceTime, fromEvent } from 'rxjs';
+import { Component, ElementRef, Input, OnInit } from '@angular/core';
+import { Subscription, fromEvent } from 'rxjs';
 import { Carousel } from './carousel';
+import { AnimationTimingFn } from './interfaces';
+import { Slider } from './slider';
+import { SliderNoResponsive } from './sliderNoResponsive';
 
 @Component({
   selector: 'carousel',
   templateUrl: './carousel.component.html',
   styleUrls: ['./carousel.component.css'],
 })
-export class CarouselComponent implements OnInit, AfterViewInit {
+export class CarouselComponent implements OnInit {
+  @Input() maxWidth!: number;
   @Input() slideToShow = 3;
-  @Input() slidingLimit = 30;
+  @Input() slideToScroll = 1;
+  @Input() slidingLimitBeforeScroll = 30;
   @Input() strechingLimit = 60;
-  @Input() slideWidth!: number;
+  @Input() slideWidth = 300;
   @Input() slideMinWidth = 300;
   @Input() dots = true;
   @Input() arrows = true;
   @Input() counter = false;
   @Input() gapBetweenSlides = 16;
+  @Input() animationTimingMs = 300;
+  @Input() animationTimingFn: AnimationTimingFn = 'ease-out';
+  @Input() responsive = true;
+  @Input() autoSlide = false;
   mouseupSubscription!: Subscription;
   VChangeSubscription!: Subscription;
   resizeSubscription!: Subscription;
   carousel!: Carousel;
+  slider!: Slider | SliderNoResponsive;
 
   constructor(private elementRef: ElementRef) {}
 
@@ -40,39 +44,51 @@ export class CarouselComponent implements OnInit, AfterViewInit {
       this.slideMinWidth,
       this.slideWidth,
       this.gapBetweenSlides,
-      this.strechingLimit,
-      this.slidingLimit
+      this.responsive
     );
+
+    this.slider = this.responsive
+      ? new Slider(
+          this.carousel,
+          this.slideToScroll,
+          this.slidingLimitBeforeScroll,
+          this.strechingLimit,
+          this.autoSlide
+        )
+      : new SliderNoResponsive(
+          this.carousel,
+          this.slideToScroll,
+          this.slidingLimitBeforeScroll,
+          this.strechingLimit,
+          this.autoSlide
+        );
 
     this.listeners();
   }
 
   listeners() {
     this.mouseupSubscription = fromEvent(window, 'mouseup').subscribe(() => {
-      if (!this.carousel.dragging) return;
+      if (!this.slider.dragging) return;
 
-      this.carousel.dragStop();
+      this.slider.dragStop();
     });
     this.VChangeSubscription = fromEvent(
       document,
       'visibilitychange'
     ).subscribe((event: any) => {
-      this.carousel.unActiveTab(event);
+      this.slider.unActiveTab(event);
     });
 
     this.resizeSubscription = fromEvent(window, 'resize')
       // .pipe(debounceTime(300))
       .subscribe(() => {
-        if (this.carousel.currentSlide > 0) {
-          this.carousel.currentSlide = 0;
-          this.carousel.computeTransformation(0);
+        if (this.slider.currentSlide > 0) {
+          this.slider.currentSlide = 0;
+          this.slider.computeTransformation(0);
         }
-        this.carousel.updateNumberDots();
-        // back to index 0 at resize
+        this.carousel.updateProperties();
       });
   }
-
-  ngAfterViewInit() {}
 
   ngOnDestroy() {
     this.mouseupSubscription.unsubscribe();
