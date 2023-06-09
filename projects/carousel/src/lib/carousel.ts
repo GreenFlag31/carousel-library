@@ -1,8 +1,7 @@
-import { visibilityEvent } from './interfaces';
-
 export class Carousel {
   slides!: NodeListOf<HTMLDivElement>;
   slideWidth!: number;
+  slideWidthWithGap!: number;
   numberDots!: number;
   arrayNumberDots!: number[];
   slidesContainer!: HTMLDivElement;
@@ -13,6 +12,7 @@ export class Carousel {
   paddingCarousel = 0;
   carouselWidth!: number;
   minWidthSlideContainer!: number;
+  slideDisplayed = 1;
 
   constructor(
     private carousel: HTMLDivElement,
@@ -37,7 +37,6 @@ export class Carousel {
     this.correctionMultipleSlides = this.multipleSlides() ? this.gap : 0;
     this.slideWidth = this.slides[0].offsetWidth;
     this.updateProperties();
-    this.carouselWidth = this.carousel.clientWidth;
     this.slidesContainer.style.gap = this.gap + 'px';
   }
 
@@ -47,6 +46,24 @@ export class Carousel {
       if (this.responsive) return;
       slide.style.width = this.width + 'px';
     });
+  }
+
+  updateProperties() {
+    this.carouselWidth = this.carousel.clientWidth;
+    if (this.responsive) {
+      this.updateSlideToShow();
+    } else {
+      this.updateSlideDisplayed();
+    }
+    this.numberDots = this.setNumberDots();
+    this.arrayNumberDots = [...Array(this.numberDots).keys()];
+    // this.setMaxWidthCarousel();
+    if (this.responsive) this.setAutoColumnSlideContainer();
+    this.slideWidth = this.slides[0].offsetWidth;
+
+    this.slideWidthWithGap = this.slideWidth + this.correctionMultipleSlides;
+    this.setMinWidthSlideContainer();
+    this.maxScrollableContent = this.getMaxScroll();
   }
 
   updateSlideToShow() {
@@ -59,14 +76,15 @@ export class Carousel {
     }
   }
 
-  updateProperties() {
-    this.updateSlideToShow();
-    this.numberDots = this.setNumberDots();
-    this.arrayNumberDots = [...Array(this.numberDots).keys()];
-    // this.setMaxWidthCarousel();
-    if (this.responsive) this.setAutoColumnSlideContainer();
-    this.setMinWidthSlideContainer();
-    this.maxScrollableContent = this.getMaxScroll();
+  updateSlideDisplayed() {
+    this.slideDisplayed = 1;
+    // Get N of FULL CARDS visible without offset, not responsive mode
+    while (this.carouselWidth > this.slideDisplayed * this.slideWidth) {
+      this.slideDisplayed++;
+    }
+    this.slideDisplayed--;
+
+    this.slideToShow = this.slideDisplayed;
   }
 
   getPaddingCarousel() {
@@ -96,7 +114,6 @@ export class Carousel {
   }
 
   setMinWidthSlideContainer() {
-    this.slideWidth = this.slides[0].offsetWidth;
     this.minWidthSlideContainer =
       this.totalSlides * this.slideWidth +
       (this.totalSlides - 1) * this.correctionMultipleSlides;
@@ -126,7 +143,6 @@ export class Carousel {
   }
 
   getMaxScroll() {
-    // debugger;
     return (
       (this.numberDots - 1) * (this.slideWidth + this.correctionMultipleSlides)
     );

@@ -2,8 +2,9 @@ import { Component, ElementRef, Input, OnInit } from '@angular/core';
 import { Subscription, fromEvent } from 'rxjs';
 import { Carousel } from './carousel';
 import { AnimationTimingFn } from './interfaces';
-import { Slider } from './slider';
+import { SliderResponsive } from './slider';
 import { SliderNoResponsive } from './sliderNoResponsive';
+import { Helper } from './helper';
 
 @Component({
   selector: 'carousel',
@@ -25,12 +26,13 @@ export class CarouselComponent implements OnInit {
   @Input() animationTimingMs = 300;
   @Input() animationTimingFn: AnimationTimingFn = 'ease-out';
   @Input() responsive = true;
-  @Input() autoSlide = false;
+  @Input() autoSlide = true;
   mouseupSubscription!: Subscription;
   VChangeSubscription!: Subscription;
   resizeSubscription!: Subscription;
   carousel!: Carousel;
-  slider!: Slider | SliderNoResponsive;
+  slider!: SliderResponsive | SliderNoResponsive;
+  helper!: Helper;
 
   constructor(private elementRef: ElementRef) {}
 
@@ -48,7 +50,7 @@ export class CarouselComponent implements OnInit {
     );
 
     this.slider = this.responsive
-      ? new Slider(
+      ? new SliderResponsive(
           this.carousel,
           this.slideToScroll,
           this.slidingLimitBeforeScroll,
@@ -63,6 +65,7 @@ export class CarouselComponent implements OnInit {
           this.autoSlide
         );
 
+    this.helper = new Helper(this.carousel, this.slider);
     this.listeners();
   }
 
@@ -82,12 +85,22 @@ export class CarouselComponent implements OnInit {
     this.resizeSubscription = fromEvent(window, 'resize')
       // .pipe(debounceTime(300))
       .subscribe(() => {
-        if (this.slider.currentSlide > 0) {
-          this.slider.currentSlide = 0;
-          this.slider.computeTransformation(0);
-        }
-        this.carousel.updateProperties();
+        this.resize();
       });
+  }
+
+  resize() {
+    this.carousel.updateProperties();
+    if (this.slider.currentSlide > 0) {
+      this.slider.currentSlide = 0;
+      this.slider.computeTransformation(0);
+    }
+
+    if (this.slider instanceof SliderNoResponsive) {
+      this.slider.offset();
+    } else {
+      this.slider.init();
+    }
   }
 
   ngOnDestroy() {
