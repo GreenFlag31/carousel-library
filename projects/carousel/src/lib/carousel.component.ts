@@ -2,9 +2,9 @@ import { Component, ElementRef, Input, OnInit } from '@angular/core';
 import { Subscription, fromEvent } from 'rxjs';
 import { Carousel } from './carousel';
 import { AnimationTimingFn } from './interfaces';
-import { SliderResponsive } from './slider';
-import { SliderNoResponsive } from './sliderNoResponsive';
-import { Helper } from './helper';
+import { SliderResponsive } from './sliderResponsive';
+import { SliderNotResponsive } from './sliderNotResponsive';
+// import { Helper } from './helper';
 
 @Component({
   selector: 'carousel',
@@ -25,14 +25,14 @@ export class CarouselComponent implements OnInit {
   @Input() gapBetweenSlides = 16;
   @Input() animationTimingMs = 300;
   @Input() animationTimingFn: AnimationTimingFn = 'ease-out';
-  @Input() responsive = true;
+  @Input() responsive = false;
   @Input() autoSlide = true;
   mouseupSubscription!: Subscription;
   VChangeSubscription!: Subscription;
   resizeSubscription!: Subscription;
   carousel!: Carousel;
-  slider!: SliderResponsive | SliderNoResponsive;
-  helper!: Helper;
+  slider!: SliderResponsive | SliderNotResponsive;
+  // helper!: Helper;
 
   constructor(private elementRef: ElementRef) {}
 
@@ -57,7 +57,7 @@ export class CarouselComponent implements OnInit {
           this.strechingLimit,
           this.autoSlide
         )
-      : new SliderNoResponsive(
+      : new SliderNotResponsive(
           this.carousel,
           this.slideToScroll,
           this.slidingLimitBeforeScroll,
@@ -65,7 +65,7 @@ export class CarouselComponent implements OnInit {
           this.autoSlide
         );
 
-    this.helper = new Helper(this.carousel, this.slider);
+    // this.helper = new Helper(this.carousel, this.slider);
     this.listeners();
   }
 
@@ -96,7 +96,7 @@ export class CarouselComponent implements OnInit {
       this.slider.computeTransformation(0);
     }
 
-    if (this.slider instanceof SliderNoResponsive) {
+    if (this.slider instanceof SliderNotResponsive) {
       this.slider.offset();
     } else {
       this.slider.init();

@@ -1,7 +1,7 @@
 import { Carousel } from './carousel';
 import { visibilityEvent } from './interfaces';
 
-export class SliderNoResponsive {
+export class SliderNotResponsive {
   dragging = false;
   currentSlide = 0;
   lastSlide = 0;
@@ -9,6 +9,8 @@ export class SliderNoResponsive {
   previousTranslation = 0;
   direction: 'right' | 'left' = 'right';
   startX = 0;
+  previousX = 0;
+  currentX = 0;
   positionChange = 0;
   draggingTranslation = false;
   totalSlides = 0;
@@ -51,8 +53,9 @@ export class SliderNoResponsive {
     this.dragging = true;
 
     this.startX =
-      event instanceof MouseEvent ? event.screenX : event.touches[0].screenX;
+      event instanceof MouseEvent ? event.pageX : event.touches[0].pageX;
 
+    this.previousX = this.startX;
     this.carousel.slidesContainer.style.transition = 'none';
   }
 
@@ -66,23 +69,25 @@ export class SliderNoResponsive {
 
     if (this.draggingTranslation && limit) {
       this.computeTransformation(this.currentSlide);
-      this.previousTranslation =
-        this.direction === 'left' && this.currentSlide === 0
-          ? 0
-          : -this.carousel.maxScrollableContent;
     }
   }
 
   getLimitSlide(index: number) {
-    const limit =
-      (this.currentSlide + index) * this.carousel.correctionMultipleSlides +
-      (this.currentSlide + index) * this.carousel.slideWidth;
+    let limit = (this.currentSlide + index) * this.carousel.slideWidthWithGap;
 
-    return limit === 0 ? this.carousel.slideWidthWithGap : limit;
+    if (index === 0) {
+      limit -= this.carousel.slideWidthWithGap;
+    }
+
+    return limit < 0 ? 0 : limit;
   }
 
   getDirection() {
-    this.direction = this.positionChange < 0 ? 'right' : 'left';
+    if (this.previousX > this.currentX) {
+      this.direction = 'right';
+    } else if (this.previousX < this.currentX) {
+      this.direction = 'left';
+    }
   }
 
   updateDirectionNavWithBullet(bullet: number) {
@@ -94,20 +99,25 @@ export class SliderNoResponsive {
   dragMove(event: MouseEvent | TouchEvent) {
     if (!this.dragging) return;
 
-    const XCoordinate =
-      event instanceof MouseEvent
-        ? event.screenX
-        : event.changedTouches[0].screenX;
-    this.positionChange = XCoordinate - this.startX;
+    this.currentX =
+      event instanceof MouseEvent ? event.pageX : event.changedTouches[0].pageX;
+
     this.getDirection();
+    this.previousX = this.currentX;
 
     this.nextLimit = this.getLimitSlide(1);
     this.prevLimit = this.getLimitSlide(0);
+    // console.log(
+    //   this.direction,
+    //   'prev:' + this.prevLimit,
+    //   'next:' + this.nextLimit
+    // );
 
+    this.positionChange = this.currentX - this.startX;
     this.currentTranslation = this.positionChange + this.previousTranslation;
-    console.log(this.currentTranslation);
+    // console.log(this.currentTranslation);
 
-    // First or last slide
+    // First or last slide exceeding limit
     if (
       (this.currentTranslation > this.strechingLimit &&
         this.currentSlide === 0) ||
@@ -117,35 +127,26 @@ export class SliderNoResponsive {
       return;
     }
 
-    // Percent of mouse mouvement to card width
-    const moveComparedToSlide =
-      (this.positionChange / this.carousel.slideWidth) * 100;
-    this.modifyCurrentSlide(moveComparedToSlide);
-
     this.draggingTranslation = true;
     this.carousel.slidesContainer.style.transform = `translate3d(${this.currentTranslation}px, 0, 0)`;
 
+    this.modifyCurrentSlide();
+  }
+
+  modifyCurrentSlide() {
     if (this.autoSlide) {
-      this.autoSlideFn(moveComparedToSlide);
-    }
-  }
+      // Percent of mouse mouvement to card width
+      const moveComparedToSlide =
+        (this.positionChange / this.carousel.slideWidth) * 100;
 
-  autoSlideFn(moveComparedToSlide: number) {
-    if (
-      moveComparedToSlide < -this.slidingLimitBeforeScroll ||
-      moveComparedToSlide > this.slidingLimitBeforeScroll
-    ) {
-      this.computeTransformation(this.currentSlide);
-    }
-  }
+      if (moveComparedToSlide < -this.slidingLimitBeforeScroll) {
+        this.currentSlide++;
+        this.computeTransformation(this.currentSlide);
+      } else if (moveComparedToSlide > this.slidingLimitBeforeScroll) {
+        this.currentSlide--;
+        this.computeTransformation(this.currentSlide);
+      }
 
-  modifyCurrentSlide(moveComparedToSlide: number) {
-    if (
-      this.autoSlide &&
-      moveComparedToSlide < -this.slidingLimitBeforeScroll &&
-      this.currentSlide < this.lastSlide
-    ) {
-      this.currentSlide++;
       return;
     }
 
@@ -173,34 +174,28 @@ export class SliderNoResponsive {
     }
   }
 
+  checkGoingBack() {
+    if (this.currentSlide - this.slideToScroll < 0) {
+      this.currentSlide = 0;
+      return;
+    }
+
+    return (this.currentSlide -= this.slideToScroll);
+  }
+
   previous() {
     this.direction = 'left';
     this.checkGoingBack();
     this.computeTransformation(this.currentSlide);
   }
 
-  checkGoingBack() {
-    // debugger;
-    if (this.currentSlide - 1 < 0) {
-      return;
-    }
-
-    const absTranslation = Math.abs(this.currentTranslation);
-    if (
-      absTranslation < this.nextLimit &&
-      absTranslation > this.prevLimit &&
-      this.direction === 'left' &&
-      this.currentSlide < this.lastSlide
-    ) {
-      return;
-    }
-
-    return this.currentSlide--;
-  }
-
   next() {
     this.direction = 'right';
-    this.computeTransformation(++this.currentSlide);
+
+    (this.currentSlide += this.slideToScroll) > this.lastSlide
+      ? (this.currentSlide = this.lastSlide)
+      : this.currentSlide;
+    this.computeTransformation(this.currentSlide);
   }
 
   computeTransformation(slide: number) {
