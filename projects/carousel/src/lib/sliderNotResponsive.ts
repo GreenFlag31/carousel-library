@@ -13,18 +13,20 @@ export class SliderNotResponsive {
   currentX = 0;
   positionChange = 0;
   draggingTranslation = false;
-  totalSlides = 0;
   prevLimit = 0;
   nextLimit = 0;
-  initialSlideToShow = 1;
   offsetNotResponsive!: number;
 
   constructor(
     private carousel: Carousel,
     private readonly slideToScroll: number,
-    private slidingLimitBeforeScroll: number,
-    private strechingLimit: number,
-    private autoSlide: boolean
+    private readonly slidingLimitBeforeScroll: number,
+    private readonly strechingLimit: number,
+    private readonly autoSlide: boolean,
+    private readonly animationTimingFn: string,
+    private readonly animationTimingMs: number,
+    private readonly enableMouseDrag: boolean,
+    private readonly enableTouch: boolean
   ) {
     this.offset();
   }
@@ -32,13 +34,12 @@ export class SliderNotResponsive {
   offset() {
     this.lastSlide = this.carousel.numberDots - 1;
 
-    // Get N of full cards visible without offset, not responsive mode calculated previously
-    // visible part of the offset in px
+    // visible part of the offset of the card in px
     this.offsetNotResponsive =
       this.carousel.carouselWidth -
       this.carousel.slideDisplayed * this.carousel.slideWidthWithGap -
-      20;
-    // non visible part of the offset
+      this.carousel.paddingCarousel;
+    // non visible part of the offset of the card
     this.offsetNotResponsive =
       this.carousel.slideWidth - this.offsetNotResponsive;
 
@@ -50,6 +51,12 @@ export class SliderNotResponsive {
   }
 
   dragStart(event: MouseEvent | TouchEvent) {
+    if (
+      (event instanceof MouseEvent && !this.enableMouseDrag) ||
+      (event instanceof TouchEvent && !this.enableTouch)
+    )
+      return;
+
     this.dragging = true;
 
     this.startX =
@@ -59,13 +66,19 @@ export class SliderNotResponsive {
     this.carousel.slidesContainer.style.transition = 'none';
   }
 
-  dragStop() {
+  dragStop(event: MouseEvent | TouchEvent) {
+    if (
+      (event instanceof MouseEvent && !this.enableMouseDrag) ||
+      (event instanceof TouchEvent && !this.enableTouch)
+    )
+      return;
+
     this.dragging = false;
 
     this.previousTranslation = this.currentTranslation;
     const limit =
-      (this.currentSlide === 0 && this.currentTranslation > 0) ||
-      (this.currentSlide === this.lastSlide && this.positionChange < 0);
+      (this.currentSlide === 0 && this.direction === 'left') ||
+      (this.currentSlide === this.lastSlide && this.direction === 'right');
 
     if (this.draggingTranslation && limit) {
       this.computeTransformation(this.currentSlide);
@@ -90,14 +103,13 @@ export class SliderNotResponsive {
     }
   }
 
-  updateDirectionNavWithBullet(bullet: number) {
-    this.currentSlide < bullet
-      ? (this.direction = 'right')
-      : (this.direction = 'left');
-  }
-
   dragMove(event: MouseEvent | TouchEvent) {
     if (!this.dragging) return;
+    if (
+      (event instanceof MouseEvent && !this.enableMouseDrag) ||
+      (event instanceof TouchEvent && !this.enableTouch)
+    )
+      return;
 
     this.currentX =
       event instanceof MouseEvent ? event.pageX : event.changedTouches[0].pageX;
@@ -134,7 +146,12 @@ export class SliderNotResponsive {
   }
 
   modifyCurrentSlide() {
-    if (this.autoSlide) {
+    const limit =
+      (this.currentSlide === this.lastSlide - 1 &&
+        this.direction === 'right') ||
+      (this.currentSlide === this.lastSlide && this.direction === 'right'); // && !this.responsive
+
+    if (this.autoSlide && !limit) {
       // Percent of mouse mouvement to card width
       const moveComparedToSlide =
         (this.positionChange / this.carousel.slideWidth) * 100;
@@ -156,6 +173,7 @@ export class SliderNotResponsive {
         this.currentSlide < this.lastSlide)
     ) {
       this.currentSlide++;
+      console.log(this.currentSlide);
     } else if (
       -this.currentTranslation < this.prevLimit &&
       -this.currentTranslation < this.offsetNotResponsive &&
@@ -165,36 +183,30 @@ export class SliderNotResponsive {
     }
   }
 
-  unActiveTab(event: visibilityEvent) {
+  unActiveTab(event: any) {
     if (
       event.target.visibilityState === 'visible' &&
       this.draggingTranslation
     ) {
-      this.dragStop();
+      this.dragStop(event);
     }
   }
 
-  checkGoingBack() {
-    if (this.currentSlide - this.slideToScroll < 0) {
-      this.currentSlide = 0;
-      return;
-    }
-
-    return (this.currentSlide -= this.slideToScroll);
-  }
-
-  previous() {
+  prev() {
     this.direction = 'left';
-    this.checkGoingBack();
+    if ((this.currentSlide -= this.slideToScroll) < 0) {
+      this.currentSlide = 0;
+    }
+
     this.computeTransformation(this.currentSlide);
   }
 
   next() {
     this.direction = 'right';
+    if ((this.currentSlide += this.slideToScroll) > this.lastSlide) {
+      this.currentSlide = this.lastSlide;
+    }
 
-    (this.currentSlide += this.slideToScroll) > this.lastSlide
-      ? (this.currentSlide = this.lastSlide)
-      : this.currentSlide;
     this.computeTransformation(this.currentSlide);
   }
 
@@ -210,7 +222,7 @@ export class SliderNotResponsive {
   }
 
   changeSlide(transformation: number) {
-    this.carousel.slidesContainer.style.transition = `transform 0.3s ease-out`;
+    this.carousel.slidesContainer.style.transition = `transform ${this.animationTimingMs}ms ${this.animationTimingFn}`;
 
     this.carousel.slidesContainer.style.transform = `translate3d(${-transformation}px, 0, 0)`;
 
@@ -221,7 +233,9 @@ export class SliderNotResponsive {
   }
 
   goTo(bullet: number) {
-    this.updateDirectionNavWithBullet(bullet);
+    this.currentSlide < bullet
+      ? (this.direction = 'right')
+      : (this.direction = 'left');
     this.currentSlide = bullet;
     this.computeTransformation(bullet);
   }

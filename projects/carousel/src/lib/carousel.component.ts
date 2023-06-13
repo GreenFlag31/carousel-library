@@ -12,7 +12,7 @@ import { SliderNotResponsive } from './sliderNotResponsive';
   styleUrls: ['./carousel.component.css'],
 })
 export class CarouselComponent implements OnInit {
-  @Input() maxWidth!: number;
+  @Input() maxWidthCarousel!: number;
   @Input() slideToShow = 3;
   @Input() slideToScroll = 1;
   @Input() slidingLimitBeforeScroll = 30;
@@ -21,12 +21,15 @@ export class CarouselComponent implements OnInit {
   @Input() slideMinWidth = 300;
   @Input() dots = true;
   @Input() arrows = true;
-  @Input() counter = false;
+  @Input() counter = true;
+  @Input() counterSeparator = '/';
   @Input() gapBetweenSlides = 16;
   @Input() animationTimingMs = 300;
   @Input() animationTimingFn: AnimationTimingFn = 'ease-out';
-  @Input() responsive = false;
+  @Input() responsive = true;
   @Input() autoSlide = true;
+  @Input() enableMouseDrag = true;
+  @Input() enableTouch = true;
   mouseupSubscription!: Subscription;
   VChangeSubscription!: Subscription;
   resizeSubscription!: Subscription;
@@ -42,6 +45,7 @@ export class CarouselComponent implements OnInit {
 
     this.carousel = new Carousel(
       carouselContainer,
+      this.maxWidthCarousel,
       this.slideToShow,
       this.slideMinWidth,
       this.slideWidth,
@@ -55,14 +59,22 @@ export class CarouselComponent implements OnInit {
           this.slideToScroll,
           this.slidingLimitBeforeScroll,
           this.strechingLimit,
-          this.autoSlide
+          this.autoSlide,
+          this.animationTimingFn,
+          this.animationTimingMs,
+          this.enableMouseDrag,
+          this.enableTouch
         )
       : new SliderNotResponsive(
           this.carousel,
           this.slideToScroll,
           this.slidingLimitBeforeScroll,
           this.strechingLimit,
-          this.autoSlide
+          this.autoSlide,
+          this.animationTimingFn,
+          this.animationTimingMs,
+          this.enableMouseDrag,
+          this.enableTouch
         );
 
     // this.helper = new Helper(this.carousel, this.slider);
@@ -70,11 +82,13 @@ export class CarouselComponent implements OnInit {
   }
 
   listeners() {
-    this.mouseupSubscription = fromEvent(window, 'mouseup').subscribe(() => {
-      if (!this.slider.dragging) return;
+    this.mouseupSubscription = fromEvent(window, 'mouseup').subscribe(
+      (event: any) => {
+        if (!this.slider.dragging) return;
 
-      this.slider.dragStop();
-    });
+        this.slider.dragStop(event);
+      }
+    );
     this.VChangeSubscription = fromEvent(
       document,
       'visibilitychange'
@@ -90,12 +104,12 @@ export class CarouselComponent implements OnInit {
   }
 
   resize() {
-    this.carousel.updateProperties();
     if (this.slider.currentSlide > 0) {
       this.slider.currentSlide = 0;
       this.slider.computeTransformation(0);
     }
 
+    this.carousel.updateProperties();
     if (this.slider instanceof SliderNotResponsive) {
       this.slider.offset();
     } else {

@@ -1,24 +1,21 @@
 .carousel-container {
   position: relative;
-  overflow: hidden;
-  margin: 10em auto;
+  overflow-x: hidden;
+  margin: 13em auto;
   padding: 0.625em;
-  width: 100%;
 }
 .slides-container {
-  /* display: flex; */
-  /* justify-content: space-around; */
   display: grid;
   grid-auto-flow: column;
-  /* gap: 1em; */
   transform: translate3d(0, 0, 0);
+  margin: auto;
 }
 .section-title {
   text-align: center;
   padding: 0.625em;
 }
 
-.previous,
+.prev,
 .next {
   display: none;
   position: absolute;
@@ -30,10 +27,10 @@
   z-index: 1;
   transition: opacity 0.3s;
   border: none;
-  outline: none;
+  /* outline: none; */
   background: none;
 }
-.previous:disabled,
+.prev:disabled,
 .next:disabled {
   opacity: 0.3;
   cursor: not-allowed;
@@ -52,13 +49,14 @@
   display: block;
   width: 0.8rem;
   height: 0.8rem;
+  border: none;
   border-radius: 50%;
   background: #dbdada;
   cursor: pointer;
   transition: background-color 0.4s;
 }
 .bullet.current {
-  background: var(--primary-color-3);
+  background: #0079b4;
 }
 ::ng-deep .carousel-slide {
   /* width: 15%; */
@@ -66,24 +64,36 @@
   width: 100%;
   border-radius: 1em;
   box-shadow: 0px 2px 4px 0px rgb(158 158 158 / 83%);
-  /* max-width: 600px; */
   user-select: none;
 }
-::ng-deep .carousel-slide.dragging {
+::ng-deep .slides-container.dragging {
   cursor: grab;
+}
+.counter-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.5em;
+}
+.counter {
+  background: lightgray;
+  padding: 0.3em 0.7em;
+  border-radius: 1em;
+  z-index: 1;
+  min-width: 3.75em;
+  text-align: center;
 }
 
 @media (min-width: 650px) {
-  .previous,
+  .prev,
   .next {
     display: inline-block;
-    background: var(--primary-color-3);
+    background: #0079b4;
     padding: 0.4em 0.5em;
     color: white;
     border-radius: 0.3em;
     box-shadow: 0px 2px 4px 0px rgb(158 158 158 / 83%);
   }
-  .previous {
+  .prev {
     margin-left: 2em;
   }
   .next {
@@ -91,7 +101,7 @@
   }
 }
 @media (min-width: 800px) {
-  .previous {
+  .prev {
     margin-left: 3em;
   }
   .next {

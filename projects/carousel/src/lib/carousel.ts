@@ -6,16 +6,16 @@ export class Carousel {
   arrayNumberDots!: number[];
   slidesContainer!: HTMLDivElement;
   maxScrollableContent = 0;
-  correctionMultipleSlides = 0;
   totalSlides = 0;
   initialSlideToShow = 1;
   paddingCarousel = 0;
   carouselWidth!: number;
-  minWidthSlideContainer!: number;
+  widthSlideContainer!: number;
   slideDisplayed = 1;
 
   constructor(
     private carousel: HTMLDivElement,
+    private maxWidthCarousel: number,
     private slideToShow: number,
     private minWidthSlide: number,
     private width: number,
@@ -31,13 +31,11 @@ export class Carousel {
     this.slidesContainer = this.selectSlideContainer();
     this.slides = this.selectSlides();
     this.totalSlides = this.slides.length;
-    this.numberDots = this.setNumberDots();
-    this.arrayNumberDots = [...Array(this.numberDots).keys()];
     this.setWidthSlides();
-    this.correctionMultipleSlides = this.multipleSlides() ? this.gap : 0;
-    this.slideWidth = this.slides[0].offsetWidth;
+    this.setMaxWidthCarousel();
     this.updateProperties();
     this.slidesContainer.style.gap = this.gap + 'px';
+    this.setDraggableImgToFalse();
   }
 
   setWidthSlides() {
@@ -57,67 +55,81 @@ export class Carousel {
     }
     this.numberDots = this.setNumberDots();
     this.arrayNumberDots = [...Array(this.numberDots).keys()];
-    // this.setMaxWidthCarousel();
     if (this.responsive) this.setAutoColumnSlideContainer();
-    this.slideWidth = this.slides[0].offsetWidth;
 
-    this.slideWidthWithGap = this.slideWidth + this.correctionMultipleSlides;
-    this.setMinWidthSlideContainer();
+    this.slideWidthWithGap = this.slideWidth + this.gap;
+    this.setWidthSlideContainer();
     this.maxScrollableContent = this.getMaxScroll();
   }
 
   updateSlideToShow() {
-    if (window.innerWidth <= 632) {
-      this.slideToShow = 1;
-    } else if (window.innerWidth <= 932) {
-      this.slideToShow = this.initialSlideToShow - 1;
-    } else {
-      this.slideToShow = this.initialSlideToShow;
+    // Only responsive mode
+    const minWidthPlusGap = this.minWidthSlide + this.gap;
+
+    let slideFitting = 1;
+    let referenceWidth = this.maxWidthCarousel || window.innerWidth;
+    if (this.maxWidthCarousel > window.innerWidth) {
+      referenceWidth = window.innerWidth;
     }
+
+    while (referenceWidth > minWidthPlusGap * slideFitting) {
+      slideFitting++;
+    }
+    slideFitting--;
+    this.determineSlideToShow(slideFitting);
+  }
+
+  determineSlideToShow(slideFitting: number) {
+    if (slideFitting > this.totalSlides) {
+      this.slideToShow = this.totalSlides;
+    } else if (slideFitting === 0) {
+      this.slideToShow = 1;
+    } else {
+      this.slideToShow = slideFitting;
+    }
+
+    console.log(this.slideToShow);
   }
 
   updateSlideDisplayed() {
+    this.slideWidth = this.slides[0].offsetWidth;
     this.slideDisplayed = 1;
-    // Get N of FULL CARDS visible without offset, not responsive mode
+    // Get number of FULL CARDS visible without offset, not responsive mode
     while (this.carouselWidth > this.slideDisplayed * this.slideWidth) {
       this.slideDisplayed++;
     }
     this.slideDisplayed--;
-
-    this.slideToShow = this.slideDisplayed;
+    this.determineSlideToShow(this.slideDisplayed);
   }
 
   getPaddingCarousel() {
     const padding = window
       .getComputedStyle(this.carousel)
-      .getPropertyValue('padding');
+      .getPropertyValue('padding-left');
     return parseFloat(padding) * 2;
   }
 
   setMaxWidthCarousel() {
-    this.slideWidth = this.slides[0].offsetWidth;
-    this.carousel.style.maxWidth =
-      this.slideToShow * this.slideWidth +
-      this.minSlideToShowValue() * this.gap +
-      this.paddingCarousel +
-      'px';
+    this.carousel.style.maxWidth = this.maxWidthCarousel + 'px';
   }
 
   setAutoColumnSlideContainer() {
     const widthCarousel =
-      this.carousel.clientWidth -
+      this.carouselWidth -
       this.paddingCarousel -
-      (this.slideToShow - 1) * this.correctionMultipleSlides;
+      (this.slideToShow - 1) * this.gap;
 
     this.slidesContainer.style.gridAutoColumns =
       widthCarousel / this.slideToShow + 'px';
+
+    this.slideWidth = this.slides[0].offsetWidth;
   }
 
-  setMinWidthSlideContainer() {
-    this.minWidthSlideContainer =
-      this.totalSlides * this.slideWidth +
-      (this.totalSlides - 1) * this.correctionMultipleSlides;
-    this.slidesContainer.style.minWidth = this.minWidthSlideContainer + 'px';
+  setWidthSlideContainer() {
+    // otherwise non visible gaps of non visible cards will not be scrollable
+    this.widthSlideContainer =
+      this.totalSlides * this.slideWidth + (this.totalSlides - 1) * this.gap;
+    this.slidesContainer.style.width = this.widthSlideContainer + 'px';
   }
 
   selectSlides(): NodeListOf<HTMLDivElement> {
@@ -137,18 +149,19 @@ export class Carousel {
   }
 
   setNumberDots() {
-    return this.multipleSlides()
+    return this.slideToShow > 1
       ? this.totalSlides - this.slideToShow + 1
       : this.totalSlides;
   }
 
   getMaxScroll() {
-    return (
-      (this.numberDots - 1) * (this.slideWidth + this.correctionMultipleSlides)
-    );
+    return (this.numberDots - 1) * this.slideWidthWithGap;
   }
 
-  multipleSlides() {
-    return this.slideToShow > 1;
+  setDraggableImgToFalse() {
+    const images = this.slidesContainer.querySelectorAll('img');
+    images?.forEach((image) => {
+      image.setAttribute('draggable', 'false');
+    });
   }
 }

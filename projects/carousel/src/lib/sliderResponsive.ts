@@ -13,7 +13,6 @@ export class SliderResponsive {
   currentX = 0;
   positionChange = 0;
   draggingTranslation = false;
-  totalSlides = 0;
   prevLimit = 0;
   nextLimit = 0;
   initialSlideToShow = 1;
@@ -21,9 +20,13 @@ export class SliderResponsive {
   constructor(
     private carousel: Carousel,
     private readonly slideToScroll: number,
-    private slidingLimitBeforeScroll: number,
-    private strechingLimit: number,
-    private autoSlide: boolean
+    private readonly slidingLimitBeforeScroll: number,
+    private readonly strechingLimit: number,
+    private readonly autoSlide: boolean,
+    private readonly animationTimingFn: string,
+    private readonly animationTimingMs: number,
+    private readonly enableMouseDrag: boolean,
+    private readonly enableTouch: boolean
   ) {
     this.init();
   }
@@ -33,6 +36,12 @@ export class SliderResponsive {
   }
 
   dragStart(event: MouseEvent | TouchEvent) {
+    if (
+      (event instanceof MouseEvent && !this.enableMouseDrag) ||
+      (event instanceof TouchEvent && !this.enableTouch)
+    )
+      return;
+
     this.dragging = true;
 
     this.startX =
@@ -42,13 +51,19 @@ export class SliderResponsive {
     this.carousel.slidesContainer.style.transition = 'none';
   }
 
-  dragStop() {
+  dragStop(event: MouseEvent | TouchEvent) {
+    if (
+      (event instanceof MouseEvent && !this.enableMouseDrag) ||
+      (event instanceof TouchEvent && !this.enableTouch)
+    )
+      return;
+
     this.dragging = false;
 
     this.previousTranslation = this.currentTranslation;
     const limit =
-      (this.currentSlide === 0 && this.currentTranslation > 0) ||
-      (this.currentSlide === this.lastSlide && this.positionChange < 0);
+      (this.currentSlide === 0 && this.direction === 'left') ||
+      (this.currentSlide === this.lastSlide && this.direction === 'right');
 
     if (this.draggingTranslation && limit) {
       this.computeTransformation(this.currentSlide);
@@ -74,6 +89,12 @@ export class SliderResponsive {
   }
 
   dragMove(event: MouseEvent | TouchEvent) {
+    if (
+      (event instanceof MouseEvent && !this.enableMouseDrag) ||
+      (event instanceof TouchEvent && !this.enableTouch)
+    )
+      return;
+
     if (!this.dragging) return;
 
     this.currentX =
@@ -106,6 +127,7 @@ export class SliderResponsive {
 
     this.draggingTranslation = true;
     this.carousel.slidesContainer.style.transform = `translate3d(${this.currentTranslation}px, 0, 0)`;
+
     this.modifyCurrentSlide();
   }
 
@@ -136,55 +158,30 @@ export class SliderResponsive {
     }
   }
 
-  unActiveTab(event: visibilityEvent) {
+  unActiveTab(event: any) {
     if (
       event.target.visibilityState === 'visible' &&
       this.draggingTranslation
     ) {
-      this.dragStop();
+      this.dragStop(event);
     }
   }
 
-  previous() {
+  prev() {
     this.direction = 'left';
-    this.checkGoingBack();
+    if ((this.currentSlide -= this.slideToScroll) < 0) {
+      this.currentSlide = 0;
+    }
+
     this.computeTransformation(this.currentSlide);
   }
 
-  checkGoingBack() {
-    // debugger;
-    if (this.currentSlide - this.slideToScroll < 0) {
-      this.currentSlide = 0;
-      return;
-    }
-
-    // if (!this.autoSlide) {
-    //   if (this.goingBackNoAutoSlide()) return;
-    // }
-
-    return (this.currentSlide -= this.slideToScroll);
-  }
-
-  // goingBackNoAutoSlide() {
-  //   const absTranslation = Math.abs(this.currentTranslation);
-  //   if (
-  //     absTranslation < this.nextLimit &&
-  //     absTranslation > this.prevLimit &&
-  //     this.direction === 'left'
-  //   ) {
-  //     this.currentSlide = this.currentSlide - this.slideToScroll + 1;
-  //     return true;
-  //   }
-
-  //   return false;
-  // }
-
   next() {
     this.direction = 'right';
+    if ((this.currentSlide += this.slideToScroll) > this.lastSlide) {
+      this.currentSlide = this.lastSlide;
+    }
 
-    (this.currentSlide += this.slideToScroll) > this.lastSlide
-      ? (this.currentSlide = this.lastSlide)
-      : this.currentSlide;
     this.computeTransformation(this.currentSlide);
   }
 
@@ -195,7 +192,7 @@ export class SliderResponsive {
   }
 
   changeSlide(transformation: number) {
-    this.carousel.slidesContainer.style.transition = `transform 0.3s ease-out`;
+    this.carousel.slidesContainer.style.transition = `transform ${this.animationTimingMs}ms ${this.animationTimingFn}`;
 
     this.carousel.slidesContainer.style.transform = `translate3d(${-transformation}px, 0, 0)`;
 
@@ -206,14 +203,10 @@ export class SliderResponsive {
   }
 
   goTo(bullet: number) {
-    this.updateDirectionNavWithBullet(bullet);
-    this.currentSlide = bullet;
-    this.computeTransformation(bullet);
-  }
-
-  updateDirectionNavWithBullet(bullet: number) {
     this.currentSlide < bullet
       ? (this.direction = 'right')
       : (this.direction = 'left');
+    this.currentSlide = bullet;
+    this.computeTransformation(bullet);
   }
 }

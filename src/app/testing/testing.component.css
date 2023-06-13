@@ -28,3 +28,7 @@
   border-radius: 1em;
   height: 200px;
 }
+/* ::ng-deep .carousel-container .previous,
+::ng-deep .carousel-container .next {
+  background: red !important;
+} */
