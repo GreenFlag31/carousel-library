@@ -16,11 +16,12 @@ export class Carousel {
   constructor(
     private carousel: HTMLDivElement,
     private maxWidthCarousel: number,
-    private slideToShow: number,
+    public slideToShow: number,
     private minWidthSlide: number,
     private width: number,
     private gap: number,
-    private responsive: boolean
+    private responsive: boolean,
+    private loop: boolean
   ) {
     this.init();
   }
@@ -80,18 +81,15 @@ export class Carousel {
   }
 
   determineSlideToShow(slideFitting: number) {
-    if (slideFitting > this.totalSlides) {
-      this.slideToShow = this.totalSlides;
-    } else if (slideFitting === 0) {
+    if (slideFitting === 0) {
       this.slideToShow = 1;
-    } else {
+    } else if (slideFitting <= this.initialSlideToShow) {
       this.slideToShow = slideFitting;
     }
-
-    console.log(this.slideToShow);
   }
 
   updateSlideDisplayed() {
+    // Only to determine number of dots
     this.slideWidth = this.slides[0].offsetWidth;
     this.slideDisplayed = 1;
     // Get number of FULL CARDS visible without offset, not responsive mode
@@ -149,6 +147,11 @@ export class Carousel {
   }
 
   setNumberDots() {
+    // if loop (infinite) then totalSlides ?
+    if (this.loop) {
+      return this.totalSlides;
+    }
+
     return this.slideToShow > 1
       ? this.totalSlides - this.slideToShow + 1
       : this.totalSlides;

@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit } from '@angular/core';
+import { Component, Directive, ElementRef, Input, OnInit } from '@angular/core';
 import { Subscription, fromEvent } from 'rxjs';
 import { Carousel } from './carousel';
 import { AnimationTimingFn } from './interfaces';
@@ -22,14 +22,15 @@ export class CarouselComponent implements OnInit {
   @Input() dots = true;
   @Input() arrows = true;
   @Input() counter = true;
+  @Input() loop = true;
+  @Input() enableMouseDrag = true;
+  @Input() enableTouch = true;
   @Input() counterSeparator = '/';
   @Input() gapBetweenSlides = 16;
   @Input() animationTimingMs = 300;
   @Input() animationTimingFn: AnimationTimingFn = 'ease-out';
   @Input() responsive = true;
-  @Input() autoSlide = true;
-  @Input() enableMouseDrag = true;
-  @Input() enableTouch = true;
+  @Input() autoSlide = false;
   mouseupSubscription!: Subscription;
   VChangeSubscription!: Subscription;
   resizeSubscription!: Subscription;
@@ -50,7 +51,8 @@ export class CarouselComponent implements OnInit {
       this.slideMinWidth,
       this.slideWidth,
       this.gapBetweenSlides,
-      this.responsive
+      this.responsive,
+      this.loop
     );
 
     this.slider = this.responsive
@@ -63,7 +65,8 @@ export class CarouselComponent implements OnInit {
           this.animationTimingFn,
           this.animationTimingMs,
           this.enableMouseDrag,
-          this.enableTouch
+          this.enableTouch,
+          this.loop
         )
       : new SliderNotResponsive(
           this.carousel,
@@ -74,7 +77,8 @@ export class CarouselComponent implements OnInit {
           this.animationTimingFn,
           this.animationTimingMs,
           this.enableMouseDrag,
-          this.enableTouch
+          this.enableTouch,
+          this.loop
         );
 
     // this.helper = new Helper(this.carousel, this.slider);
@@ -105,16 +109,28 @@ export class CarouselComponent implements OnInit {
 
   resize() {
     if (this.slider.currentSlide > 0) {
+      if (this.loop && this.slider instanceof SliderResponsive) {
+        let times =
+          Math.abs(this.slider.counterNextInf) % this.carousel.totalSlides;
+
+        times =
+          this.slider.counterNextInf > 0
+            ? times
+            : this.carousel.totalSlides - times;
+
+        if (this.slider.counterNextInf !== 0) {
+          this.slider.direction = 'left';
+          this.slider.prependOrAppendNTimesElement(times);
+          this.slider.counterNextInf = 0;
+        }
+      }
+
       this.slider.currentSlide = 0;
       this.slider.computeTransformation(0);
     }
 
     this.carousel.updateProperties();
-    if (this.slider instanceof SliderNotResponsive) {
-      this.slider.offset();
-    } else {
-      this.slider.init();
-    }
+    this.slider.updateProperties();
   }
 
   ngOnDestroy() {

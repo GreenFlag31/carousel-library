@@ -10,3 +10,7 @@ export type AnimationTimingFn =
   | 'ease-in'
   | 'ease-out'
   | 'ease-in-out';
+
+export type prependOrAppend = 'prepend' | 'append';
+
+export type changeType = 'arrow' | 'mouse';

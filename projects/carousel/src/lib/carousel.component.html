@@ -11,7 +11,9 @@
     class="prev"
     *ngIf="arrows"
     (click)="slider.prev()"
-    [disabled]="slider.currentSlide === 0 && slider.currentTranslation >= 0"
+    [disabled]="
+      slider.currentSlide === 0 && slider.currentTranslation >= 0 && !loop
+    "
   >
     <i class="fa-solid fa-arrow-left-long"></i>
   </button>
@@ -33,7 +35,8 @@
     (click)="slider.next()"
     [disabled]="
       slider.currentSlide === carousel.numberDots - 1 &&
-      slider.currentTranslation <= -carousel.maxScrollableContent
+      slider.currentTranslation <= -carousel.maxScrollableContent &&
+      !loop
     "
   >
     <i class="fa-solid fa-arrow-right-long"></i>

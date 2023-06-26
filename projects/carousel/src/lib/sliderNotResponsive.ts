@@ -26,12 +26,13 @@ export class SliderNotResponsive {
     private readonly animationTimingFn: string,
     private readonly animationTimingMs: number,
     private readonly enableMouseDrag: boolean,
-    private readonly enableTouch: boolean
+    private readonly enableTouch: boolean,
+    private readonly loop: boolean
   ) {
-    this.offset();
+    this.updateProperties();
   }
 
-  offset() {
+  updateProperties() {
     this.lastSlide = this.carousel.numberDots - 1;
 
     // visible part of the offset of the card in px
@@ -51,11 +52,7 @@ export class SliderNotResponsive {
   }
 
   dragStart(event: MouseEvent | TouchEvent) {
-    if (
-      (event instanceof MouseEvent && !this.enableMouseDrag) ||
-      (event instanceof TouchEvent && !this.enableTouch)
-    )
-      return;
+    if (this.currentEventIsDisabled(event)) return;
 
     this.dragging = true;
 
@@ -67,11 +64,7 @@ export class SliderNotResponsive {
   }
 
   dragStop(event: MouseEvent | TouchEvent) {
-    if (
-      (event instanceof MouseEvent && !this.enableMouseDrag) ||
-      (event instanceof TouchEvent && !this.enableTouch)
-    )
-      return;
+    if (this.currentEventIsDisabled(event)) return;
 
     this.dragging = false;
 
@@ -103,13 +96,20 @@ export class SliderNotResponsive {
     }
   }
 
-  dragMove(event: MouseEvent | TouchEvent) {
-    if (!this.dragging) return;
+  currentEventIsDisabled(event: MouseEvent | TouchEvent) {
     if (
       (event instanceof MouseEvent && !this.enableMouseDrag) ||
       (event instanceof TouchEvent && !this.enableTouch)
-    )
-      return;
+    ) {
+      return true;
+    }
+
+    return false;
+  }
+
+  dragMove(event: MouseEvent | TouchEvent) {
+    if (!this.dragging) return;
+    if (this.currentEventIsDisabled(event)) return;
 
     this.currentX =
       event instanceof MouseEvent ? event.pageX : event.changedTouches[0].pageX;
