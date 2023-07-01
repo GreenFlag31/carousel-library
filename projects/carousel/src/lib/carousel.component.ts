@@ -1,4 +1,4 @@
-import { Component, Directive, ElementRef, Input, OnInit } from '@angular/core';
+import { Component, ElementRef, Input, OnInit } from '@angular/core';
 import { Subscription, fromEvent } from 'rxjs';
 import { Carousel } from './carousel';
 import { AnimationTimingFn } from './interfaces';
@@ -14,7 +14,7 @@ import { SliderNotResponsive } from './sliderNotResponsive';
 export class CarouselComponent implements OnInit {
   @Input() maxWidthCarousel!: number;
   @Input() slideToShow = 3;
-  @Input() slideToScroll = 1;
+  @Input() slideToScroll = 2;
   @Input() slidingLimitBeforeScroll = 30;
   @Input() strechingLimit = 60;
   @Input() slideWidth = 300;
@@ -30,7 +30,7 @@ export class CarouselComponent implements OnInit {
   @Input() animationTimingMs = 300;
   @Input() animationTimingFn: AnimationTimingFn = 'ease-out';
   @Input() responsive = true;
-  @Input() autoSlide = false;
+  @Input() autoSlide = true;
   mouseupSubscription!: Subscription;
   VChangeSubscription!: Subscription;
   resizeSubscription!: Subscription;
@@ -100,31 +100,23 @@ export class CarouselComponent implements OnInit {
       this.slider.unActiveTab(event);
     });
 
-    this.resizeSubscription = fromEvent(window, 'resize')
-      // .pipe(debounceTime(300))
-      .subscribe(() => {
-        this.resize();
-      });
+    this.resizeSubscription = fromEvent(window, 'resize').subscribe(() => {
+      this.resize();
+    });
   }
 
   resize() {
-    if (this.slider.currentSlide > 0) {
-      if (this.loop && this.slider instanceof SliderResponsive) {
-        let times =
-          Math.abs(this.slider.counterNextInf) % this.carousel.totalSlides;
-
-        times =
-          this.slider.counterNextInf > 0
-            ? times
-            : this.carousel.totalSlides - times;
-
-        if (this.slider.counterNextInf !== 0) {
-          this.slider.direction = 'left';
-          this.slider.prependOrAppendNTimesElement(times);
-          this.slider.counterNextInf = 0;
-        }
+    if (
+      this.carousel.selectSlides().length > this.carousel.totalSlides ||
+      this.slider.currentSlide > 0
+    ) {
+      if (this.loop) {
+        this.carousel.slidesContainer.replaceChildren(
+          ...this.carousel.arrayOfSlides
+        );
       }
 
+      // put back to start
       this.slider.currentSlide = 0;
       this.slider.computeTransformation(0);
     }

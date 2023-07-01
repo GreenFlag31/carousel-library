@@ -1,5 +1,4 @@
 import { Carousel } from './carousel';
-import { prependOrAppend } from './interfaces';
 
 export class SliderResponsive {
   dragging = false;
@@ -14,18 +13,23 @@ export class SliderResponsive {
   positionChange = 0;
   draggingTranslation = false;
   prevLimit = 0;
+  currentLimit = 0;
   nextLimit = 0;
+  marginForCurrentLimit = 0;
   slideContainer!: HTMLDivElement;
-  fromLastSlide = false;
-  fromFirstSlide = false;
-  numberOfTranslations = 0;
-  oneTranslationBeforeMax = 0;
+  arrayOfSlides!: HTMLDivElement[];
+  totalAmountOfSlides!: number;
   maxTranslationValue = 0;
+  lastSlideOffset = 0;
+  totalSlides = 0;
+  DOMLimitReached = false;
+  offsetBetweenSlides = 0;
+  MAX_DOM_SIZE = 4;
 
   constructor(
     private carousel: Carousel,
     private readonly slideToScroll: number,
-    private readonly slidingLimitBeforeScroll: number,
+    private readonly LIMIT_AUTO_SLIDE: number,
     private readonly strechingLimit: number,
     private readonly autoSlide: boolean,
     private readonly animationTimingFn: string,
@@ -34,41 +38,40 @@ export class SliderResponsive {
     private readonly enableTouch: boolean,
     private readonly loop: boolean
   ) {
-    this.slideContainer = this.carousel.slidesContainer;
+    this.initProperties();
 
     this.updateProperties();
-    this.setUpPrevAndNextLimit();
-    this.oneTranslationBeforeMax = this.getOneTranslationBeforeMaxTranslation();
+    this.setUpNextLimit();
+  }
+
+  initProperties() {
+    this.slideContainer = this.carousel.slidesContainer;
+    this.arrayOfSlides = this.carousel.arrayOfSlides;
+
+    this.totalSlides = this.carousel.totalSlides;
+    this.totalAmountOfSlides = this.totalSlides;
+
     this.maxTranslationValue =
-      this.oneTranslationBeforeMax + carousel.slideWidthWithGap;
+      this.totalAmountOfSlides * this.carousel.slideWidthWithGap;
+    this.offsetBetweenSlides =
+      this.carousel.slideToShow - 1 > 0 ? this.carousel.slideToShow - 1 : 1;
+
+    this.lastSlideOffset =
+      this.slideContainer.clientWidth -
+      this.carousel.slideToShow * this.carousel.slideWidthWithGap +
+      this.carousel.gap;
   }
 
   updateProperties() {
     this.lastSlide = this.carousel.numberDots - 1;
   }
 
-  getOneTranslationBeforeMaxTranslation() {
-    // starting at 0 and  - 1 because 0 indexed
-    return (
-      (this.carousel.totalSlides - this.carousel.slideToShow - 1) *
-      this.carousel.slideWidthWithGap
+  setUpNextLimit() {
+    this.nextLimit = Math.floor(this.carousel.slideWidthWithGap);
+
+    this.marginForCurrentLimit = Math.floor(
+      this.carousel.slideWidthWithGap / 2
     );
-  }
-
-  setUpPrevAndNextLimit() {
-    this.prevLimit = 0;
-    this.nextLimit = this.carousel.slideWidthWithGap;
-
-    // si infini alors une fenetre en plus
-    // {0: 0, 1: 382, 2: 764, 3: 1146}
-    // currentSlide 0 et currentTranslation > 382 alors ++
-    // currentSlide 1 et currentTranslation === 0 alors --
-    // switch case ?
-    // si on se déplace (+2 par exemple) alors tout + 2 sauf + 1 pour ceux qui dépassent car slide en plus en infini
-    // exemple avec 3
-    // 3 + 2 = 5
-    // 5 % 4 = 1
-    // 1 - 1 = 0
   }
 
   dragStart(event: MouseEvent | TouchEvent) {
@@ -118,8 +121,8 @@ export class SliderResponsive {
   }
 
   dragMove(event: MouseEvent | TouchEvent) {
-    if (!this.dragging) return;
     if (this.currentEventIsDisabled(event)) return;
+    if (!this.dragging) return;
 
     this.currentX =
       event instanceof MouseEvent ? event.pageX : event.changedTouches[0].pageX;
@@ -156,21 +159,24 @@ export class SliderResponsive {
     const moveComparedToSlide =
       (this.positionChange / this.carousel.slideWidth) * 100;
 
-    if (moveComparedToSlide < -this.slidingLimitBeforeScroll) {
+    if (moveComparedToSlide < -this.LIMIT_AUTO_SLIDE) {
+      // to the right
       this.changeOnlySlideNumber(1);
-      if (this.counterNextInf < 0) {
-        // loop enabled and next slide
-        const transformation =
-          -this.previousTranslation + this.carousel.slideWidthWithGap;
-        this.changeSlide(transformation);
+      if (this.loop) {
+        const actualSlide = this.findCurrentSlideNumber();
+        this.computeTransformation(actualSlide + 1);
+        this.changePrevAndNextLimits(actualSlide + 1);
         return;
       }
       this.computeTransformation(this.currentSlide);
-    } else if (moveComparedToSlide > this.slidingLimitBeforeScroll) {
-      // loop enabled and new slide
+    } else if (moveComparedToSlide > this.LIMIT_AUTO_SLIDE) {
+      // to the left
       this.changeOnlySlideNumber(1);
-      if (this.counterNextInf < 0) {
-        this.changeSlide(0);
+      if (this.loop) {
+        // debugger;
+        const actualSlide = this.findCurrentSlideNumber();
+        this.computeTransformation(actualSlide - 1);
+        this.changePrevAndNextLimits(actualSlide - 1);
         return;
       }
 
@@ -178,83 +184,181 @@ export class SliderResponsive {
     }
   }
 
-  addOneSlideNextInf() {
-    this.prependOrAppendNTimesElement(1);
+  appendOrPrependNElements() {
+    if (this.direction === 'left') {
+      for (let i = this.arrayOfSlides.length - 1; i >= 0; i--) {
+        const clonedElement = this.arrayOfSlides[i].cloneNode(true);
+        this.slideContainer.prepend(clonedElement);
+      }
 
-    let translation =
-      -this.previousTranslation - this.carousel.slideWidthWithGap;
+      this.resetViewLeftDirection();
+    } else {
+      for (let i = 0; i < this.arrayOfSlides.length; i++) {
+        const clonedElement = this.arrayOfSlides[i].cloneNode(true);
+        this.slideContainer.append(clonedElement);
+      }
+    }
+
+    if (this.totalAmountOfSlides >= this.MAX_DOM_SIZE * this.totalSlides) {
+      // add a limit for DOM growth, max X times original DOM
+      this.limitDOMGrowth();
+      this.DOMLimitReached = true;
+    } else {
+      this.totalAmountOfSlides += this.totalSlides;
+      this.DOMLimitReached = false;
+      this.updateSlideContainerWidth();
+    }
+  }
+
+  limitDOMGrowth() {
+    const slides = this.carousel.selectSlides();
+
+    if (this.direction === 'right') {
+      for (let i = 0; i < 5; i++) {
+        slides[i].remove();
+      }
+
+      this.resetViewRightDirection();
+    } else {
+      for (let i = slides.length - 1; i > slides.length - 5 - 1; i--) {
+        slides[i].remove();
+      }
+
+      this.resetViewLeftDirection();
+    }
+  }
+
+  resetViewLeftDirection() {
+    const translation = this.maxTranslationValue - this.previousTranslation;
+    this.slideContainer.style.transition = 'none';
+    this.slideContainer.style.transform = `translate3d(${-translation}px, 0, 0)`;
+    this.slideContainer.offsetHeight;
+  }
+
+  resetViewRightDirection() {
+    const translation =
+      this.currentTranslation +
+      this.totalSlides * this.carousel.slideWidthWithGap;
+    this.slideContainer.style.transition = 'none';
+    this.slideContainer.style.transform = `translate3d(${translation}px, 0, 0)`;
+    this.previousTranslation = translation - this.positionChange;
+    this.slideContainer.offsetHeight;
+  }
+
+  updateSlideContainerWidth() {
+    // update slideContainer Width
+    // 1 gap less than the n of slides, 4 gaps for 5 slides
+    const totalSlidesContainerWidth =
+      this.carousel.slidesContainer.clientWidth +
+      this.totalSlides * this.carousel.slideWidthWithGap;
+
+    this.carousel.slidesContainer.style.width =
+      totalSlidesContainerWidth + 'px';
+
+    this.lastSlideOffset =
+      totalSlidesContainerWidth -
+      this.carousel.slideToShow * this.carousel.slideWidthWithGap +
+      this.carousel.gap;
+  }
+
+  addSlidesNextInf() {
+    this.appendOrPrependNElements();
+  }
+
+  addSlidesPrevInf() {
+    this.appendOrPrependNElements();
+
+    let translation = -this.previousTranslation + this.maxTranslationValue;
 
     // put back where the translation was
     this.slideContainer.style.transform = `translate3d(${-this
-      .oneTranslationBeforeMax}px, 0, 0)`;
+      .maxTranslationValue}px, 0, 0)`;
     this.previousTranslation = -translation;
-    // debugger;
-
-    if (!this.autoSlide && this.counterNextInf !== 0) {
-      this.changeOnlySlideNumber(1);
-    }
   }
 
-  addOneSlidePrevInf() {
-    this.prependOrAppendNTimesElement(1);
+  increaseLimits() {
+    this.nextLimit += Math.floor(this.carousel.slideWidthWithGap);
 
-    let translation =
-      -this.previousTranslation + this.carousel.slideWidthWithGap;
-
-    // put back where the translation was
-    this.slideContainer.style.transform = `translate3d(${-this.carousel
-      .slideWidthWithGap}px, 0, 0)`;
-    this.previousTranslation = -translation;
-
-    if (!this.autoSlide && this.counterNextInf !== 0) {
-      this.changeOnlySlideNumber(1);
-    }
-  }
-
-  increasePrevAndNextLimit() {
-    if (
-      (this.nextLimit += this.carousel.slideWidthWithGap) >
-      this.maxTranslationValue
-    ) {
-      this.nextLimit = this.maxTranslationValue;
-    }
-    //  il y aura this.carousel.slideToShow - 1 difference entre prev et next limit
-    this.prevLimit =
+    this.prevLimit = Math.floor(
       this.nextLimit -
-      this.carousel.slideWidthWithGap * (this.carousel.slideToShow - 1);
+        this.carousel.slideWidthWithGap * this.offsetBetweenSlides
+    );
+
+    this.currentLimit =
+      Math.floor(this.nextLimit - this.carousel.slideWidthWithGap) +
+      this.marginForCurrentLimit;
+    console.log(this.prevLimit, this.nextLimit);
+  }
+
+  changePrevAndNextLimits(newLimit: number) {
+    const limitInPX = newLimit * this.carousel.slideWidthWithGap;
+    this.nextLimit = Math.floor(limitInPX + this.carousel.slideWidthWithGap);
+
+    // adding a margin
+    this.currentLimit =
+      Math.floor(this.nextLimit - this.carousel.slideWidthWithGap) +
+      this.marginForCurrentLimit;
+
+    this.prevLimit = Math.floor(
+      this.nextLimit -
+        this.carousel.slideWidthWithGap * this.offsetBetweenSlides
+    );
 
     console.log(this.prevLimit, this.nextLimit);
   }
 
-  decreasePrevAndNextLimit() {
-    if ((this.prevLimit -= this.carousel.slideWidthWithGap) < 0) {
-      this.prevLimit = 0;
-    }
-    this.nextLimit = this.prevLimit + this.carousel.slideWidthWithGap;
+  decreaseLimits() {
+    // Taking back prevLimit if defined or current offset
+    const translationCorrectionAfterClone =
+      this.prevLimit <= 0 ? this.maxTranslationValue : this.prevLimit;
 
-    // at index = 0 and new slide created
-    if (this.prevLimit === 0) {
-      this.nextLimit += this.carousel.slideWidthWithGap;
-    }
+    this.prevLimit =
+      translationCorrectionAfterClone - this.carousel.slideWidthWithGap;
+
+    this.nextLimit =
+      this.prevLimit +
+      this.offsetBetweenSlides * this.carousel.slideWidthWithGap;
+
+    this.prevLimit = Math.floor(this.prevLimit);
+    this.nextLimit = Math.floor(this.nextLimit);
+
+    this.currentLimit =
+      Math.floor(this.nextLimit - this.carousel.slideWidthWithGap) +
+      this.marginForCurrentLimit;
 
     console.log(this.prevLimit, this.nextLimit);
+  }
+
+  shouldHandleInfiniteEventChanges() {
+    // a new slide has to be created, autoslide enabled or not
+    if (this.currentTranslation > 0) {
+      this.addSlidesPrevInf();
+      this.decreaseLimits();
+
+      // not enabled at start
+      if (this.currentSlide > 0) {
+        this.changeOnlySlideNumber(1);
+      }
+      return true;
+    } else if (
+      -this.currentTranslation >
+      this.lastSlideOffset - this.carousel.slideWidthWithGap
+    ) {
+      // one slide width of margin for creating new slides
+      this.addSlidesNextInf();
+      this.counterNextInf++;
+      if (this.DOMLimitReached) {
+        const actualSlide = this.findCurrentSlideNumber() - this.totalSlides;
+        this.changePrevAndNextLimits(actualSlide);
+        return true;
+      }
+    }
+    return false;
   }
 
   modifyCurrentSlide() {
     if (this.loop) {
-      const lastSlideExceeded = this.checkIfExceedingLastSlide(1);
-      // a new slide has to be created, autoslide enabled or not
-      if (this.currentTranslation > 0) {
-        this.addOneSlidePrevInf();
-        this.counterNextInf++;
-        this.decreasePrevAndNextLimit();
-        return;
-      } else if (lastSlideExceeded) {
-        this.addOneSlideNextInf();
-        this.counterNextInf++;
-        this.increasePrevAndNextLimit();
-        return;
-      }
+      if (this.shouldHandleInfiniteEventChanges()) return;
     }
 
     if (this.autoSlide) {
@@ -262,40 +366,14 @@ export class SliderResponsive {
       return;
     }
 
-    if (
-      -this.currentTranslation < this.prevLimit &&
-      (this.currentSlide > 0 || this.loop)
-    ) {
+    if (-this.currentTranslation < this.prevLimit) {
       this.changeOnlySlideNumber(1);
-      this.decreasePrevAndNextLimit();
+      this.decreaseLimits();
     } else if (-this.currentTranslation >= this.nextLimit) {
-      debugger;
+      // debugger;
       this.changeOnlySlideNumber(1);
-      this.increasePrevAndNextLimit();
+      this.increaseLimits();
     }
-  }
-
-  getLimitSlide(index: number) {
-    const maximum =
-      this.currentSlide + index > this.lastSlide - 1
-        ? this.lastSlide - 1
-        : this.currentSlide + index;
-    let limit = maximum * this.carousel.slideWidthWithGap;
-
-    if (index === 0) {
-      limit -= this.carousel.slideWidthWithGap;
-    }
-
-    if (this.counterNextInf < 0 && index === 0) {
-      limit -= this.carousel.slideWidthWithGap;
-    }
-
-    if (this.counterNextInf < 0 && index === 1) {
-      if (maximum === 3) return limit;
-      limit += this.carousel.slideWidthWithGap;
-    }
-
-    return limit < 0 ? 0 : limit;
   }
 
   unActiveTab(event: any) {
@@ -305,37 +383,6 @@ export class SliderResponsive {
     ) {
       this.dragStop(event);
     }
-  }
-
-  prependOrAppendNTimesElement(times: number) {
-    if (this.direction === 'left') {
-      for (let i = 0; i < times; i++) {
-        this.slideContainer.prepend(this.slideContainer.lastElementChild!);
-      }
-    } else {
-      for (let i = 0; i < times; i++) {
-        this.slideContainer.appendChild(this.slideContainer.firstElementChild!);
-      }
-    }
-  }
-
-  addSlidePrevInfinite() {
-    const limit =
-      -this.currentTranslation -
-      this.slideToScroll * this.carousel.slideWidthWithGap;
-    const result = Math.abs(limit) / this.carousel.slideWidthWithGap;
-    // debugger;
-    this.counterNextInf -= result;
-    this.prependOrAppendNTimesElement(result);
-
-    this.slideContainer.style.transition = 'none';
-    let translation =
-      -this.currentTranslation + this.carousel.slideWidthWithGap * result;
-    // put back where the translation was
-    this.slideContainer.style.transform = `translate3d(${-translation}px, 0, 0)`;
-
-    this.slideContainer.offsetHeight;
-    this.changeSlide(0);
   }
 
   prev() {
@@ -350,84 +397,84 @@ export class SliderResponsive {
   }
 
   handlePrevInfinite() {
-    if (
-      this.currentTranslation +
-        this.carousel.slideWidthWithGap * this.slideToScroll >
-      0
-    ) {
-      this.addSlidePrevInfinite();
-    } else {
-      const transformation =
-        -this.currentTranslation -
-        this.carousel.slideWidthWithGap * this.slideToScroll;
+    let actualSlide = this.findCurrentSlideNumber();
+    let goingTo = actualSlide - this.slideToScroll;
 
-      this.changeSlide(transformation);
+    if (goingTo < 0) {
+      this.addSlidesPrevInf();
+      actualSlide += this.totalSlides;
+      if (this.DOMLimitReached) goingTo -= this.totalSlides;
     }
 
+    this.changePrevAndNextLimits(goingTo);
+    this.computeTransformation(goingTo);
     this.changeOnlySlideNumber(this.slideToScroll);
   }
 
   counterNextInf = 0;
-  addSlideNextInfinite() {
-    const limit =
-      -this.currentTranslation +
-      this.slideToScroll * this.carousel.slideWidthWithGap;
-
-    let result = limit / this.carousel.slideWidthWithGap;
-    // debugger;
-    result -= this.lastSlide - (this.carousel.slideToShow - 1);
-    this.counterNextInf += result;
-    this.prependOrAppendNTimesElement(result);
-
-    this.currentTranslation =
-      -this.currentTranslation - this.carousel.slideWidthWithGap * result;
-
-    this.slideContainer.style.transition = 'none';
-    // put back where the translation was
-    this.slideContainer.style.transform = `translate3d(${-this
-      .currentTranslation}px, 0, 0)`;
-
-    this.slideContainer.offsetHeight;
-    this.currentTranslation +=
-      this.carousel.slideWidthWithGap * this.slideToScroll;
-    this.changeSlide(this.currentTranslation);
-  }
-
-  checkIfExceedingLastSlide(step: number) {
-    const goingTo =
-      -this.currentTranslation + step * this.carousel.slideWidthWithGap;
-    const limit = this.carousel.slideWidthWithGap * (this.lastSlide - 1);
-
-    // console.log('goingTo:' + goingTo, 'limit:' + limit, goingTo > limit);
-
-    return goingTo > limit;
-  }
 
   handleNextInfinite() {
-    if (this.checkIfExceedingLastSlide(this.slideToScroll)) {
+    let goingTo = this.findCurrentSlideNumber() + this.slideToScroll;
+
+    if (goingTo + this.carousel.slideToShow > this.totalAmountOfSlides) {
       // We are exceeding last slide
-      this.addSlideNextInfinite();
-    } else {
-      const transformation =
-        -this.currentTranslation +
-        this.carousel.slideWidthWithGap * this.slideToScroll;
-      this.changeSlide(transformation);
+      this.addSlidesNextInf();
+      if (this.DOMLimitReached) goingTo -= this.totalSlides;
     }
 
+    this.changePrevAndNextLimits(goingTo);
+    this.computeTransformation(goingTo);
     this.changeOnlySlideNumber(this.slideToScroll);
+  }
+
+  goTo(bullet: number) {
+    if (this.currentSlide < bullet) {
+      this.direction = 'right';
+    } else {
+      this.direction = 'left';
+    }
+
+    if (this.loop) {
+      this.navInfiniteBullets(bullet);
+      return;
+    }
+
+    this.currentSlide = bullet;
+    this.computeTransformation(bullet);
+  }
+
+  navInfiniteBullets(bullet: number) {
+    let actualSlide = this.findCurrentSlideNumber();
+    const positionOfCurrentSlide = actualSlide % this.totalSlides;
+    const difference = bullet - positionOfCurrentSlide;
+    let goingTo = actualSlide + difference;
+
+    if (goingTo + this.carousel.slideToShow > this.totalAmountOfSlides) {
+      this.addSlidesNextInf();
+    }
+
+    if (this.DOMLimitReached) goingTo -= this.totalSlides;
+    this.changePrevAndNextLimits(goingTo);
+    this.computeTransformation(goingTo);
+    this.currentSlide = bullet;
+  }
+
+  findCurrentSlideNumber() {
+    const limit = Math.abs(this.currentLimit) / this.carousel.slideWidthWithGap;
+    return Math.floor(limit);
   }
 
   changeOnlySlideNumber(step: number) {
     if (this.loop) {
-      const difference = this.currentSlide - step;
       if (this.direction === 'right') {
-        // debugger;
         if ((this.currentSlide += step) > this.lastSlide) {
-          this.currentSlide = this.lastSlide - difference - 1;
+          const surplus = this.currentSlide % this.lastSlide;
+          this.currentSlide = surplus - 1;
         }
       } else {
         if ((this.currentSlide -= step) < 0) {
-          this.currentSlide = this.lastSlide + difference + 1;
+          const surplus = this.currentSlide % this.lastSlide;
+          this.currentSlide = this.totalSlides + surplus;
         }
       }
 
@@ -448,6 +495,7 @@ export class SliderResponsive {
   next() {
     this.direction = 'right';
     if (this.loop) {
+      // debugger;
       this.handleNextInfinite();
       return;
     }
@@ -457,7 +505,7 @@ export class SliderResponsive {
   }
 
   computeTransformation(slide: number) {
-    const transformation = this.carousel.slideWidthWithGap * slide;
+    const transformation = slide * this.carousel.slideWidthWithGap;
 
     this.changeSlide(transformation);
   }
@@ -471,13 +519,5 @@ export class SliderResponsive {
     this.draggingTranslation = false;
     this.previousTranslation = -transformation;
     this.currentTranslation = -transformation;
-  }
-
-  goTo(bullet: number) {
-    this.currentSlide < bullet
-      ? (this.direction = 'right')
-      : (this.direction = 'left');
-    this.currentSlide = bullet;
-    this.computeTransformation(bullet);
   }
 }

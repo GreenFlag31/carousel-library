@@ -12,6 +12,7 @@ export class Carousel {
   carouselWidth!: number;
   widthSlideContainer!: number;
   slideDisplayed = 1;
+  arrayOfSlides: HTMLDivElement[] = [];
 
   constructor(
     private carousel: HTMLDivElement,
@@ -19,7 +20,7 @@ export class Carousel {
     public slideToShow: number,
     private minWidthSlide: number,
     private width: number,
-    private gap: number,
+    public gap: number,
     private responsive: boolean,
     private loop: boolean
   ) {
@@ -29,8 +30,9 @@ export class Carousel {
   init() {
     this.paddingCarousel = this.getPaddingCarousel();
     this.initialSlideToShow = this.slideToShow;
-    this.slidesContainer = this.selectSlideContainer();
+    this.slidesContainer = this.selectSlidesContainer();
     this.slides = this.selectSlides();
+    this.arrayOfSlides = this.slidesArray();
     this.totalSlides = this.slides.length;
     this.setWidthSlides();
     this.setMaxWidthCarousel();
@@ -117,16 +119,16 @@ export class Carousel {
       this.paddingCarousel -
       (this.slideToShow - 1) * this.gap;
 
-    this.slidesContainer.style.gridAutoColumns =
-      widthCarousel / this.slideToShow + 'px';
+    const widthPerSlide = widthCarousel / this.slideToShow;
+    this.slidesContainer.style.gridAutoColumns = widthPerSlide + 'px';
 
-    this.slideWidth = this.slides[0].offsetWidth;
+    this.slideWidth = widthPerSlide;
   }
 
   setWidthSlideContainer() {
     // otherwise non visible gaps of non visible cards will not be scrollable
     this.widthSlideContainer =
-      this.totalSlides * this.slideWidth + (this.totalSlides - 1) * this.gap;
+      this.totalSlides * this.slideWidthWithGap - this.gap;
     this.slidesContainer.style.width = this.widthSlideContainer + 'px';
   }
 
@@ -134,7 +136,11 @@ export class Carousel {
     return this.carousel.querySelectorAll('.carousel-slide');
   }
 
-  selectSlideContainer() {
+  slidesArray() {
+    return Array.from(this.slides);
+  }
+
+  selectSlidesContainer() {
     return this.carousel.querySelector('.slides-container') as HTMLDivElement;
   }
 

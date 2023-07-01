@@ -1,5 +1,4 @@
 import { Carousel } from './carousel';
-import { visibilityEvent } from './interfaces';
 
 export class SliderNotResponsive {
   dragging = false;
