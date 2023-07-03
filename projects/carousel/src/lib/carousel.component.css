@@ -10,35 +10,41 @@
   transform: translate3d(0, 0, 0);
   margin: auto;
 }
-.section-title {
-  text-align: center;
-  padding: 0.625em;
+.banner-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 0.5em;
 }
-
+.counter {
+  background: lightgray;
+  padding: 0.3em 0.7em;
+  border-radius: 1em;
+  z-index: 1;
+  min-width: 3.75em;
+  text-align: center;
+}
 .prev,
 .next {
-  display: none;
-  position: absolute;
-  top: 50%;
-  left: 0;
-  transform: translateY(-50%);
-  padding: 0.25em;
+  background: #0079b4;
+  padding: 0.4em 0.5em;
+  color: white;
+  border-radius: 0.3em;
+  box-shadow: 0px 2px 4px 0px rgb(158 158 158 / 83%);
+  border: none;
   cursor: pointer;
   z-index: 1;
   transition: opacity 0.3s;
-  border: none;
-  /* outline: none; */
-  background: none;
+}
+.prev {
+  margin-right: 1em;
 }
 .prev:disabled,
 .next:disabled {
   opacity: 0.3;
   cursor: not-allowed;
 }
-.next {
-  right: 0;
-  left: auto;
-}
+
 .bullets-container {
   display: flex;
   justify-content: center;
@@ -59,8 +65,6 @@
   background: #0079b4;
 }
 ::ng-deep .carousel-slide {
-  /* width: 15%; */
-  /* min-width: 300px; */
   width: 100%;
   border-radius: 1em;
   box-shadow: 0px 2px 4px 0px rgb(158 158 158 / 83%);
@@ -69,35 +73,22 @@
 ::ng-deep .slides-container.dragging {
   cursor: grab;
 }
-.counter-container {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 0.5em;
-}
-.counter {
-  background: lightgray;
-  padding: 0.3em 0.7em;
-  border-radius: 1em;
-  z-index: 1;
-  min-width: 3.75em;
-  text-align: center;
-}
 
 @media (min-width: 650px) {
   .prev,
   .next {
-    display: inline-block;
-    background: #0079b4;
-    padding: 0.4em 0.5em;
-    color: white;
-    border-radius: 0.3em;
-    box-shadow: 0px 2px 4px 0px rgb(158 158 158 / 83%);
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
   }
   .prev {
     margin-left: 2em;
   }
   .next {
     margin-right: 2em;
+    right: 0;
+    left: auto;
   }
 }
 @media (min-width: 800px) {

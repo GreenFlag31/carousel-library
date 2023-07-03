@@ -37,14 +37,14 @@ export class SliderNotResponsive {
     // visible part of the offset of the card in px
     this.offsetNotResponsive =
       this.carousel.carouselWidth -
-      this.carousel.slideDisplayed * this.carousel.slideWidthWithGap -
+      this.carousel.slideToShow * this.carousel.slideWidthWithGap -
       this.carousel.paddingCarousel;
     // non visible part of the offset of the card
     this.offsetNotResponsive =
       this.carousel.slideWidth - this.offsetNotResponsive;
 
     this.offsetNotResponsive +=
-      (this.carousel.totalSlides - this.carousel.slideDisplayed - 1) *
+      (this.carousel.totalSlides - this.carousel.slideToShow - 1) *
       this.carousel.slideWidthWithGap;
     console.log(this.offsetNotResponsive);
     this.carousel.maxScrollableContent = this.offsetNotResponsive;

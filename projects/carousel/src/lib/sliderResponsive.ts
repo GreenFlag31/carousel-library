@@ -23,7 +23,6 @@ export class SliderResponsive {
   lastSlideOffset = 0;
   totalSlides = 0;
   DOMLimitReached = false;
-  offsetBetweenSlides = 0;
   MAX_DOM_SIZE = 4;
 
   constructor(
@@ -39,9 +38,7 @@ export class SliderResponsive {
     private readonly loop: boolean
   ) {
     this.initProperties();
-
     this.updateProperties();
-    this.setUpNextLimit();
   }
 
   initProperties() {
@@ -51,27 +48,23 @@ export class SliderResponsive {
     this.totalSlides = this.carousel.totalSlides;
     this.totalAmountOfSlides = this.totalSlides;
 
+    this.nextLimit = Math.floor(this.carousel.slideWidthWithGap);
+  }
+
+  updateProperties() {
+    this.lastSlide = this.carousel.numberDots - 1;
+
+    this.marginForCurrentLimit = Math.floor(
+      this.carousel.slideWidthWithGap / 2
+    );
+
     this.maxTranslationValue =
       this.totalAmountOfSlides * this.carousel.slideWidthWithGap;
-    this.offsetBetweenSlides =
-      this.carousel.slideToShow - 1 > 0 ? this.carousel.slideToShow - 1 : 1;
 
     this.lastSlideOffset =
       this.slideContainer.clientWidth -
       this.carousel.slideToShow * this.carousel.slideWidthWithGap +
       this.carousel.gap;
-  }
-
-  updateProperties() {
-    this.lastSlide = this.carousel.numberDots - 1;
-  }
-
-  setUpNextLimit() {
-    this.nextLimit = Math.floor(this.carousel.slideWidthWithGap);
-
-    this.marginForCurrentLimit = Math.floor(
-      this.carousel.slideWidthWithGap / 2
-    );
   }
 
   dragStart(event: MouseEvent | TouchEvent) {
@@ -89,33 +82,29 @@ export class SliderResponsive {
   dragStop(event: MouseEvent | TouchEvent) {
     if (this.currentEventIsDisabled(event)) return;
     this.dragging = false;
-
     this.previousTranslation = this.currentTranslation;
+    if (this.loop) return;
 
     const limit =
-      (this.currentSlide === 0 && this.direction === 'left') ||
-      (this.currentSlide === this.lastSlide && this.direction === 'right');
+      this.currentTranslation > 0 ||
+      -this.currentTranslation > this.lastSlideOffset;
 
-    if (this.draggingTranslation && limit && !this.loop) {
+    if (this.draggingTranslation && limit) {
       this.computeTransformation(this.currentSlide);
     }
   }
 
   currentEventIsDisabled(event: MouseEvent | TouchEvent) {
-    if (
+    return (
       (event instanceof MouseEvent && !this.enableMouseDrag) ||
       (event instanceof TouchEvent && !this.enableTouch)
-    ) {
-      return true;
-    }
-
-    return false;
+    );
   }
 
   getDirection() {
     if (this.previousX > this.currentX) {
       this.direction = 'right';
-    } else if (this.previousX < this.currentX) {
+    } else {
       this.direction = 'left';
     }
   }
@@ -159,28 +148,16 @@ export class SliderResponsive {
     const moveComparedToSlide =
       (this.positionChange / this.carousel.slideWidth) * 100;
 
-    if (moveComparedToSlide < -this.LIMIT_AUTO_SLIDE) {
-      // to the right
-      this.changeOnlySlideNumber(1);
-      if (this.loop) {
-        const actualSlide = this.findCurrentSlideNumber();
-        this.computeTransformation(actualSlide + 1);
-        this.changePrevAndNextLimits(actualSlide + 1);
-        return;
-      }
-      this.computeTransformation(this.currentSlide);
-    } else if (moveComparedToSlide > this.LIMIT_AUTO_SLIDE) {
-      // to the left
-      this.changeOnlySlideNumber(1);
-      if (this.loop) {
-        // debugger;
-        const actualSlide = this.findCurrentSlideNumber();
-        this.computeTransformation(actualSlide - 1);
-        this.changePrevAndNextLimits(actualSlide - 1);
-        return;
-      }
-
-      this.computeTransformation(this.currentSlide);
+    if (
+      moveComparedToSlide < -this.LIMIT_AUTO_SLIDE ||
+      moveComparedToSlide > this.LIMIT_AUTO_SLIDE
+    ) {
+      // to the right or left
+      const change = this.direction === 'right' ? 1 : -1;
+      const newSlide = this.findCurrentSlideNumber() + change;
+      this.currentSlide = newSlide % this.totalSlides;
+      this.computeTransformation(newSlide);
+      this.changePrevAndNextLimits(newSlide);
     }
   }
 
@@ -214,13 +191,17 @@ export class SliderResponsive {
     const slides = this.carousel.selectSlides();
 
     if (this.direction === 'right') {
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < this.totalSlides; i++) {
         slides[i].remove();
       }
 
       this.resetViewRightDirection();
     } else {
-      for (let i = slides.length - 1; i > slides.length - 5 - 1; i--) {
+      for (
+        let i = slides.length - 1;
+        i > slides.length - this.totalSlides - 1;
+        i--
+      ) {
         slides[i].remove();
       }
 
@@ -231,7 +212,7 @@ export class SliderResponsive {
   resetViewLeftDirection() {
     const translation = this.maxTranslationValue - this.previousTranslation;
     this.slideContainer.style.transition = 'none';
-    this.slideContainer.style.transform = `translate3d(${-translation}px, 0, 0)`;
+    this.slideContainer.style.transform = `translate3d(${-translation}px, 0px, 0px)`;
     this.slideContainer.offsetHeight;
   }
 
@@ -240,13 +221,12 @@ export class SliderResponsive {
       this.currentTranslation +
       this.totalSlides * this.carousel.slideWidthWithGap;
     this.slideContainer.style.transition = 'none';
-    this.slideContainer.style.transform = `translate3d(${translation}px, 0, 0)`;
+    this.slideContainer.style.transform = `translate3d(${translation}px, 0px, 0px)`;
     this.previousTranslation = translation - this.positionChange;
     this.slideContainer.offsetHeight;
   }
 
   updateSlideContainerWidth() {
-    // update slideContainer Width
     // 1 gap less than the n of slides, 4 gaps for 5 slides
     const totalSlidesContainerWidth =
       this.carousel.slidesContainer.clientWidth +
@@ -272,7 +252,7 @@ export class SliderResponsive {
 
     // put back where the translation was
     this.slideContainer.style.transform = `translate3d(${-this
-      .maxTranslationValue}px, 0, 0)`;
+      .maxTranslationValue}px, 0px, 0px)`;
     this.previousTranslation = -translation;
   }
 
@@ -280,8 +260,7 @@ export class SliderResponsive {
     this.nextLimit += Math.floor(this.carousel.slideWidthWithGap);
 
     this.prevLimit = Math.floor(
-      this.nextLimit -
-        this.carousel.slideWidthWithGap * this.offsetBetweenSlides
+      this.nextLimit - this.carousel.slideWidthWithGap * 2
     );
 
     this.currentLimit =
@@ -300,24 +279,24 @@ export class SliderResponsive {
       this.marginForCurrentLimit;
 
     this.prevLimit = Math.floor(
-      this.nextLimit -
-        this.carousel.slideWidthWithGap * this.offsetBetweenSlides
+      this.nextLimit - this.carousel.slideWidthWithGap * 2
     );
 
     console.log(this.prevLimit, this.nextLimit);
   }
 
   decreaseLimits() {
-    // Taking back prevLimit if defined or current offset
-    const translationCorrectionAfterClone =
-      this.prevLimit <= 0 ? this.maxTranslationValue : this.prevLimit;
+    // Taking back prevLimit or max translation after new slides created to the right
+    let translationCorrectionAfterClone = this.prevLimit;
+    if (this.loop) {
+      translationCorrectionAfterClone =
+        this.prevLimit <= 0 ? this.maxTranslationValue : this.prevLimit;
+    }
 
     this.prevLimit =
       translationCorrectionAfterClone - this.carousel.slideWidthWithGap;
 
-    this.nextLimit =
-      this.prevLimit +
-      this.offsetBetweenSlides * this.carousel.slideWidthWithGap;
+    this.nextLimit = this.prevLimit + 2 * this.carousel.slideWidthWithGap;
 
     this.prevLimit = Math.floor(this.prevLimit);
     this.nextLimit = Math.floor(this.nextLimit);
@@ -333,8 +312,8 @@ export class SliderResponsive {
     // a new slide has to be created, autoslide enabled or not
     if (this.currentTranslation > 0) {
       this.addSlidesPrevInf();
-      this.decreaseLimits();
 
+      this.decreaseLimits();
       // not enabled at start
       if (this.currentSlide > 0) {
         this.changeOnlySlideNumber(1);
@@ -346,7 +325,7 @@ export class SliderResponsive {
     ) {
       // one slide width of margin for creating new slides
       this.addSlidesNextInf();
-      this.counterNextInf++;
+
       if (this.DOMLimitReached) {
         const actualSlide = this.findCurrentSlideNumber() - this.totalSlides;
         this.changePrevAndNextLimits(actualSlide);
@@ -370,7 +349,6 @@ export class SliderResponsive {
       this.changeOnlySlideNumber(1);
       this.decreaseLimits();
     } else if (-this.currentTranslation >= this.nextLimit) {
-      // debugger;
       this.changeOnlySlideNumber(1);
       this.increaseLimits();
     }
@@ -388,7 +366,7 @@ export class SliderResponsive {
   prev() {
     this.direction = 'left';
     if (this.loop) {
-      this.handlePrevInfinite();
+      this.handleBtnInfinite();
       return;
     }
 
@@ -396,38 +374,27 @@ export class SliderResponsive {
     this.computeTransformation(this.currentSlide);
   }
 
-  handlePrevInfinite() {
-    let actualSlide = this.findCurrentSlideNumber();
-    let goingTo = actualSlide - this.slideToScroll;
+  handleBtnInfinite() {
+    let goingTo = this.findCurrentSlideNumber();
+    goingTo +=
+      this.direction === 'right' ? this.slideToScroll : -this.slideToScroll;
 
     if (goingTo < 0) {
       this.addSlidesPrevInf();
-      actualSlide += this.totalSlides;
-      if (this.DOMLimitReached) goingTo -= this.totalSlides;
-    }
-
-    this.changePrevAndNextLimits(goingTo);
-    this.computeTransformation(goingTo);
-    this.changeOnlySlideNumber(this.slideToScroll);
-  }
-
-  counterNextInf = 0;
-
-  handleNextInfinite() {
-    let goingTo = this.findCurrentSlideNumber() + this.slideToScroll;
-
-    if (goingTo + this.carousel.slideToShow > this.totalAmountOfSlides) {
+      goingTo += this.totalSlides;
+    } else if (goingTo + this.carousel.slideToShow > this.totalAmountOfSlides) {
       // We are exceeding last slide
       this.addSlidesNextInf();
       if (this.DOMLimitReached) goingTo -= this.totalSlides;
     }
 
-    this.changePrevAndNextLimits(goingTo);
     this.computeTransformation(goingTo);
+    this.changePrevAndNextLimits(goingTo);
     this.changeOnlySlideNumber(this.slideToScroll);
   }
 
   goTo(bullet: number) {
+    if (this.carousel.numberDots === 1) return;
     if (this.currentSlide < bullet) {
       this.direction = 'right';
     } else {
@@ -440,6 +407,7 @@ export class SliderResponsive {
     }
 
     this.currentSlide = bullet;
+    this.changePrevAndNextLimits(bullet);
     this.computeTransformation(bullet);
   }
 
@@ -451,11 +419,11 @@ export class SliderResponsive {
 
     if (goingTo + this.carousel.slideToShow > this.totalAmountOfSlides) {
       this.addSlidesNextInf();
+      if (this.DOMLimitReached) goingTo -= this.totalSlides;
     }
 
-    if (this.DOMLimitReached) goingTo -= this.totalSlides;
-    this.changePrevAndNextLimits(goingTo);
     this.computeTransformation(goingTo);
+    this.changePrevAndNextLimits(goingTo);
     this.currentSlide = bullet;
   }
 
@@ -465,6 +433,8 @@ export class SliderResponsive {
   }
 
   changeOnlySlideNumber(step: number) {
+    if (this.carousel.numberDots === 1) return;
+
     if (this.loop) {
       if (this.direction === 'right') {
         if ((this.currentSlide += step) > this.lastSlide) {
@@ -496,7 +466,7 @@ export class SliderResponsive {
     this.direction = 'right';
     if (this.loop) {
       // debugger;
-      this.handleNextInfinite();
+      this.handleBtnInfinite();
       return;
     }
 
@@ -513,7 +483,7 @@ export class SliderResponsive {
   changeSlide(transformation: number) {
     this.slideContainer.style.transition = `transform ${this.animationTimingMs}ms ${this.animationTimingFn}`;
 
-    this.slideContainer.style.transform = `translate3d(${-transformation}px, 0, 0)`;
+    this.slideContainer.style.transform = `translate3d(${-transformation}px, 0px, 0px)`;
 
     this.dragging = false;
     this.draggingTranslation = false;

@@ -1,5 +1,27 @@
 <div class="carousel-container">
-  <div class="counter-container">
+  <div class="banner-container">
+    <div class="btn-container" *ngIf="arrows">
+      <button
+        class="prev"
+        (click)="slider.prev()"
+        [disabled]="
+          slider.currentSlide === 0 && slider.currentTranslation >= 0 && !loop
+        "
+      >
+        <i class="fa-solid fa-arrow-left-long"></i>
+      </button>
+      <button
+        class="next"
+        (click)="slider.next()"
+        [disabled]="
+          slider.currentSlide === carousel.numberDots - 1 &&
+          slider.currentTranslation <= -carousel.maxScrollableContent &&
+          !loop
+        "
+      >
+        <i class="fa-solid fa-arrow-right-long"></i>
+      </button>
+    </div>
     <div class="counter" *ngIf="counter">
       <p>
         {{ slider.currentSlide + 1 }} {{ counterSeparator }}
@@ -7,16 +29,7 @@
       </p>
     </div>
   </div>
-  <button
-    class="prev"
-    *ngIf="arrows"
-    (click)="slider.prev()"
-    [disabled]="
-      slider.currentSlide === 0 && slider.currentTranslation >= 0 && !loop
-    "
-  >
-    <i class="fa-solid fa-arrow-left-long"></i>
-  </button>
+
   <div
     class="slides-container"
     [class.dragging]="slider.dragging"
@@ -29,18 +42,7 @@
     <ng-content></ng-content>
     <ng-template></ng-template>
   </div>
-  <button
-    class="next"
-    *ngIf="arrows"
-    (click)="slider.next()"
-    [disabled]="
-      slider.currentSlide === carousel.numberDots - 1 &&
-      slider.currentTranslation <= -carousel.maxScrollableContent &&
-      !loop
-    "
-  >
-    <i class="fa-solid fa-arrow-right-long"></i>
-  </button>
+
   <div class="bullets-container" *ngIf="dots">
     <button
       class="bullet"

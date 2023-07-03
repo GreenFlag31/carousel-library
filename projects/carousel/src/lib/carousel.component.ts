@@ -22,15 +22,15 @@ export class CarouselComponent implements OnInit {
   @Input() dots = true;
   @Input() arrows = true;
   @Input() counter = true;
-  @Input() loop = true;
   @Input() enableMouseDrag = true;
   @Input() enableTouch = true;
   @Input() counterSeparator = '/';
   @Input() gapBetweenSlides = 16;
   @Input() animationTimingMs = 300;
   @Input() animationTimingFn: AnimationTimingFn = 'ease-out';
+  @Input() loop = true;
   @Input() responsive = true;
-  @Input() autoSlide = true;
+  @Input() autoSlide = false;
   mouseupSubscription!: Subscription;
   VChangeSubscription!: Subscription;
   resizeSubscription!: Subscription;
@@ -106,19 +106,11 @@ export class CarouselComponent implements OnInit {
   }
 
   resize() {
-    if (
-      this.carousel.selectSlides().length > this.carousel.totalSlides ||
-      this.slider.currentSlide > 0
-    ) {
-      if (this.loop) {
-        this.carousel.slidesContainer.replaceChildren(
-          ...this.carousel.arrayOfSlides
-        );
-      }
-
-      // put back to start
-      this.slider.currentSlide = 0;
-      this.slider.computeTransformation(0);
+    // put back to start
+    this.slider.currentSlide = 0;
+    this.slider.computeTransformation(0);
+    if (this.loop && this.slider instanceof SliderResponsive) {
+      this.slider.changePrevAndNextLimits(0);
     }
 
     this.carousel.updateProperties();

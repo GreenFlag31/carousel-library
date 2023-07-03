@@ -11,7 +11,6 @@ export class Carousel {
   paddingCarousel = 0;
   carouselWidth!: number;
   widthSlideContainer!: number;
-  slideDisplayed = 1;
   arrayOfSlides: HTMLDivElement[] = [];
 
   constructor(
@@ -44,17 +43,18 @@ export class Carousel {
   setWidthSlides() {
     this.slides.forEach((slide) => {
       slide.style.minWidth = this.minWidthSlide + 'px';
-      if (this.responsive) return;
-      slide.style.width = this.width + 'px';
+      if (!this.responsive) {
+        slide.style.width = this.width + 'px';
+      }
     });
   }
 
   updateProperties() {
     this.carouselWidth = this.carousel.clientWidth;
     if (this.responsive) {
-      this.updateSlideToShow();
+      this.updateSlideToShowResponsive();
     } else {
-      this.updateSlideDisplayed();
+      this.updateSlideToShowNotResponsive();
     }
     this.numberDots = this.setNumberDots();
     this.arrayNumberDots = [...Array(this.numberDots).keys()];
@@ -65,8 +65,7 @@ export class Carousel {
     this.maxScrollableContent = this.getMaxScroll();
   }
 
-  updateSlideToShow() {
-    // Only responsive mode
+  updateSlideToShowResponsive() {
     const minWidthPlusGap = this.minWidthSlide + this.gap;
 
     let slideFitting = 1;
@@ -79,27 +78,30 @@ export class Carousel {
       slideFitting++;
     }
     slideFitting--;
+
     this.determineSlideToShow(slideFitting);
   }
 
   determineSlideToShow(slideFitting: number) {
     if (slideFitting === 0) {
       this.slideToShow = 1;
-    } else if (slideFitting <= this.initialSlideToShow) {
+    } else if (slideFitting > this.initialSlideToShow) {
+      this.slideToShow = this.initialSlideToShow;
+    } else {
       this.slideToShow = slideFitting;
     }
   }
 
-  updateSlideDisplayed() {
-    // Only to determine number of dots
+  updateSlideToShowNotResponsive() {
     this.slideWidth = this.slides[0].offsetWidth;
-    this.slideDisplayed = 1;
+    let slideFitting = 1;
     // Get number of FULL CARDS visible without offset, not responsive mode
-    while (this.carouselWidth > this.slideDisplayed * this.slideWidth) {
-      this.slideDisplayed++;
+    while (this.carouselWidth > slideFitting * this.slideWidth) {
+      slideFitting++;
     }
-    this.slideDisplayed--;
-    this.determineSlideToShow(this.slideDisplayed);
+    slideFitting--;
+
+    this.determineSlideToShow(slideFitting);
   }
 
   getPaddingCarousel() {
@@ -144,18 +146,10 @@ export class Carousel {
     return this.carousel.querySelector('.slides-container') as HTMLDivElement;
   }
 
-  minSlideToShowValue() {
-    if (this.slideToShow - 1 <= 0) {
-      return 1;
-    }
-
-    return this.slideToShow;
-  }
-
   setNumberDots() {
-    // if loop (infinite) then totalSlides ?
+    // if loop (infinite) then totalSlides, one more window then 'normal'
     if (this.loop) {
-      return this.totalSlides;
+      return this.totalSlides === this.slideToShow ? 1 : this.totalSlides;
     }
 
     return this.slideToShow > 1
