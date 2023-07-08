@@ -16,7 +16,7 @@ export class SliderResponsive {
   currentLimit = 0;
   nextLimit = 0;
   marginForCurrentLimit = 0;
-  slideContainer!: HTMLDivElement;
+  slidesContainer!: HTMLDivElement;
   arrayOfSlides!: HTMLDivElement[];
   totalAmountOfSlides!: number;
   maxTranslationValue = 0;
@@ -42,7 +42,7 @@ export class SliderResponsive {
   }
 
   initProperties() {
-    this.slideContainer = this.carousel.slidesContainer;
+    this.slidesContainer = this.carousel.slidesContainer;
     this.arrayOfSlides = this.carousel.arrayOfSlides;
 
     this.totalSlides = this.carousel.totalSlides;
@@ -59,10 +59,10 @@ export class SliderResponsive {
     );
 
     this.maxTranslationValue =
-      this.totalAmountOfSlides * this.carousel.slideWidthWithGap;
+      this.totalSlides * this.carousel.slideWidthWithGap;
 
     this.lastSlideOffset =
-      this.slideContainer.clientWidth -
+      this.slidesContainer.clientWidth -
       this.carousel.slideToShow * this.carousel.slideWidthWithGap +
       this.carousel.gap;
   }
@@ -76,7 +76,7 @@ export class SliderResponsive {
       event instanceof MouseEvent ? event.pageX : event.touches[0].pageX;
 
     this.previousX = this.startX;
-    this.slideContainer.style.transition = 'none';
+    this.slidesContainer.style.transition = 'none';
   }
 
   dragStop(event: MouseEvent | TouchEvent) {
@@ -129,7 +129,7 @@ export class SliderResponsive {
     }
 
     this.draggingTranslation = true;
-    this.slideContainer.style.transform = `translate3d(${this.currentTranslation}px, 0, 0)`;
+    this.slidesContainer.style.transform = `translate3d(${this.currentTranslation}px, 0, 0)`;
 
     this.modifyCurrentSlide();
   }
@@ -165,14 +165,14 @@ export class SliderResponsive {
     if (this.direction === 'left') {
       for (let i = this.arrayOfSlides.length - 1; i >= 0; i--) {
         const clonedElement = this.arrayOfSlides[i].cloneNode(true);
-        this.slideContainer.prepend(clonedElement);
+        this.slidesContainer.prepend(clonedElement);
       }
 
       this.resetViewLeftDirection();
     } else {
       for (let i = 0; i < this.arrayOfSlides.length; i++) {
         const clonedElement = this.arrayOfSlides[i].cloneNode(true);
-        this.slideContainer.append(clonedElement);
+        this.slidesContainer.append(clonedElement);
       }
     }
 
@@ -211,29 +211,28 @@ export class SliderResponsive {
 
   resetViewLeftDirection() {
     const translation = this.maxTranslationValue - this.previousTranslation;
-    this.slideContainer.style.transition = 'none';
-    this.slideContainer.style.transform = `translate3d(${-translation}px, 0px, 0px)`;
-    this.slideContainer.offsetHeight;
+    this.slidesContainer.style.transition = 'none';
+    this.slidesContainer.style.transform = `translate3d(${-translation}px, 0px, 0px)`;
+    this.slidesContainer.offsetHeight;
   }
 
   resetViewRightDirection() {
     const translation =
       this.currentTranslation +
       this.totalSlides * this.carousel.slideWidthWithGap;
-    this.slideContainer.style.transition = 'none';
-    this.slideContainer.style.transform = `translate3d(${translation}px, 0px, 0px)`;
+    this.slidesContainer.style.transition = 'none';
+    this.slidesContainer.style.transform = `translate3d(${translation}px, 0px, 0px)`;
     this.previousTranslation = translation - this.positionChange;
-    this.slideContainer.offsetHeight;
+    this.slidesContainer.offsetHeight;
   }
 
   updateSlideContainerWidth() {
     // 1 gap less than the n of slides, 4 gaps for 5 slides
     const totalSlidesContainerWidth =
-      this.carousel.slidesContainer.clientWidth +
+      this.slidesContainer.clientWidth +
       this.totalSlides * this.carousel.slideWidthWithGap;
 
-    this.carousel.slidesContainer.style.width =
-      totalSlidesContainerWidth + 'px';
+    this.slidesContainer.style.width = totalSlidesContainerWidth + 'px';
 
     this.lastSlideOffset =
       totalSlidesContainerWidth -
@@ -248,10 +247,11 @@ export class SliderResponsive {
   addSlidesPrevInf() {
     this.appendOrPrependNElements();
 
+    // // only for mouse | touch event
     let translation = -this.previousTranslation + this.maxTranslationValue;
 
     // put back where the translation was
-    this.slideContainer.style.transform = `translate3d(${-this
+    this.slidesContainer.style.transform = `translate3d(${-this
       .maxTranslationValue}px, 0px, 0px)`;
     this.previousTranslation = -translation;
   }
@@ -310,6 +310,7 @@ export class SliderResponsive {
 
   shouldHandleInfiniteEventChanges() {
     // a new slide has to be created, autoslide enabled or not
+
     if (this.currentTranslation > 0) {
       this.addSlidesPrevInf();
 
@@ -321,13 +322,17 @@ export class SliderResponsive {
       return true;
     } else if (
       -this.currentTranslation >
-      this.lastSlideOffset - this.carousel.slideWidthWithGap
+        this.lastSlideOffset - this.carousel.slideWidthWithGap &&
+      this.direction === 'right'
     ) {
-      // one slide width of margin for creating new slides
+      // one slide width of margin for creating new slides.
       this.addSlidesNextInf();
 
       if (this.DOMLimitReached) {
         const actualSlide = this.findCurrentSlideNumber() - this.totalSlides;
+        if (actualSlide < 17) debugger;
+        console.log(actualSlide);
+
         this.changePrevAndNextLimits(actualSlide);
         return true;
       }
@@ -378,6 +383,7 @@ export class SliderResponsive {
     let goingTo = this.findCurrentSlideNumber();
     goingTo +=
       this.direction === 'right' ? this.slideToScroll : -this.slideToScroll;
+    // debugger;
 
     if (goingTo < 0) {
       this.addSlidesPrevInf();
@@ -434,16 +440,20 @@ export class SliderResponsive {
 
   changeOnlySlideNumber(step: number) {
     if (this.carousel.numberDots === 1) return;
-
+    // debugger;
     if (this.loop) {
       if (this.direction === 'right') {
         if ((this.currentSlide += step) > this.lastSlide) {
-          const surplus = this.currentSlide % this.lastSlide;
+          const surplus =
+            this.currentSlide % this.lastSlide ||
+            this.currentSlide / this.lastSlide;
           this.currentSlide = surplus - 1;
         }
       } else {
         if ((this.currentSlide -= step) < 0) {
-          const surplus = this.currentSlide % this.lastSlide;
+          const surplus =
+            this.currentSlide % this.lastSlide ||
+            this.lastSlide / this.currentSlide - 1;
           this.currentSlide = this.totalSlides + surplus;
         }
       }
@@ -481,9 +491,9 @@ export class SliderResponsive {
   }
 
   changeSlide(transformation: number) {
-    this.slideContainer.style.transition = `transform ${this.animationTimingMs}ms ${this.animationTimingFn}`;
+    this.slidesContainer.style.transition = `transform ${this.animationTimingMs}ms ${this.animationTimingFn}`;
 
-    this.slideContainer.style.transform = `translate3d(${-transformation}px, 0px, 0px)`;
+    this.slidesContainer.style.transform = `translate3d(${-transformation}px, 0px, 0px)`;
 
     this.dragging = false;
     this.draggingTranslation = false;

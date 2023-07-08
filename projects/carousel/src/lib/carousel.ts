@@ -130,7 +130,7 @@ export class Carousel {
   setWidthSlideContainer() {
     // otherwise non visible gaps of non visible cards will not be scrollable
     this.widthSlideContainer =
-      this.totalSlides * this.slideWidthWithGap - this.gap;
+      this.selectSlides().length * this.slideWidthWithGap - this.gap;
     this.slidesContainer.style.width = this.widthSlideContainer + 'px';
   }
 

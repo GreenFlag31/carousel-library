@@ -13,7 +13,7 @@ import { SliderNotResponsive } from './sliderNotResponsive';
 })
 export class CarouselComponent implements OnInit {
   @Input() maxWidthCarousel!: number;
-  @Input() slideToShow = 3;
+  @Input() slideToShow = 5;
   @Input() slideToScroll = 2;
   @Input() slidingLimitBeforeScroll = 30;
   @Input() strechingLimit = 60;
