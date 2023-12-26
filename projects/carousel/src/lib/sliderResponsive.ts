@@ -325,12 +325,11 @@ export class SliderResponsive {
         this.lastSlideOffset - this.carousel.slideWidthWithGap &&
       this.direction === 'right'
     ) {
-      // one slide width of margin for creating new slides.
+      // one slide width of margin for creating new slides + checks if right dir because of the one slide interval
       this.addSlidesNextInf();
 
       if (this.DOMLimitReached) {
         const actualSlide = this.findCurrentSlideNumber() - this.totalSlides;
-        if (actualSlide < 17) debugger;
         console.log(actualSlide);
 
         this.changePrevAndNextLimits(actualSlide);
@@ -400,7 +399,6 @@ export class SliderResponsive {
   }
 
   goTo(bullet: number) {
-    if (this.carousel.numberDots === 1) return;
     if (this.currentSlide < bullet) {
       this.direction = 'right';
     } else {

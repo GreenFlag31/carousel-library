@@ -29,7 +29,7 @@ export class CarouselComponent implements OnInit {
   @Input() animationTimingMs = 300;
   @Input() animationTimingFn: AnimationTimingFn = 'ease-out';
   @Input() loop = true;
-  @Input() responsive = true;
+  @Input() responsive = false;
   @Input() autoSlide = false;
   mouseupSubscription!: Subscription;
   VChangeSubscription!: Subscription;

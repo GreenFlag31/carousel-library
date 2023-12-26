@@ -128,7 +128,7 @@ export class Carousel {
   }
 
   setWidthSlideContainer() {
-    // otherwise non visible gaps of non visible cards will not be scrollable
+    // otherwise non visible gaps of non visible cards will not be scrollable and needed to compute lastSlide offset
     this.widthSlideContainer =
       this.selectSlides().length * this.slideWidthWithGap - this.gap;
     this.slidesContainer.style.width = this.widthSlideContainer + 'px';
