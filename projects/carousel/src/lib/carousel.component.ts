@@ -1,15 +1,26 @@
-import { Component, ElementRef, Input, OnInit } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Inject,
+  Input,
+  OnInit,
+  PLATFORM_ID,
+  ViewEncapsulation,
+  isDevMode,
+} from '@angular/core';
 import { Subscription, fromEvent } from 'rxjs';
 import { Carousel } from './carousel';
 import { AnimationTimingFn } from './interfaces';
-import { SliderResponsive } from './sliderResponsive';
-import { SliderNotResponsive } from './sliderNotResponsive';
-// import { Helper } from './helper';
+import { Slider } from './slider';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'carousel',
   templateUrl: './carousel.component.html',
   styleUrls: ['./carousel.component.css'],
+  imports: [CommonModule],
+  standalone: true,
+  encapsulation: ViewEncapsulation.None,
 })
 export class CarouselComponent implements OnInit {
   @Input() maxWidthCarousel!: number;
@@ -27,20 +38,29 @@ export class CarouselComponent implements OnInit {
   @Input() counterSeparator = '/';
   @Input() gapBetweenSlides = 16;
   @Input() animationTimingMs = 300;
+  @Input() maxDomSize = 4;
   @Input() animationTimingFn: AnimationTimingFn = 'ease-out';
   @Input() loop = true;
-  @Input() responsive = false;
+  @Input() responsive = true;
   @Input() autoSlide = false;
   mouseupSubscription!: Subscription;
   VChangeSubscription!: Subscription;
   resizeSubscription!: Subscription;
   carousel!: Carousel;
-  slider!: SliderResponsive | SliderNotResponsive;
-  // helper!: Helper;
+  slider!: Slider;
+  isBrowser = true;
 
-  constructor(private elementRef: ElementRef) {}
+  constructor(
+    private elementRef: ElementRef,
+    @Inject(PLATFORM_ID) platformId: Object
+  ) {
+    this.isBrowser = isPlatformBrowser(platformId);
+  }
 
   ngOnInit() {
+    // console.log(isDevMode());
+    if (!this.isBrowser) return;
+
     const carouselContainer: HTMLDivElement =
       this.elementRef.nativeElement.children[0];
 
@@ -55,33 +75,21 @@ export class CarouselComponent implements OnInit {
       this.loop
     );
 
-    this.slider = this.responsive
-      ? new SliderResponsive(
-          this.carousel,
-          this.slideToScroll,
-          this.slidingLimitBeforeScroll,
-          this.strechingLimit,
-          this.autoSlide,
-          this.animationTimingFn,
-          this.animationTimingMs,
-          this.enableMouseDrag,
-          this.enableTouch,
-          this.loop
-        )
-      : new SliderNotResponsive(
-          this.carousel,
-          this.slideToScroll,
-          this.slidingLimitBeforeScroll,
-          this.strechingLimit,
-          this.autoSlide,
-          this.animationTimingFn,
-          this.animationTimingMs,
-          this.enableMouseDrag,
-          this.enableTouch,
-          this.loop
-        );
+    this.slider = new Slider(
+      this.carousel,
+      this.responsive,
+      this.slideToScroll,
+      this.slidingLimitBeforeScroll,
+      this.strechingLimit,
+      this.autoSlide,
+      this.animationTimingFn,
+      this.animationTimingMs,
+      this.maxDomSize,
+      this.enableMouseDrag,
+      this.enableTouch,
+      this.loop
+    );
 
-    // this.helper = new Helper(this.carousel, this.slider);
     this.listeners();
   }
 
@@ -96,7 +104,7 @@ export class CarouselComponent implements OnInit {
     this.VChangeSubscription = fromEvent(
       document,
       'visibilitychange'
-    ).subscribe((event: any) => {
+    ).subscribe((event) => {
       this.slider.unActiveTab(event);
     });
 
@@ -105,21 +113,24 @@ export class CarouselComponent implements OnInit {
     });
   }
 
+  /**
+   * Reinitialise variables at resize
+   */
   resize() {
-    // put back to start
     this.slider.currentSlide = 0;
     this.slider.computeTransformation(0);
-    if (this.loop && this.slider instanceof SliderResponsive) {
-      this.slider.changePrevAndNextLimits(0);
-    }
 
     this.carousel.updateProperties();
     this.slider.updateProperties();
+
+    if (this.loop) {
+      this.slider.changePrevAndNextLimits(0);
+    }
   }
 
   ngOnDestroy() {
-    this.mouseupSubscription.unsubscribe();
-    this.VChangeSubscription.unsubscribe();
-    this.resizeSubscription.unsubscribe();
+    this.mouseupSubscription?.unsubscribe();
+    this.VChangeSubscription?.unsubscribe();
+    this.resizeSubscription?.unsubscribe();
   }
 }

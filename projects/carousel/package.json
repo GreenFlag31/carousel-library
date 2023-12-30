@@ -1,9 +1,9 @@
 {
-  "name": "carousel",
+  "name": "ngx-carousel-glide",
   "version": "0.0.1",
   "peerDependencies": {
-    "@angular/common": "^14.2.0",
-    "@angular/core": "^14.2.0"
+    "@angular/common": "^17.0.8",
+    "@angular/core": "^17.0.8"
   },
   "dependencies": {
     "tslib": "^2.3.0"

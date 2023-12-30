@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { TestingComponent } from './testing/testing.component';
-import { CarouselModule } from 'carousel';
+import { CarouselModule } from 'projects/carousel/src/public-api';
 
 @NgModule({
   declarations: [AppComponent, TestingComponent],

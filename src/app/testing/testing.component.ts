@@ -1,15 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 
 @Component({
   selector: 'app-testing',
   templateUrl: './testing.component.html',
-  styleUrls: ['./testing.component.css']
+  styleUrls: ['./testing.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
-export class TestingComponent implements OnInit {
-
-  constructor() { }
-
-  ngOnInit(): void {
-  }
-
-}
+export class TestingComponent {}

@@ -1,9 +1,8 @@
 export class Carousel {
   slides!: NodeListOf<HTMLDivElement>;
-  slideWidth!: number;
   slideWidthWithGap!: number;
   numberDots!: number;
-  arrayNumberDots!: number[];
+  arrayNumberDots: number[] = [];
   slidesContainer!: HTMLDivElement;
   maxScrollableContent = 0;
   totalSlides = 0;
@@ -17,8 +16,8 @@ export class Carousel {
     private carousel: HTMLDivElement,
     private maxWidthCarousel: number,
     public slideToShow: number,
-    private minWidthSlide: number,
-    private width: number,
+    private slideMinWidth: number,
+    public slideWidth: number,
     public gap: number,
     private responsive: boolean,
     private loop: boolean
@@ -31,48 +30,70 @@ export class Carousel {
     this.initialSlideToShow = this.slideToShow;
     this.slidesContainer = this.selectSlidesContainer();
     this.slides = this.selectSlides();
-    this.arrayOfSlides = this.slidesArray();
+    this.arrayOfSlides = this.slidesToArray();
     this.totalSlides = this.slides.length;
+    this.slideWidth = Math.max(this.slideMinWidth, this.slideWidth);
     this.setWidthSlides();
     this.setMaxWidthCarousel();
     this.updateProperties();
-    this.slidesContainer.style.gap = this.gap + 'px';
+    this.slidesContainer.style.gap = `${this.gap}px`;
     this.setDraggableImgToFalse();
   }
 
+  /**
+   * Set the slide width and min width
+   * Width only affect not responsive mode. In responsive mode, width is automatically adapted through the setAutoColumnSlideContainer() method.
+   *
+   */
   setWidthSlides() {
-    this.slides.forEach((slide) => {
-      slide.style.minWidth = this.minWidthSlide + 'px';
+    for (const slide of this.slides) {
+      slide.style.minWidth = `${this.slideMinWidth}px`;
+
       if (!this.responsive) {
-        slide.style.width = this.width + 'px';
+        slide.style.width = `${this.slideWidth}px`;
       }
-    });
+    }
   }
 
+  /**
+   * Update carousel properties
+   * Occurs at start and at resizing.
+   */
   updateProperties() {
     this.carouselWidth = this.carousel.clientWidth;
     if (this.responsive) {
       this.updateSlideToShowResponsive();
+      this.setAutoColumnSlideContainer();
     } else {
       this.updateSlideToShowNotResponsive();
     }
+
     this.numberDots = this.setNumberDots();
     this.arrayNumberDots = [...Array(this.numberDots).keys()];
-    if (this.responsive) this.setAutoColumnSlideContainer();
 
     this.slideWidthWithGap = this.slideWidth + this.gap;
     this.setWidthSlideContainer();
     this.maxScrollableContent = this.getMaxScroll();
   }
 
+  /**
+   * Update slide to show (responsive mode)
+   * Computes the number of slide fitting
+   */
   updateSlideToShowResponsive() {
-    const minWidthPlusGap = this.minWidthSlide + this.gap;
+    const minWidthPlusGap = this.slideMinWidth + this.gap;
+
+    if (minWidthPlusGap === 0) {
+      throw new Error(
+        'Unable to update slide to show (responsive mode), min width of the slide and gap equal 0'
+      );
+    }
 
     let slideFitting = 1;
-    let referenceWidth = this.maxWidthCarousel || window.innerWidth;
-    if (this.maxWidthCarousel > window.innerWidth) {
-      referenceWidth = window.innerWidth;
-    }
+    const referenceWidth = Math.min(
+      this.maxWidthCarousel || Infinity,
+      window.innerWidth
+    );
 
     while (referenceWidth > minWidthPlusGap * slideFitting) {
       slideFitting++;
@@ -85,18 +106,31 @@ export class Carousel {
   determineSlideToShow(slideFitting: number) {
     if (slideFitting === 0) {
       this.slideToShow = 1;
-    } else if (slideFitting > this.initialSlideToShow) {
-      this.slideToShow = this.initialSlideToShow;
     } else {
-      this.slideToShow = slideFitting;
+      this.slideToShow = Math.min(slideFitting, this.initialSlideToShow);
     }
   }
 
+  /**
+   * Update slide to show (not responsive mode)
+   * Computes the number of slide fitting
+   */
   updateSlideToShowNotResponsive() {
-    this.slideWidth = this.slides[0].offsetWidth;
+    const slidePlusGap = this.slideWidth + this.gap;
+
+    if (slidePlusGap === 0) {
+      throw new Error(
+        'Unable to update slide to show (not responsive mode), min width of the slide and gap equal 0'
+      );
+    }
+
     let slideFitting = 1;
-    // Get number of FULL CARDS visible without offset, not responsive mode
-    while (this.carouselWidth > slideFitting * this.slideWidth) {
+    const referenceWidth = Math.min(
+      this.maxWidthCarousel || Infinity,
+      window.innerWidth
+    );
+
+    while (referenceWidth > slideFitting * slidePlusGap) {
       slideFitting++;
     }
     slideFitting--;
@@ -112,33 +146,40 @@ export class Carousel {
   }
 
   setMaxWidthCarousel() {
-    this.carousel.style.maxWidth = this.maxWidthCarousel + 'px';
+    this.carousel.style.maxWidth = `${this.maxWidthCarousel}px`;
   }
 
+  /**
+   * Set the with of a slide, responsive mode
+   * There are [n cards - 1] gaps (3 cards, 2 gaps)
+   */
   setAutoColumnSlideContainer() {
-    const widthCarousel =
+    const windowWidth =
       this.carouselWidth -
       this.paddingCarousel -
       (this.slideToShow - 1) * this.gap;
 
-    const widthPerSlide = widthCarousel / this.slideToShow;
-    this.slidesContainer.style.gridAutoColumns = widthPerSlide + 'px';
+    const widthPerSlide = windowWidth / this.slideToShow;
+    this.slidesContainer.style.gridAutoColumns = `${widthPerSlide}px`;
 
     this.slideWidth = widthPerSlide;
   }
 
+  /**
+   * Define the slide container width
+   * Make non visible gaps of non visible cards scrollable and is used to compute the maxScrollableContent (strechingEffect)
+   */
   setWidthSlideContainer() {
-    // otherwise non visible gaps of non visible cards will not be scrollable and needed to compute lastSlide offset
     this.widthSlideContainer =
       this.selectSlides().length * this.slideWidthWithGap - this.gap;
-    this.slidesContainer.style.width = this.widthSlideContainer + 'px';
+    this.slidesContainer.style.width = `${this.widthSlideContainer}px`;
   }
 
   selectSlides(): NodeListOf<HTMLDivElement> {
     return this.carousel.querySelectorAll('.carousel-slide');
   }
 
-  slidesArray() {
+  slidesToArray() {
     return Array.from(this.slides);
   }
 
@@ -146,8 +187,11 @@ export class Carousel {
     return this.carousel.querySelector('.slides-container') as HTMLDivElement;
   }
 
+  /**
+   * Set number of dots
+   * If infinite mode, one more window than normal mode.
+   */
   setNumberDots() {
-    // if loop (infinite) then totalSlides, one more window then 'normal'
     if (this.loop) {
       return this.totalSlides === this.slideToShow ? 1 : this.totalSlides;
     }
@@ -157,6 +201,10 @@ export class Carousel {
       : this.totalSlides;
   }
 
+  /**
+   * Get the max scrollable content
+   * Useful for the streching effect (not infinite mode), end of the slides
+   */
   getMaxScroll() {
     return (this.numberDots - 1) * this.slideWidthWithGap;
   }

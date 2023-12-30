@@ -64,13 +64,13 @@
 .bullet.current {
   background: #0079b4;
 }
-::ng-deep .carousel-slide {
+.carousel-slide {
   width: 100%;
   border-radius: 1em;
   box-shadow: 0px 2px 4px 0px rgb(158 158 158 / 83%);
   user-select: none;
 }
-::ng-deep .slides-container.dragging {
+.slides-container.dragging {
   cursor: grab;
 }
 
