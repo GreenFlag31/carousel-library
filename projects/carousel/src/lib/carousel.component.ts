@@ -27,11 +27,12 @@ import { Validation } from './validation';
 })
 export class CarouselComponent implements OnInit {
   @Input() maxWidthCarousel!: number;
-  @Input() slideToShow = 1;
+  @Input() slideToShow = 3;
   @Input() slideToScroll = 2;
   @Input() autoslideLimitPercentCard = 30;
   @Input() strechingLimit = 60;
-  @Input() slideWidth = 500;
+  @Input() slideMinWidth = 300;
+  @Input() slideWidth = 300;
   @Input() slideMaxWidth = 500;
   @Input() dots = true;
   @Input() arrows = true;
@@ -44,7 +45,7 @@ export class CarouselComponent implements OnInit {
   @Input() maxDomSize = 4;
   @Input() animationTimingFn: AnimationTimingFn = 'ease-out';
   @Input() infinite = true;
-  @Input() responsive = false;
+  @Input() responsive = true;
   @Input() autoSlide = true;
   mouseupSubscription!: Subscription;
   VChangeSubscription!: Subscription;
@@ -78,6 +79,7 @@ export class CarouselComponent implements OnInit {
       carouselContainer,
       this.maxWidthCarousel,
       this.slideToShow,
+      this.slideMinWidth,
       this.slideWidth,
       this.slideMaxWidth,
       this.gapBetweenSlides,

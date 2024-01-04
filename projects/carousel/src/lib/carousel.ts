@@ -16,6 +16,7 @@ export class Carousel {
     private readonly carousel: HTMLDivElement,
     private readonly maxWidthCarousel: number,
     public slideToShow: number,
+    public readonly slideMinWidth: number,
     public slideWidth: number,
     public readonly slideMaxWidth: number,
     public readonly gap: number,
@@ -46,6 +47,7 @@ export class Carousel {
    */
   setWidthSlides() {
     for (const slide of this.slides) {
+      slide.style.minWidth = `${this.slideMinWidth}px`;
       slide.style.maxWidth = `${this.slideMaxWidth}px`;
 
       if (!this.responsive) {
@@ -79,15 +81,14 @@ export class Carousel {
    * Computes the number of slide fitting
    */
   updateSlideToShowResponsive() {
-    const slideWidthPlusGap = this.slideWidth + this.gap;
+    const slideWidthPlusGap = this.slideMinWidth + this.gap;
 
     const referenceWidth = Math.min(
       this.maxWidthCarousel || Infinity,
       window.innerWidth
     );
 
-    const slideFitting = Math.floor(referenceWidth / slideWidthPlusGap);
-    console.log(slideFitting);
+    const slideFitting = Math.floor(referenceWidth / slideWidthPlusGap) || 1;
 
     this.determineSlideToShow(slideFitting);
   }
@@ -117,9 +118,8 @@ export class Carousel {
       window.innerWidth
     );
 
-    const numberOfSlidesComputed = Math.floor(
-      referenceWidth / slideWidthPlusGap
-    );
+    const numberOfSlidesComputed =
+      Math.floor(referenceWidth / slideWidthPlusGap) || 1;
     const slideFitting = Math.min(numberOfSlidesComputed, this.totalSlides);
 
     this.determineSlideToShow(slideFitting);
