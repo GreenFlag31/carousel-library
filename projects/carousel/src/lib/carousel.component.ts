@@ -1,4 +1,6 @@
 import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   ElementRef,
   Inject,
@@ -6,13 +8,13 @@ import {
   OnInit,
   PLATFORM_ID,
   ViewEncapsulation,
-  isDevMode,
 } from '@angular/core';
 import { Subscription, fromEvent } from 'rxjs';
 import { Carousel } from './carousel';
 import { AnimationTimingFn } from './interfaces';
 import { Slider } from './slider';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Validation } from './validation';
 
 @Component({
   selector: 'carousel',
@@ -21,15 +23,16 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
   imports: [CommonModule],
   standalone: true,
   encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CarouselComponent implements OnInit {
   @Input() maxWidthCarousel!: number;
-  @Input() slideToShow = 5;
+  @Input() slideToShow = 1;
   @Input() slideToScroll = 2;
-  @Input() slidingLimitBeforeScroll = 30;
+  @Input() autoslideLimitPercentCard = 30;
   @Input() strechingLimit = 60;
-  @Input() slideWidth = 300;
-  @Input() slideMinWidth = 300;
+  @Input() slideWidth = 500;
+  @Input() slideMaxWidth = 500;
   @Input() dots = true;
   @Input() arrows = true;
   @Input() counter = true;
@@ -40,9 +43,9 @@ export class CarouselComponent implements OnInit {
   @Input() animationTimingMs = 300;
   @Input() maxDomSize = 4;
   @Input() animationTimingFn: AnimationTimingFn = 'ease-out';
-  @Input() loop = true;
-  @Input() responsive = true;
-  @Input() autoSlide = false;
+  @Input() infinite = true;
+  @Input() responsive = false;
+  @Input() autoSlide = true;
   mouseupSubscription!: Subscription;
   VChangeSubscription!: Subscription;
   resizeSubscription!: Subscription;
@@ -52,34 +55,41 @@ export class CarouselComponent implements OnInit {
 
   constructor(
     private elementRef: ElementRef,
+    private changeDetection: ChangeDetectorRef,
     @Inject(PLATFORM_ID) platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
   }
 
   ngOnInit() {
-    // console.log(isDevMode());
     if (!this.isBrowser) return;
 
     const carouselContainer: HTMLDivElement =
       this.elementRef.nativeElement.children[0];
 
+    new Validation(
+      carouselContainer,
+      this.slideWidth,
+      this.slideMaxWidth,
+      this.gapBetweenSlides
+    );
+
     this.carousel = new Carousel(
       carouselContainer,
       this.maxWidthCarousel,
       this.slideToShow,
-      this.slideMinWidth,
       this.slideWidth,
+      this.slideMaxWidth,
       this.gapBetweenSlides,
       this.responsive,
-      this.loop
+      this.infinite
     );
 
     this.slider = new Slider(
       this.carousel,
       this.responsive,
       this.slideToScroll,
-      this.slidingLimitBeforeScroll,
+      this.autoslideLimitPercentCard,
       this.strechingLimit,
       this.autoSlide,
       this.animationTimingFn,
@@ -87,7 +97,7 @@ export class CarouselComponent implements OnInit {
       this.maxDomSize,
       this.enableMouseDrag,
       this.enableTouch,
-      this.loop
+      this.infinite
     );
 
     this.listeners();
@@ -117,15 +127,18 @@ export class CarouselComponent implements OnInit {
    * Reinitialise variables at resize
    */
   resize() {
-    this.slider.currentSlide = 0;
-    this.slider.computeTransformation(0);
-
     this.carousel.updateProperties();
     this.slider.updateProperties();
 
-    if (this.loop) {
+    this.slider.currentSlide = 0;
+    this.slider.accumulatedSlide = 0;
+    this.slider.computeTransformation(0);
+
+    if (this.infinite) {
       this.slider.changePrevAndNextLimits(0);
     }
+
+    this.changeDetection.detectChanges();
   }
 
   ngOnDestroy() {

@@ -16,7 +16,7 @@ export class Slider {
   slidesContainer!: HTMLDivElement;
   arrayOfSlides!: HTMLDivElement[];
   totalAmountOfSlides!: number;
-  maxTranslationValue = 0;
+  initialFullWidth = 0;
   lastWindowTranslation = 0;
   totalSlides = 0;
   DOMLimitReached = false;
@@ -25,7 +25,7 @@ export class Slider {
   accumulatedSlide = 0;
 
   constructor(
-    private carousel: Carousel,
+    private readonly carousel: Carousel,
     private readonly responsive: boolean,
     private readonly slideToScroll: number,
     private readonly LIMIT_AUTO_SLIDE: number,
@@ -36,10 +36,11 @@ export class Slider {
     private readonly MAX_DOM_SIZE: number,
     private readonly enableMouseDrag: boolean,
     private readonly enableTouch: boolean,
-    private readonly loop: boolean
+    private readonly infinite: boolean
   ) {
     this.initProperties();
     this.updateProperties();
+    this.addSlidesToRightAtStart();
   }
 
   initProperties() {
@@ -61,8 +62,7 @@ export class Slider {
 
     this.updateNotResponsive();
 
-    this.maxTranslationValue =
-      this.totalSlides * this.carousel.slideWidthWithGap;
+    this.initialFullWidth = this.totalSlides * this.carousel.slideWidthWithGap;
 
     this.lastWindowTranslation =
       this.slidesContainer.clientWidth -
@@ -77,6 +77,11 @@ export class Slider {
       this.carousel.widthSlideContainer -
       this.carousel.carouselWidth +
       this.carousel.paddingCarousel;
+
+    if (this.carousel.numberDots === 1) {
+      // if all slides visible in one window, max scrollable content equals 0
+      this.carousel.maxScrollableContent = 0;
+    }
   }
 
   updateNotResponsive() {
@@ -90,6 +95,18 @@ export class Slider {
 
     this.invisibleOffsetCardNotResponsive =
       this.carousel.slideWidth - this.visibleOffsetCardNotResponsive;
+  }
+
+  /**
+   * Add slides to the right at start
+   * If only one window (number of dots === 1) and not responsive mode, there is possibly space at start for slides to the right (even though this configuration does not make a lot of sense)
+   */
+  addSlidesToRightAtStart() {
+    if (this.carousel.numberDots > 1 || this.responsive || !this.infinite) {
+      return;
+    }
+
+    this.addSlidesToTheRight();
   }
 
   /**
@@ -118,7 +135,7 @@ export class Slider {
     if (this.currentEventIsDisabled(event)) return;
     this.dragging = false;
     this.previousTranslation = this.currentTranslation;
-    if (this.loop) return;
+    if (this.infinite) return;
 
     const limit =
       this.currentTranslation > 0 ||
@@ -164,9 +181,10 @@ export class Slider {
 
     this.positionChange = this.currentX - this.startX;
     this.currentTranslation = this.positionChange + this.previousTranslation;
+    // console.log(this.currentTranslation);
 
-    // First or last slide exceeding limits, finite mode
-    if (!this.loop) {
+    // Current translation exceeding start of end limits, finite mode
+    if (!this.infinite) {
       if (this.strechingEffect()) return;
     }
 
@@ -191,7 +209,7 @@ export class Slider {
    * If createSlidesInfiniteModeIfLimitsReached() or autoSlider() don't take action, slide change according to previous computed limits.
    */
   modifyCurrentSlide() {
-    if (this.loop) {
+    if (this.infinite) {
       if (this.createSlidesInfiniteModeIfLimitsReached()) return;
     }
 
@@ -210,6 +228,7 @@ export class Slider {
 
   /**
    * Handle slide creation in infinite mode if limits reached
+   * Mouse or touch drag.
    */
   createSlidesInfiniteModeIfLimitsReached() {
     if (this.currentTranslation > 0) {
@@ -221,11 +240,7 @@ export class Slider {
         this.changeSlideNumber(1);
       }
       return true;
-    } else if (
-      -this.currentTranslation > this.lastWindowTranslation
-      //    - this.carousel.slideWidthWithGap &&
-      // this.direction === 'right'
-    ) {
+    } else if (-this.currentTranslation > this.lastWindowTranslation) {
       this.addSlidesToTheRight();
 
       if (this.DOMLimitReached) {
@@ -241,29 +256,35 @@ export class Slider {
    * Auto slide card if option enabled
    * Applied on right or left direction. If the dragging is greater than the limit in percent, auto slide occurs.
    * Prevents auto slide on limits in finite mode (if streching < limit auto slide).
+   * If only one slide is displayed (slideToShow === 1), the width of the slide corresponds to the window's width (a dot). Hence, taking the min between the two.
    */
   autoSlider() {
     if (
-      !this.loop &&
+      !this.infinite &&
       ((this.currentSlide === 0 && this.direction === 'left') ||
         (this.currentSlide === this.lastWindow && this.direction === 'right'))
     ) {
       return true;
     }
 
-    const moveComparedToSlide =
-      (this.positionChange / this.carousel.slideWidth) * 100;
+    const referenceWidth = Math.min(
+      this.carousel.slideWidth,
+      this.carousel.slideMaxWidth || Infinity
+    );
+
+    const moveComparedToSlide = (this.positionChange / referenceWidth) * 100;
 
     if (
       moveComparedToSlide < -this.LIMIT_AUTO_SLIDE ||
       moveComparedToSlide > this.LIMIT_AUTO_SLIDE
     ) {
-      const change = this.direction === 'right' ? 1 : -1;
-      this.accumulatedSlide += change;
-      this.currentSlide += change;
-
+      this.changeSlideNumber(1);
       this.computeTransformation(this.accumulatedSlide);
       this.changePrevAndNextLimits(this.accumulatedSlide);
+
+      if (-this.currentTranslation > this.lastWindowTranslation) {
+        this.addSlidesToTheRight();
+      }
       return true;
     }
 
@@ -283,7 +304,7 @@ export class Slider {
       }
 
       this.accumulatedSlide += this.totalSlides;
-      // this.resetViewLeftDirection();
+      this.resetViewLeftDirection();
     } else {
       for (let i = 0; i < this.arrayOfSlides.length; i++) {
         const clonedElement = this.arrayOfSlides[i].cloneNode(true);
@@ -293,6 +314,7 @@ export class Slider {
 
     if (this.totalAmountOfSlides >= this.MAX_DOM_SIZE * this.totalSlides) {
       // Limit DOM growth, max X times original DOM
+      console.log('dom limit reached');
       this.limitDOMGrowth();
       this.DOMLimitReached = true;
     } else {
@@ -325,21 +347,27 @@ export class Slider {
         slides[i].remove();
       }
 
-      this.resetViewLeftDirection();
+      // this.resetViewLeftDirection();
     }
   }
 
   /**
    * Reset the view in a movement to the left
-   * Last set of slides has been deleted, so the translation has to be updated accordingly.
+   * New slides added to the left, so the view has to be updated accordingly.
+   * If the carousel is moved with the mouse | touch event (dragging is true), the offset should be equal to a full carousel width. Otherwise (with the buttons), the computed translation should be taken into account.
+   * Side comment: the view does not have to be updated for slides added to the right, since relative order does not change.
    * offsetHeight triggers reflow of the element.
    */
   resetViewLeftDirection() {
-    // puts back to previous position
-    // const translation = this.maxTranslationValue - this.previousTranslation;
-    // this.slidesContainer.style.transition = 'none';
-    // this.slidesContainer.style.transform = `translate3d(${-translation}px, 0px, 0px)`;
-    // this.slidesContainer.offsetHeight;
+    const translation =
+      Math.abs(this.previousTranslation) + this.initialFullWidth;
+    this.previousTranslation = -translation;
+
+    this.slidesContainer.style.transition = 'none';
+    this.slidesContainer.style.transform = `translate3d(${
+      this.dragging ? -this.initialFullWidth : -translation
+    }px, 0px, 0px)`;
+    this.slidesContainer.offsetHeight;
   }
 
   /**
@@ -349,9 +377,8 @@ export class Slider {
    * offsetHeight triggers reflow of the element.
    */
   resetViewRightDirection() {
-    const translation =
-      this.currentTranslation +
-      this.totalSlides * this.carousel.slideWidthWithGap;
+    const translation = this.currentTranslation + this.initialFullWidth;
+
     this.slidesContainer.style.transition = 'none';
     this.slidesContainer.style.transform = `translate3d(${translation}px, 0px, 0px)`;
     this.previousTranslation = translation - this.positionChange;
@@ -374,21 +401,8 @@ export class Slider {
       : -this.visibleOffsetCardNotResponsive - this.carousel.gap;
   }
 
-  /**
-   * Add slides to the left
-   * Put back the translation where it was (new slides created, offset appear)
-   */
   addSlidesToTheLeft() {
     this.appendOrPrependNElements();
-
-    const translation =
-      Math.abs(this.previousTranslation) + this.maxTranslationValue;
-    this.previousTranslation = -translation;
-
-    this.slidesContainer.style.transition = 'none';
-    this.slidesContainer.style.transform = `translate3d(${-this
-      .maxTranslationValue}px, 0px, 0px)`;
-    this.slidesContainer.offsetHeight;
   }
 
   addSlidesToTheRight() {
@@ -397,14 +411,14 @@ export class Slider {
 
   /**
    * Decrease limit (movement to the left)
-   * In infinite mode, take max translation value if first slide as new slides are created to the left (a whole set offset).
+   * In infinite mode, take full width of a set if on the first slide as new slides are created to the left (a whole set offset).
    * Exception: if not responsive (card offset) and finite carousel, the next limit is at the maximum (the end of the carousel)
    */
   decreaseLimits() {
     let translationCorrectionAfterClone = this.prevLimit;
-    if (this.loop) {
+    if (this.infinite) {
       translationCorrectionAfterClone =
-        this.prevLimit <= 0 ? this.maxTranslationValue : this.prevLimit;
+        this.prevLimit <= 0 ? this.initialFullWidth : this.prevLimit;
     }
 
     this.prevLimit =
@@ -414,7 +428,7 @@ export class Slider {
 
     if (
       !this.responsive &&
-      !this.loop &&
+      !this.infinite &&
       this.currentSlide >= this.lastWindow - 1
     ) {
       this.nextLimit = this.lastWindowTranslation;
@@ -439,7 +453,7 @@ export class Slider {
 
     if (
       !this.responsive &&
-      !this.loop &&
+      !this.infinite &&
       this.currentSlide >= this.lastWindow - 1
     ) {
       this.nextLimit = this.lastWindowTranslation;
@@ -471,21 +485,12 @@ export class Slider {
     console.log(this.prevLimit, this.nextLimit);
   }
 
+  /**
+   * Previous button navigation
+   */
   prev() {
     this.direction = 'left';
-    if (this.loop) {
-      this.handleBtnInfinite();
-      return;
-    }
-
-    this.changeSlideNumber(this.slideToScroll);
-    this.changePrevAndNextLimits(this.currentSlide);
-    this.computeTransformation(this.currentSlide);
-  }
-
-  next() {
-    this.direction = 'right';
-    if (this.loop) {
+    if (this.infinite) {
       this.handleBtnInfinite();
       return;
     }
@@ -496,7 +501,22 @@ export class Slider {
   }
 
   /**
-   * Handle navigation with the buttons
+   * Next button navigation
+   */
+  next() {
+    this.direction = 'right';
+    if (this.infinite) {
+      this.handleBtnInfinite();
+      return;
+    }
+
+    this.changeSlideNumber(this.slideToScroll);
+    this.changePrevAndNextLimits(this.currentSlide);
+    this.computeTransformation(this.currentSlide);
+  }
+
+  /**
+   * Buttons navigation in infinite mode
    * Create new slide if limits reached (start or end). Update slide, limits and apply transformation accordingly.
    */
   handleBtnInfinite() {
@@ -523,13 +543,13 @@ export class Slider {
   }
 
   /**
-   * Navigation with the bullet points
+   * Navigation with bullet points
    * Update values accordingly.
    */
   goTo(bullet: number) {
     this.direction = this.currentSlide < bullet ? 'right' : 'left';
 
-    if (this.loop) {
+    if (this.infinite) {
       this.navInfiniteBullets(bullet);
       return;
     }
@@ -541,7 +561,7 @@ export class Slider {
   }
 
   /**
-   * Handle in infinite mode bullet navigation
+   * Bullets navigation
    * Create new slides if exceeding end of carousel.
    */
   navInfiniteBullets(bullet: number) {
@@ -567,11 +587,10 @@ export class Slider {
 
   /**
    * Responsible for changing slide number in finite and infinite mode
+   * Exception: if only one window (numberDots === 1), update the accumulatedSlide to let the transformation occurs, but currentSlide should stay at 0.
    */
   changeSlideNumber(step: number) {
-    if (this.carousel.numberDots === 1) return;
-
-    if (this.loop) {
+    if (this.infinite) {
       if (this.direction === 'right') {
         this.accumulatedSlide += step;
         if ((this.currentSlide += step) > this.lastWindow) {
@@ -586,19 +605,26 @@ export class Slider {
         }
       }
 
+      if (this.carousel.numberDots === 1) {
+        this.currentSlide = 0;
+      }
       return;
     }
 
     if (this.direction === 'right') {
       if ((this.currentSlide += step) > this.lastWindow) {
         this.currentSlide = this.lastWindow;
-        this.accumulatedSlide = this.currentSlide;
       }
+      this.accumulatedSlide = this.currentSlide;
     } else {
       if ((this.currentSlide -= step) < 0) {
         this.currentSlide = 0;
-        this.accumulatedSlide = 0;
       }
+      this.accumulatedSlide = this.currentSlide;
+    }
+
+    if (this.carousel.numberDots === 1) {
+      this.currentSlide = 0;
     }
   }
 
@@ -609,7 +635,12 @@ export class Slider {
   computeTransformation(slide: number) {
     let transformation = slide * this.carousel.slideWidthWithGap;
 
-    if (!this.responsive && !this.loop && slide >= this.lastWindow - 1) {
+    if (
+      !this.responsive &&
+      !this.infinite &&
+      slide >= this.lastWindow - 1 &&
+      this.carousel.numberDots > 1
+    ) {
       this.nextLimit = this.lastWindowTranslation;
 
       if (slide === this.lastWindow) {
@@ -637,7 +668,7 @@ export class Slider {
   /**
    * Trigger drag stop
    * If client leaves the page (navigating to another tab) and comes back, stop the dragging.
-   * Correct typing not possible?
+   * Correct Typescript typing not possible?
    */
   unActiveTab(event: any) {
     if (event.target.visibilityState === 'visible') {

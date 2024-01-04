@@ -13,14 +13,14 @@ export class Carousel {
   arrayOfSlides: HTMLDivElement[] = [];
 
   constructor(
-    private carousel: HTMLDivElement,
-    private maxWidthCarousel: number,
+    private readonly carousel: HTMLDivElement,
+    private readonly maxWidthCarousel: number,
     public slideToShow: number,
-    private slideMinWidth: number,
     public slideWidth: number,
-    public gap: number,
-    private responsive: boolean,
-    private loop: boolean
+    public readonly slideMaxWidth: number,
+    public readonly gap: number,
+    private readonly responsive: boolean,
+    private readonly loop: boolean
   ) {
     this.init();
   }
@@ -32,7 +32,6 @@ export class Carousel {
     this.slides = this.selectSlides();
     this.arrayOfSlides = this.slidesToArray();
     this.totalSlides = this.slides.length;
-    this.slideWidth = Math.max(this.slideMinWidth, this.slideWidth);
     this.setWidthSlides();
     this.setMaxWidthCarousel();
     this.updateProperties();
@@ -41,13 +40,13 @@ export class Carousel {
   }
 
   /**
-   * Set the slide width and min width
-   * Width only affect not responsive mode. In responsive mode, width is automatically adapted through the setAutoColumnSlideContainer() method.
+   * Set the slide width and max width
+   * NB: In responsive mode, width is automatically adapted through the setAutoColumnSlideContainer() method.
    *
    */
   setWidthSlides() {
     for (const slide of this.slides) {
-      slide.style.minWidth = `${this.slideMinWidth}px`;
+      slide.style.maxWidth = `${this.slideMaxWidth}px`;
 
       if (!this.responsive) {
         slide.style.width = `${this.slideWidth}px`;
@@ -67,7 +66,6 @@ export class Carousel {
     } else {
       this.updateSlideToShowNotResponsive();
     }
-
     this.numberDots = this.setNumberDots();
     this.arrayNumberDots = [...Array(this.numberDots).keys()];
 
@@ -81,68 +79,58 @@ export class Carousel {
    * Computes the number of slide fitting
    */
   updateSlideToShowResponsive() {
-    const minWidthPlusGap = this.slideMinWidth + this.gap;
+    const slideWidthPlusGap = this.slideWidth + this.gap;
 
-    if (minWidthPlusGap === 0) {
-      throw new Error(
-        'Unable to update slide to show (responsive mode), min width of the slide and gap equal 0'
-      );
-    }
-
-    let slideFitting = 1;
     const referenceWidth = Math.min(
       this.maxWidthCarousel || Infinity,
       window.innerWidth
     );
 
-    while (referenceWidth > minWidthPlusGap * slideFitting) {
-      slideFitting++;
-    }
-    slideFitting--;
+    const slideFitting = Math.floor(referenceWidth / slideWidthPlusGap);
+    console.log(slideFitting);
 
     this.determineSlideToShow(slideFitting);
   }
 
+  /**
+   * Determine slide to show
+   * Useful to compute the slide displayed on screen and for the slider class.
+   * In not responsive mode, the maximum slides to show is determined by the maximum available space and the width of the slide set by the user.
+   */
   determineSlideToShow(slideFitting: number) {
-    if (slideFitting === 0) {
-      this.slideToShow = 1;
-    } else {
-      this.slideToShow = Math.min(slideFitting, this.initialSlideToShow);
-    }
+    const maxSlidesToShow = this.responsive
+      ? this.initialSlideToShow
+      : this.totalSlides;
+
+    this.slideToShow = Math.min(slideFitting, maxSlidesToShow);
   }
 
   /**
    * Update slide to show (not responsive mode)
-   * Computes the number of slide fitting
+   * Computes the number of slide fitting. The number of slides to be shown are determined by the number of slides fitting within its container.
    */
   updateSlideToShowNotResponsive() {
-    const slidePlusGap = this.slideWidth + this.gap;
+    const slideWidthPlusGap = this.slideWidth + this.gap;
 
-    if (slidePlusGap === 0) {
-      throw new Error(
-        'Unable to update slide to show (not responsive mode), min width of the slide and gap equal 0'
-      );
-    }
-
-    let slideFitting = 1;
     const referenceWidth = Math.min(
       this.maxWidthCarousel || Infinity,
       window.innerWidth
     );
 
-    while (referenceWidth > slideFitting * slidePlusGap) {
-      slideFitting++;
-    }
-    slideFitting--;
+    const numberOfSlidesComputed = Math.floor(
+      referenceWidth / slideWidthPlusGap
+    );
+    const slideFitting = Math.min(numberOfSlidesComputed, this.totalSlides);
 
     this.determineSlideToShow(slideFitting);
   }
 
   getPaddingCarousel() {
-    const padding = window
-      .getComputedStyle(this.carousel)
-      .getPropertyValue('padding-left');
-    return parseFloat(padding) * 2;
+    const computedStyle = window.getComputedStyle(this.carousel);
+    const paddingLeft = computedStyle.getPropertyValue('padding-left');
+    const paddingRight = computedStyle.getPropertyValue('padding-right');
+
+    return parseFloat(paddingLeft) + parseFloat(paddingRight);
   }
 
   setMaxWidthCarousel() {

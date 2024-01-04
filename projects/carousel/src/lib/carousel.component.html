@@ -3,20 +3,25 @@
     <div class="btn-container" *ngIf="arrows">
       <button
         class="prev"
+        aria-label="previous button navigation"
         (click)="slider.prev()"
         [disabled]="
-          slider.currentSlide === 0 && slider.currentTranslation >= 0 && !loop
+          !infinite &&
+          ((slider.currentSlide === 0 && slider.currentTranslation >= 0) ||
+            carousel.numberDots === 1)
         "
       >
         <i class="fa-solid fa-arrow-left-long"></i>
       </button>
       <button
         class="next"
+        aria-label="next button navigation"
         (click)="slider.next()"
         [disabled]="
-          slider.currentSlide === carousel.numberDots - 1 &&
-          slider.currentTranslation <= -carousel.maxScrollableContent &&
-          !loop
+          !infinite &&
+          ((slider.currentSlide === carousel.numberDots - 1 &&
+            slider.currentTranslation <= -carousel.maxScrollableContent) ||
+            carousel.numberDots === 1)
         "
       >
         <i class="fa-solid fa-arrow-right-long"></i>
@@ -45,6 +50,7 @@
   <div class="bullets-container" *ngIf="dots">
     <button
       class="bullet"
+      aria-label="bullet point navigation"
       *ngFor="let bullet of carousel.arrayNumberDots"
       [class.current]="bullet === slider.currentSlide"
       (click)="slider.goTo(bullet)"
