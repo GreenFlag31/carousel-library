@@ -1,5 +1,7 @@
 # ngx-carousel-ease
 
-| Name       | Default     | Description   |
-| ---------- | ----------- | ------------- |
-| responsive | slideToShow | slideToScroll |
+| Name                                                       | Default                                          | Description                                                                                                                                                                      |
+| ---------------------------------------------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| responsive                                                 | true                                             | Width of the slides will be automatically adapted.                                                                                                                               |
+| <span style="background-color:#f2f2f2;">slideToShow</span> | <span style="background-color:#f2f2f2;">3</span> | <span style="background-color:#f2f2f2;">Number of slides to show. In non-responsive mode, slide to show is determined by the available space and the width of the slides.</span> |
+| responsive                                                 | true                                             | Width of the slides will be automatically adapted.                                                                                                                               |
