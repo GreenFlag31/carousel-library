@@ -18,17 +18,31 @@ You can install the library using the following command:
 npm i ngx-carousel-ease
 ```
 
+Then, add the `CarouselModule` in the imports array of the hosting component (if standalone) or to your appModule.
+Finally, add your cards content within the `<carousel></carousel>` selector. Each of your card content should contain the class `carousel-slide`.
+
+```
+<carousel>
+  <div class="carousel-slide">
+    ...
+  </div>
+  <div class="carousel-slide">
+    ...
+  </div>
+</carousel>
+```
+
 # Inputs
 
 | Name                                                                     | Default                                                   | Description                                                                                                                                                                         |
 | ------------------------------------------------------------------------ | --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| <span style="background-color:#f2f2f2;">maxWidthCarousel</span>          | <span style="background-color:#f2f2f2;">undefined</span>  | <span style="background-color:#f2f2f2;">Defines the max width of the carousel. The max width should be defined in pixels.</span>                                                    |
-| infinite                                                                 | true                                                      | Enable infinite loop of slides.                                                                                                                                                     |
-| <span style="background-color:#f2f2f2;">responsive</span>                | <span style="background-color:#f2f2f2;">true</span>       | <span style="background-color:#f2f2f2;">Width of the slides will be automatically adapted. In non responsive mode, the width of the slides won't be adapted.</span>                 |
+| <span style="background-color:#f2f2f2;">maxWidthCarousel</span>          | <span style="background-color:#f2f2f2;">undefined</span>  | <span style="background-color:#f2f2f2;">Defines the max width of the carousel. The max width should be defined in pixels. If not defined, defaulted to window's width.</span>       |
+| infinite                                                                 | false                                                     | Enable infinite loop of slides.                                                                                                                                                     |
+| <span style="background-color:#f2f2f2;">responsive</span>                | <span style="background-color:#f2f2f2;">true</span>       | <span style="background-color:#f2f2f2;">Width of the slides will be automatically adapted. In non-responsive mode, the width of the slides won't be adapted.</span>                 |
 | autoSlide                                                                | false                                                     | Enable automatic sliding.                                                                                                                                                           |
+| <span style="background-color:#f2f2f2;">autoslideLimitPercentCard</span> | <span style="background-color:#f2f2f2;">30</span>         | <span style="background-color:#f2f2f2;">Percentage of the card compared to mouvement to trigger automatic sliding.</span>                                                           |
 | <span style="background-color:#f2f2f2;">slideToShow</span>               | <span style="background-color:#f2f2f2;">3</span>          | <span style="background-color:#f2f2f2;">Number of slides to show at a time. The number of slides to show is dependant of the available space.</span>                                |
 | <span style="background-color:#f2f2f2;">slideToScroll</span>             | <span style="background-color:#f2f2f2;">2</span>          | <span style="background-color:#f2f2f2;">Number of slides to scroll at a time.</span>                                                                                                |
-| <span style="background-color:#f2f2f2;">autoslideLimitPercentCard</span> | <span style="background-color:#f2f2f2;">30</span>         | <span style="background-color:#f2f2f2;">Percentage of the card visible to trigger automatic sliding.</span>                                                                         |
 | <span style="background-color:#f2f2f2;">strechingLimit</span>            | <span style="background-color:#f2f2f2;">60</span>         | <span style="background-color:#f2f2f2;">Limit for the stretching effect in pixels. Streching effect occurs only in finite mode and at the start or end of the carousel.</span>      |
 | <span style="background-color:#f2f2f2;">slideWidth</span>                | <span style="background-color:#f2f2f2;">300</span>        | <span style="background-color:#f2f2f2;">Width of each slide in pixels.</span>                                                                                                       |
 | <span style="background-color:#f2f2f2;">slideMaxWidth</span>             | <span style="background-color:#f2f2f2;">500</span>        | <span style="background-color:#f2f2f2;">Maximum width of each slide in pixels.</span>                                                                                               |
