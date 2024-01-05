@@ -35,7 +35,7 @@ Finally, add your cards content within the `<carousel></carousel>` selector in t
 
 # Inputs
 
-This carousel is configured by default and all options are optional.
+This carousel is configured by default and all inputs are optional.
 
 | Name                                                                     | Default                                                   | Description                                                                                                                                                                                                                                                |
 | ------------------------------------------------------------------------ | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -77,7 +77,7 @@ The following example changes the defaulted blue arrows:
 
 # SSR (Server Side Rendering)
 
-This library supports Server Side Rendering (SSR). The carousel will not instantiate during server-side execution, as it requires access to the DOM API.
+This library supports Server Side Rendering (SSR). The carousel will not instantiate during server-side execution, as it requires access to the DOM API, preventing errors.
 
 # DX Friendly
 
@@ -85,7 +85,7 @@ Ensuring a seamless Developer Experience (DX), basic validation is performed on 
 
 # Performance
 
-Emphasis has been placed on performance, adopting ChangeDetectionStrategy.OnPush and utilizing translate3d instead of translateX. This choice aims to enable hardware acceleration in specific scenarios, which can contribute to a smoother and more efficient user experience. Bu default, if infinite mode is enabled, a function will prevent infinite DOM growth by removing invisible cards.
+Emphasis has been placed on performance, adopting `ChangeDetectionStrategy.OnPush` and utilizing `translate3d` instead of `translateX`. This choice aims to enable hardware acceleration in specific scenarios, which can contribute to a smoother and more efficient user experience. By default, if infinite mode is enabled, a function will prevent infinite DOM growth by removing invisible cards.
 
 # Report a Bug
 
