@@ -7,7 +7,6 @@ import {
   Input,
   OnInit,
   PLATFORM_ID,
-  ViewEncapsulation,
 } from '@angular/core';
 import { Subscription, fromEvent } from 'rxjs';
 import { Carousel } from './carousel';
@@ -22,7 +21,6 @@ import { Validation } from './validation';
   styleUrls: ['./carousel.component.css'],
   imports: [CommonModule],
   standalone: true,
-  encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CarouselComponent implements OnInit {
@@ -31,7 +29,6 @@ export class CarouselComponent implements OnInit {
   @Input() slideToScroll = 2;
   @Input() autoslideLimitPercentCard = 30;
   @Input() strechingLimit = 60;
-  @Input() slideMinWidth = 300;
   @Input() slideWidth = 300;
   @Input() slideMaxWidth = 500;
   @Input() dots = true;
@@ -46,7 +43,7 @@ export class CarouselComponent implements OnInit {
   @Input() animationTimingFn: AnimationTimingFn = 'ease-out';
   @Input() infinite = true;
   @Input() responsive = true;
-  @Input() autoSlide = true;
+  @Input() autoSlide = false;
   mouseupSubscription!: Subscription;
   VChangeSubscription!: Subscription;
   resizeSubscription!: Subscription;
@@ -79,7 +76,6 @@ export class CarouselComponent implements OnInit {
       carouselContainer,
       this.maxWidthCarousel,
       this.slideToShow,
-      this.slideMinWidth,
       this.slideWidth,
       this.slideMaxWidth,
       this.gapBetweenSlides,

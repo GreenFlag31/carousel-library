@@ -1,3 +1,8 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 .carousel-container {
   position: relative;
   overflow-x: hidden;
@@ -37,6 +42,16 @@
   z-index: 1;
   transition: opacity 0.3s;
 }
+.prev svg,
+.next svg {
+  fill: #fff;
+}
+.prev,
+.next {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .prev {
   margin-right: 1rem;
 }
@@ -65,12 +80,7 @@
 .bullet.current {
   background: #0079b4;
 }
-.carousel-slide {
-  width: 100%;
-  border-radius: 1rem;
-  box-shadow: 0px 2px 4px 0px rgb(158 158 158 / 83%);
-  user-select: none;
-}
+
 .slides-container.dragging {
   cursor: grab;
 }
