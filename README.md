@@ -1,6 +1,6 @@
 # ngx-carousel-ease
 
-# DEMO
+# Demo
 
 Explore a live demonstration of the ngx-carousel-ease library [here](#).
 
@@ -8,7 +8,8 @@ Explore a live demonstration of the ngx-carousel-ease library [here](#).
 
 You can install the library using the following command:
 
-npm i ngx-carousel-ease
+```bash
+npm i `ngx-carousel-ease`
 
 # Inputs
 
@@ -34,3 +35,4 @@ npm i ngx-carousel-ease
 | <span style="background-color:#f2f2f2;">animationTimingMs</span>         | <span style="background-color:#f2f2f2;">300</span>        | <span style="background-color:#f2f2f2;">Duration of slide transition animation in milliseconds.</span>                                                                              |
 | <span style="background-color:#f2f2f2;">maxDomSize</span>                | <span style="background-color:#f2f2f2;">4</span>          | <span style="background-color:#f2f2f2;">Maximum number of times the number of slides present in the DOM to prevent infinite growth. Example: 6 cards x 4 = 24 maximum cards.</span> |
 | <span style="background-color:#f2f2f2;">animationTimingFn</span>         | <span style="background-color:#f2f2f2;">'ease-out'</span> | <span style="background-color:#f2f2f2;">Timing function for the slide transition animation. Options include 'linear', 'ease-in', 'ease-out', 'ease-in-out'.</span>                  |
+```
