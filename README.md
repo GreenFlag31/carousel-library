@@ -1,8 +1,14 @@
 # ngx-carousel-ease
 
+# Description
+
+ngx-carousel-ease is a versatile Angular library designed to enhance the development experience by providing a feature-rich and performant carousel component. This librairy supports infinite and responsive mode, mouse and touch event. Attention has been put to accessibility, performance, and friendly developer experience.
+
+Support Angular version starts at v17.
+
 # Demo
 
-Explore a live demonstration of the ngx-carousel-ease library [here](#).
+Live demonstration of the ngx-carousel-ease library [here](#).
 
 # Installation
 
@@ -37,6 +43,33 @@ npm i ngx-carousel-ease
 | <span style="background-color:#f2f2f2;">maxDomSize</span>                | <span style="background-color:#f2f2f2;">4</span>          | <span style="background-color:#f2f2f2;">Maximum number of times the number of slides present in the DOM to prevent infinite growth. Example: 6 cards x 4 = 24 maximum cards.</span> |
 | <span style="background-color:#f2f2f2;">animationTimingFn</span>         | <span style="background-color:#f2f2f2;">'ease-out'</span> | <span style="background-color:#f2f2f2;">Timing function for the slide transition animation. Options include 'linear', 'ease-in', 'ease-out', 'ease-in-out'.</span>                  |
 
-```
+# Style Customisation
+
+Given the nearly infinite and subjective possibilities for customization, a predefined choice of themes (such as light or dark) has not been incorporated.
+
+If you wish to customize the theme or parts of the carousel, add `encapsulation: ViewEncapsulation.None` to the hosting parent component and erase the default styles. Find the corresponding classes by inspecting the DOM.
+
+The following example changes the defaulted blue arrows:
 
 ```
+.carousel-container .prev,
+.carousel-container .next {
+  background: red !important;
+}
+```
+
+# SSR (Server Side Rendering)
+
+This library supports Server Side Rendering (SSR). The carousel will not instantiate during server-side execution, as it requires access to the DOM API.
+
+# DX Friendly
+
+Ensuring a seamless Developer Experience (DX), basic validation is performed on the parameters passed to the carousel. An error is raised in case of abnormal parameters. Please note that common sense mistakes, such as passing a negative value for slide to show or a negative carousel max width, are not validated. This library has been meticulously documented.
+
+# Performance
+
+Emphasis has been placed on performance, adopting ChangeDetectionStrategy.OnPush and utilizing translate3d instead of translateX. This choice aims to enable hardware acceleration in specific scenarios, which can contribute to a smoother and more efficient user experience.
+
+# Report a Bug
+
+Please provide a detailed description of the encountered bug, including your carousel configuration and the steps/actions that led to the issue. An accurate description will help me to reproduce the issue.
