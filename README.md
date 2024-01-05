@@ -35,6 +35,8 @@ Finally, add your cards content within the `<carousel></carousel>` selector. Eac
 
 # Inputs
 
+This carousel if configured by default and all options are optional.
+
 | Name                                                                     | Default                                                   | Description                                                                                                                                                                                                                                                |
 | ------------------------------------------------------------------------ | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | <span style="background-color:#f2f2f2;">maxWidthCarousel</span>          | <span style="background-color:#f2f2f2;">undefined</span>  | <span style="background-color:#f2f2f2;">Defines the max width of the carousel. The max width should be defined in pixels. If not defined, defaulted to window's width.</span>                                                                              |
