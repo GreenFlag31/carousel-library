@@ -1,40 +1,21 @@
 # ngx-carousel-ease
 
-| Name                          | Default                       | Description                                                  |
-| ----------------------------- | ----------------------------- | ------------------------------------------------------------ | ----------------------------- |
-| maxWidthCarousel              | _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_                                | _{background-color:#f2f2f2;}_ |
-| infinite                      | true                          | Enable infinite loop of slides.                              |
-| _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_                                |
-| autoSlide                     | false                         | Enable automatic sliding.                                    |
-| _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_                                |
-| slideToShow                   | 3                             | Number of slides to show at a time.                          |
-| _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_                                |
-| slideToScroll                 | 2                             | Number of slides to scroll at a time.                        |
-| _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_                                |
-| autoslideLimitPercentCard     | 30                            | Percentage of the card visible to trigger automatic sliding. |
-| _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_                                |
-| strechingLimit                | 60                            | Limit for the stretching effect in pixels.                   |
-| _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_                                |
-| slideWidth                    | 300                           | Width of each slide in pixels.                               |
-| _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_                                |
-| slideMaxWidth                 | 500                           | Maximum width of each slide in pixels.                       |
-| _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_                                |
-| dots                          | true                          | Display navigation dots.                                     |
-| _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_                                |
-| arrows                        | true                          | Display navigation arrows.                                   |
-| _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_                                |
-| counter                       | true                          | Display slide counter.                                       |
-| _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_                                |
-| enableMouseDrag               | true                          | Enable mouse drag for navigation.                            |
-| _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_                                |
-| enableTouch                   | true                          | Enable touch drag for navigation.                            |
-| _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_                                |
-| counterSeparator              | '/'                           | Separator for the slide counter.                             |
-| _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_                                |
-| gapBetweenSlides              | 16                            | Gap between slides in pixels.                                |
-| _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_                                |
-| animationTimingMs             | 300                           | Duration of slide transition animation in milliseconds.      |
-| _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_                                |
-| maxDomSize                    | 4                             | Maximum number of slides to keep in the DOM for performance. |
-| _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_ | _{background-color:#f2f2f2;}_                                |
-| animationTimingFn             | 'ease-out'                    | Timing function for the slide transition animation.          |
+| Name                                                                     | Default                                                                      | Description                                                                                                                                                                                |
+| ------------------------------------------------------------------------ | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| <span style="background-color:#f2f2f2;">maxWidthCarousel</span>          | <span style="background-color:#f2f2f2;">_{background-color:#f2f2f2;}_</span> | <span style="background-color:#f2f2f2;">_{background-color:#f2f2f2;}_</span>                                                                                                               |
+| infinite                                                                 | true                                                                         | Enable infinite loop of slides.                                                                                                                                                            |
+| <span style="background-color:#f2f2f2;">responsive</span>                | <span style="background-color:#f2f2f2;">true</span>                          | <span style="background-color:#f2f2f2;">Width of the slides will be automatically adapted.</span>                                                                                          |
+| autoSlide                                                                | false                                                                        | Enable automatic sliding.                                                                                                                                                                  |
+| <span style="background-color:#f2f2f2;">slideToShow</span>               | <span style="background-color:#f2f2f2;">3</span>                             | <span style="background-color:#f2f2f2;">Number of slides to show at a time. In non-responsive mode, slide to show is determined by the available space and the width of the slides.</span> |
+| <span style="background-color:#f2f2f2;">slideToScroll</span>             | <span style="background-color:#f2f2f2;">2</span>                             | <span style="background-color:#f2f2f2;">Number of slides to scroll at a time.</span>                                                                                                       |
+| <span style="background-color:#f2f2f2;">autoslideLimitPercentCard</span> | <span style="background-color:#f2f2f2;">30</span>                            | <span style="background-color:#f2f2f2;">Percentage of the card visible to trigger automatic sliding.</span>                                                                                |
+| <span style="background-color:#f2f2f2;">strechingLimit</span>            | <span style="background-color:#f2f2f2;">60</span>                            | <span style="background-color:#f2f2f2;">Limit for the stretching effect in pixels.</span>                                                                                                  |
+| <span style="background-color:#f2f2f2;">slideWidth</span>                | <span style="background-color:#f2f2f2;">300</span>                           | <span style="background-color:#f2f2f2;">Width of each slide in pixels.</span>                                                                                                              |
+| <span style="background-color:#f2f2f2;">slideMaxWidth</span>             | <span style="background-color:#f2f2f2;">500</span>                           | <span style="background-color:#f2f2f2;">Maximum width of each slide in pixels.</span>                                                                                                      |
+| <span style="background-color:#f2f2f2;">dots</span>                      | <span style="background-color:#f2f2f2;">true</span>                          | <span style="background-color:#f2f2f2;">Display navigation dots.</span>                                                                                                                    |
+| <span style="background-color:#f2f2f2;">arrows</span>                    | <span style="background-color:#f2f2f2;">true</span>                          | <span style="background-color:#f2f2f2;">Display navigation arrows.</span>                                                                                                                  |
+| <span style="background-color:#f2f2f2;">counter</span>                   | <span style="background-color:#f2f2f2;">true</span>                          | <span style="background-color:#f2f2f2;">Display slide counter.</span>                                                                                                                      |
+| <span style="background-color:#f2f2f2;">enableMouseDrag</span>           | <span style="background-color:#f2f2f2;">true</span>                          | <span style="background-color:#f2f2f2;">Enable mouse drag for navigation.</span>                                                                                                           |
+| <span style="background-color:#f2f2f2;">enableTouch</span>               | <span style="background-color:#f2f2f2;">true</span>                          | <span style="background-color:#f2f2f2;">Enable touch drag for navigation.</span>                                                                                                           |
+| <span style="background-color:#f2f2f2;">counterSeparator</span>          | <span style="background-color:#f2f2f2;">'/'</span>                           | <span style="background-color:#f2f2f2;">Separator for the slide counter.</span>                                                                                                            |
+| <span style="background-color:#f2f2f2;">gapBetweenSlides</span>          | <span style="background-color:#f2f2f                                         |
