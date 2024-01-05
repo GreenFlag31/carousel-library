@@ -18,6 +18,7 @@ You can install the library using the following command:
 npm i ngx-carousel-ease
 ```
 
+<br>
 Then, add the `CarouselModule` in the imports array of the hosting component (if standalone) or to your appModule.
 Finally, add your cards content within the `<carousel></carousel>` selector. Each of your card content should contain the class `carousel-slide`.
 
