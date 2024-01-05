@@ -25,6 +25,9 @@ import { Validation } from './validation';
 })
 export class CarouselComponent implements OnInit {
   @Input() maxWidthCarousel!: number;
+  @Input() infinite = true;
+  @Input() responsive = true;
+  @Input() autoSlide = false;
   @Input() slideToShow = 3;
   @Input() slideToScroll = 2;
   @Input() autoslideLimitPercentCard = 30;
@@ -41,9 +44,6 @@ export class CarouselComponent implements OnInit {
   @Input() animationTimingMs = 300;
   @Input() maxDomSize = 4;
   @Input() animationTimingFn: AnimationTimingFn = 'ease-out';
-  @Input() infinite = true;
-  @Input() responsive = true;
-  @Input() autoSlide = false;
   mouseupSubscription!: Subscription;
   VChangeSubscription!: Subscription;
   resizeSubscription!: Subscription;
