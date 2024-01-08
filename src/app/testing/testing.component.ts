@@ -23,7 +23,7 @@ export class TestingComponent implements OnInit {
   ngOnInit() {
     this.carouselService.onSlideChange.subscribe((slideAndID) => {
       const { slide, carouselID } = slideAndID;
-      // console.log(slideAndID);
+      console.log(slideAndID);
 
       if (carouselID !== 2) return;
 
