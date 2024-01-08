@@ -3,8 +3,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { TestingComponent } from './testing/testing.component';
 
 const routes: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: 'testing' },
-  { path: 'testing', component: TestingComponent },
+  { path: '', pathMatch: 'full', redirectTo: 'ngx-carousel-ease' },
+  { path: 'ngx-carousel-ease', component: TestingComponent },
 ];
 
 @NgModule({
