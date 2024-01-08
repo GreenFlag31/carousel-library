@@ -8,7 +8,7 @@ Support Angular version starts at v17.
 
 # Demo
 
-Live demonstration of the ngx-carousel-ease library [here](#).
+Live demonstration of the ngx-carousel-ease library [here](https://greenflag31.github.io/carousel-librairy).
 
 # Installation
 
