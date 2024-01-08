@@ -1,40 +1,209 @@
-.content {
-  padding: 0.625em;
+.carousel-demo {
+  margin: auto;
+  max-width: 65rem;
 }
-.content h3 {
+.carousel-demo h1 {
+  font-family: "Allura";
+  font-size: 3rem;
+  margin-top: 4rem;
   text-align: center;
 }
-.data {
-  margin-top: 3em;
+.carousel-example {
+  margin: 10rem 0 3rem;
+  padding: 1rem;
+}
+.first-example {
+  margin: 7rem 0 3rem;
+}
+.carousel-example h2 {
+  font-family: "Allura";
+  font-size: 3rem;
+  font-weight: normal;
+}
+.properties-container {
   display: flex;
-  justify-content: center;
-  gap: 2em;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
-.param {
+.properties-container p {
+  padding: 0.4rem 0.8rem;
+  background: #e6e6e6;
+  border-radius: 1rem;
+}
+
+/* FIRST CAROUSEL INFINITE RESPONSIVE */
+.card-content {
+  padding: 0.625rem;
+}
+.title-card {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.title-card h3 {
+  font-size: 1.2rem;
+}
+
+.caracteristic {
   display: flex;
-  align-items: center;
-  gap: 0.5em;
-  padding: 0.4em;
-  background: rgb(225, 225, 225);
-  border-radius: 0.3em;
+  justify-content: space-between;
+  padding: 0.1rem 0;
 }
-.param i {
-  color: rgb(44, 44, 44);
-}
-.carousel-slide img {
+
+.first-carousel .carousel-slide > img {
   display: block;
   width: 100%;
   object-fit: cover;
-  border-radius: 1em;
+  border-radius: 0.5em;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
   height: 200px;
 }
-
+.origin {
+  align-items: center;
+  padding-bottom: 0;
+}
+.origin img {
+  width: 20px;
+  height: 15px;
+}
 .carousel-slide {
   border-radius: 1rem;
   box-shadow: 0px 2px 4px 0px rgb(158 158 158 / 83%);
 }
 
-.carousel-container .prev,
-.carousel-container .next {
-  background: red !important;
+/* SECOND CAROUSEL FINITE NON RESPONSIVE */
+.second-carousel .carousel-slide {
+  position: relative;
+}
+.second-carousel .carousel-slide h3 {
+  position: absolute;
+  z-index: 1;
+  margin-top: 2rem;
+  text-align: center;
+  width: 100%;
+  color: #fff;
+  font-family: "Allura";
+  font-size: 2.8rem;
+}
+.second {
+  height: 350px;
+}
+.second .img-bg {
+  height: 100%;
+}
+.brazil .img-bg {
+  background-image: url("../../assets/pictures/second-carousel/rsz_brazil.jpg");
+  background-repeat: no-repeat;
+  background-size: 200% 120%;
+}
+.belize .img-bg {
+  background-image: url("../../assets/pictures/second-carousel/rsz_belize.jpg");
+  background-size: 100% 100%;
+}
+.egypt .img-bg {
+  background-image: url("../../assets/pictures/second-carousel/rsz_egypt.jpg");
+  background-size: 110% 100%;
+}
+.norway .img-bg {
+  background-image: url("../../assets/pictures/second-carousel/rsz_norway.jpg");
+  background-size: 135% 100%;
+}
+.uk .img-bg {
+  background-image: url("../../assets/pictures/second-carousel/rsz_UK.jpg");
+  background-size: 105% 120%;
+}
+
+/* THIRD CAROUSEL FINITE NON RESPONSIVE */
+.third-carousel .carousel-container .prev,
+.third-carousel .carousel-container .next {
+  background: green;
+}
+.third-carousel .bullets-container .bullet.current {
+  background: green;
+}
+.third-carousel .carousel-slide {
+  background: #2f2f2f;
+  color: #e8e8e8;
+  display: grid;
+  grid-template-rows: auto auto min-content;
+}
+.third {
+  padding: 1rem;
+}
+.third .title {
+  background-image: linear-gradient(to right, #006104, #34ee00);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  text-align: center;
+  font-family: "Allura";
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+.third.blue .title {
+  background-image: linear-gradient(to right, #005162, #00d9ff);
+}
+.third.kingfisher .title {
+  background-image: linear-gradient(to right, #ff0303, #960000);
+}
+.third.parrot .title {
+  background-image: linear-gradient(to right, #f7ef00, #23c200);
+}
+.third .bullets-points {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.third .bullets-points span {
+  width: 7px;
+  height: 7px;
+  display: block;
+  border-radius: 50%;
+  background: #00a900;
+}
+.kingfisher .bullets-points span {
+  background: #bb0000;
+}
+.parrot .bullets-points span {
+  background: rgb(200 214 0);
+}
+.blue .bullets-points span {
+  background: #00a0a9;
+}
+.third .img-bg {
+  display: block;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  float: left;
+  margin-right: 0.5em;
+}
+.third p {
+  text-align: justify;
+}
+.last-p {
+  margin-top: 1rem;
+}
+.bird-container {
+  display: flex;
+  justify-content: center;
+}
+.humming .img-bg {
+  background-image: url("../../assets/pictures/third-carousel/rsz_1humming-bird.jpg");
+  background-size: 100% 105%;
+}
+.blue .img-bg {
+  background-image: url("../../assets/pictures/third-carousel/rsz_blue-tailed_bee-eater.jpg");
+  background-size: 99% 120%;
+}
+.kingfisher .img-bg {
+  background-image: url("../../assets/pictures/third-carousel/rsz_1kingfisher.jpg");
+  background-size: 100% 110%;
+}
+.parrot .img-bg {
+  background-image: url("../../assets/pictures/third-carousel/parrot.jpg");
+  background-size: 100% 120%;
 }

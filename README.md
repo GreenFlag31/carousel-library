@@ -2,7 +2,7 @@
 
 # Description
 
-ngx-carousel-ease is a versatile Angular library designed to enhance the development experience by providing a feature-rich and performant carousel component. This librairy supports infinite and responsive mode, mouse and touch event. Attention has been put to accessibility, performance, and friendly developer experience.
+ngx-carousel-ease is a versatile Angular providing a feature-rich, simple, and performant carousel component. This librairy supports infinite and responsive mode, mouse and touch event. Attention has been put to accessibility, performance, and friendly developer experience.
 
 Support Angular version starts at v17.
 
@@ -39,7 +39,7 @@ This carousel is configured by default and all inputs are optional.
 
 | Name                                                                     | Default                                                   | Description                                                                                                                                                                                                                                                |
 | ------------------------------------------------------------------------ | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| <span style="background-color:#f2f2f2;">maxWidthCarousel</span>          | <span style="background-color:#f2f2f2;">undefined</span>  | <span style="background-color:#f2f2f2;">Defines the max width of the carousel. The max width should be defined in pixels. If not defined, defaulted to window's width.</span>                                                                              |
+| <span style="background-color:#f2f2f2;">maxWidthCarousel</span>          | <span style="background-color:#f2f2f2;">undefined</span>  | <span style="background-color:#f2f2f2;">Define the max width of the carousel in pixels.</span>                                                                                                                                                             |
 | infinite                                                                 | false                                                     | Enable infinite loop of slides.                                                                                                                                                                                                                            |
 | <span style="background-color:#f2f2f2;">responsive</span>                | <span style="background-color:#f2f2f2;">true</span>       | <span style="background-color:#f2f2f2;">Width of the slides will be automatically adapted. In non-responsive mode, the width of the slides won't be adapted.</span>                                                                                        |
 | autoSlide                                                                | false                                                     | Enable automatic sliding.                                                                                                                                                                                                                                  |
@@ -59,6 +59,22 @@ This carousel is configured by default and all inputs are optional.
 | <span style="background-color:#f2f2f2;">animationTimingFn</span>         | <span style="background-color:#f2f2f2;">'ease-out'</span> | <span style="background-color:#f2f2f2;">Timing function for the slide transition animation. Options include 'linear', 'ease-in', 'ease-out', 'ease-in-out'.</span>                                                                                         |
 | <span style="background-color:#f2f2f2;">animationTimingMs</span>         | <span style="background-color:#f2f2f2;">300</span>        | <span style="background-color:#f2f2f2;">Duration of slide transition animation in milliseconds.</span>                                                                                                                                                     |
 | <span style="background-color:#f2f2f2;">maxDomSize</span>                | <span style="background-color:#f2f2f2;">4</span>          | <span style="background-color:#f2f2f2;">Maximum number of times the number of slides present in the DOM to prevent infinite growth. Example: 6 cards x 4 = 24 maximum cards. If you want to disable this feature, pass 'Infinity' to this property.</span> |
+
+# Service
+
+This librairy provides a CarouselService containing an RxJs Subject `onSlideChange` that is triggered at every slide change. `onSlideChange` returns an object containing the current slide number and the carousel ID (useful if multiple carousel on a page to target a specific carousel instance). The slide number and carousel ID are zero indexed.
+
+Inject the CarouselService through regular dependency injection in your hosting component.
+
+```
+ngOnInit() {
+  this.carouselService.onSlideChange.subscribe((slideAndID) => {
+    // change carousel color, trigger a function, ...
+  });
+}
+```
+
+The third example in the documentation uses this functionnality.
 
 # Style Customisation
 

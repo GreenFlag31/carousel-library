@@ -18,10 +18,24 @@
   src: url("./assets/poppins/Poppins-Bold.ttf") format("truetype");
   font-weight: bold;
 }
+@font-face {
+  font-family: "Allura";
+  src: url("./assets/Allura/Allura-Regular.ttf") format("truetype");
+  font-weight: 400;
+}
 
-/* * {
+* {
+  font-family: "Poppins", sans-serif;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Poppins", sans-serif;
-} */
+}
+::-webkit-scrollbar {
+  width: 12px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(203, 203, 203);
+  border-radius: 10px;
+}

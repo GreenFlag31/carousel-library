@@ -6,8 +6,7 @@
 .carousel-container {
   position: relative;
   overflow-x: hidden;
-  margin: 13rem auto;
-  padding: 0.625rem;
+  padding: 0.2rem;
 }
 .slides-container {
   display: grid;
@@ -23,24 +22,23 @@
   margin-bottom: 0.5rem;
 }
 .counter {
-  background: lightgray;
+  background: #e6e6e6;
   padding: 0.3rem 0.7rem;
   border-radius: 1rem;
-  z-index: 1;
   min-width: 3.75rem;
   text-align: center;
 }
 .prev,
 .next {
   background: #0079b4;
-  padding: 0.4rem 0.5rem;
+  padding: 0.5rem;
   color: white;
   border-radius: 0.3rem;
   box-shadow: 0px 2px 4px 0px rgb(158 158 158 / 83%);
   border: none;
   cursor: pointer;
   z-index: 1;
-  transition: opacity 0.3s;
+  transition: 0.4s;
 }
 .prev svg,
 .next svg {
@@ -48,7 +46,7 @@
 }
 .prev,
 .next {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
 }
@@ -80,7 +78,6 @@
 .bullet.current {
   background: #0079b4;
 }
-
 .slides-container.dragging {
   cursor: grab;
 }
@@ -100,13 +97,5 @@
     margin-right: 2rem;
     right: 0;
     left: auto;
-  }
-}
-@media (min-width: 800px) {
-  .prev {
-    margin-left: 3rem;
-  }
-  .next {
-    margin-right: 3rem;
   }
 }

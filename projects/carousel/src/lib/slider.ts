@@ -1,4 +1,5 @@
 import { Carousel } from './carousel';
+import { CarouselService } from './carousel.service';
 
 export class Slider {
   dragging = false;
@@ -23,6 +24,7 @@ export class Slider {
   visibleOffsetCardNotResponsive = 0;
   invisibleOffsetCardNotResponsive = 0;
   accumulatedSlide = 0;
+  currentCarouselID = 0;
 
   constructor(
     private readonly carousel: Carousel,
@@ -36,7 +38,8 @@ export class Slider {
     private readonly MAX_DOM_SIZE: number,
     private readonly enableMouseDrag: boolean,
     private readonly enableTouch: boolean,
-    private readonly infinite: boolean
+    private readonly infinite: boolean,
+    private carouselService: CarouselService
   ) {
     this.initProperties();
     this.updateProperties();
@@ -51,6 +54,9 @@ export class Slider {
     this.totalAmountOfSlides = this.totalSlides;
 
     this.nextLimit = Math.floor(this.carousel.slideWidthWithGap);
+
+    this.carouselService.carouselID += 1;
+    this.currentCarouselID = this.carouselService.carouselID;
   }
 
   /**
@@ -207,10 +213,19 @@ export class Slider {
    * Take into account finite and infinite mode and auto slide.
    * Responsible for changing slide number and updating the limits.
    * If createSlidesInfiniteModeIfLimitsReached() or autoSlider() don't take action, slide change according to previous computed limits.
+   * In finite mode, if all slides visible on one window or end of carousel, early return to not trigger Rxjs Subject.
    */
   modifyCurrentSlide() {
     if (this.infinite) {
-      if (this.createSlidesInfiniteModeIfLimitsReached()) return;
+      if (this.createSlidesInfiniteModeIfLimits()) return;
+    }
+
+    if (
+      !this.infinite &&
+      (this.carousel.numberDots === 1 ||
+        (this.currentSlide === this.lastWindow && this.direction === 'right'))
+    ) {
+      return;
     }
 
     if (this.autoSlide) {
@@ -230,7 +245,7 @@ export class Slider {
    * Handle slide creation in infinite mode if limits reached
    * Mouse or touch drag.
    */
-  createSlidesInfiniteModeIfLimitsReached() {
+  createSlidesInfiniteModeIfLimits() {
     if (this.currentTranslation > 0) {
       this.addSlidesToTheLeft();
       this.decreaseLimits();
@@ -282,7 +297,10 @@ export class Slider {
       this.computeTransformation(this.accumulatedSlide);
       this.changePrevAndNextLimits(this.accumulatedSlide);
 
-      if (-this.currentTranslation > this.lastWindowTranslation) {
+      if (
+        -this.currentTranslation > this.lastWindowTranslation &&
+        this.infinite
+      ) {
         this.addSlidesToTheRight();
       }
       return true;
@@ -549,12 +567,14 @@ export class Slider {
   goTo(bullet: number) {
     this.direction = this.currentSlide < bullet ? 'right' : 'left';
 
+    this.currentSlide = bullet;
+    this.carouselService.onChange(this.currentSlide, this.currentCarouselID);
+
     if (this.infinite) {
       this.navInfiniteBullets(bullet);
       return;
     }
 
-    this.currentSlide = bullet;
     this.accumulatedSlide = this.currentSlide;
     this.changePrevAndNextLimits(bullet);
     this.computeTransformation(bullet);
@@ -582,7 +602,6 @@ export class Slider {
 
     this.computeTransformation(this.accumulatedSlide);
     this.changePrevAndNextLimits(this.accumulatedSlide);
-    this.currentSlide = bullet;
   }
 
   /**
@@ -591,41 +610,48 @@ export class Slider {
    */
   changeSlideNumber(step: number) {
     if (this.infinite) {
-      if (this.direction === 'right') {
-        this.accumulatedSlide += step;
-        if ((this.currentSlide += step) > this.lastWindow) {
-          const surplus = this.currentSlide % this.lastWindow;
-          this.currentSlide = surplus - 1;
-        }
-      } else {
-        this.accumulatedSlide -= step;
-        if ((this.currentSlide -= step) < 0) {
-          const surplus = this.currentSlide % this.lastWindow;
-          this.currentSlide = this.totalSlides + surplus;
-        }
-      }
-
-      if (this.carousel.numberDots === 1) {
-        this.currentSlide = 0;
-      }
-      return;
-    }
-
-    if (this.direction === 'right') {
-      if ((this.currentSlide += step) > this.lastWindow) {
-        this.currentSlide = this.lastWindow;
-      }
-      this.accumulatedSlide = this.currentSlide;
+      this.infiniteChangeSlideNumber(step);
     } else {
-      if ((this.currentSlide -= step) < 0) {
-        this.currentSlide = 0;
-      }
-      this.accumulatedSlide = this.currentSlide;
+      this.finiteChangeSlideNumber(step);
     }
 
     if (this.carousel.numberDots === 1) {
       this.currentSlide = 0;
     }
+
+    const current =
+      this.carousel.numberDots > 1 ? this.currentSlide : this.accumulatedSlide;
+    this.carouselService.onChange(current, this.currentCarouselID);
+  }
+
+  infiniteChangeSlideNumber(step: number) {
+    if (this.direction === 'right') {
+      this.accumulatedSlide += step;
+      if ((this.currentSlide += step) > this.lastWindow) {
+        const surplus = this.currentSlide % this.lastWindow;
+        this.currentSlide = surplus - 1;
+      }
+    } else {
+      this.accumulatedSlide -= step;
+      if ((this.currentSlide -= step) < 0) {
+        const surplus = this.currentSlide % this.lastWindow;
+        this.currentSlide = this.totalSlides + surplus;
+      }
+    }
+  }
+
+  finiteChangeSlideNumber(step: number) {
+    if (this.direction === 'right') {
+      if ((this.currentSlide += step) > this.lastWindow) {
+        this.currentSlide = this.lastWindow;
+      }
+    } else {
+      if ((this.currentSlide -= step) < 0) {
+        this.currentSlide = 0;
+      }
+    }
+
+    this.accumulatedSlide = this.currentSlide;
   }
 
   /**

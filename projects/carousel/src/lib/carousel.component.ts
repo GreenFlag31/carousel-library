@@ -14,6 +14,7 @@ import { AnimationTimingFn } from './interfaces';
 import { Slider } from './slider';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Validation } from './validation';
+import { CarouselService } from './carousel.service';
 
 @Component({
   selector: 'carousel',
@@ -25,7 +26,7 @@ import { Validation } from './validation';
 })
 export class CarouselComponent implements OnInit {
   @Input() maxWidthCarousel!: number;
-  @Input() infinite = true;
+  @Input() infinite = false;
   @Input() responsive = true;
   @Input() autoSlide = false;
   @Input() slideToShow = 3;
@@ -54,6 +55,7 @@ export class CarouselComponent implements OnInit {
   constructor(
     private elementRef: ElementRef,
     private changeDetection: ChangeDetectorRef,
+    private carouselService: CarouselService,
     @Inject(PLATFORM_ID) platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
@@ -95,7 +97,8 @@ export class CarouselComponent implements OnInit {
       this.maxDomSize,
       this.enableMouseDrag,
       this.enableTouch,
-      this.infinite
+      this.infinite,
+      this.carouselService
     );
 
     this.listeners();
@@ -131,10 +134,11 @@ export class CarouselComponent implements OnInit {
     this.slider.currentSlide = 0;
     this.slider.accumulatedSlide = 0;
     this.slider.computeTransformation(0);
-
-    if (this.infinite) {
-      this.slider.changePrevAndNextLimits(0);
-    }
+    this.slider.changePrevAndNextLimits(0);
+    this.carouselService.onChange(
+      this.slider.currentSlide,
+      this.slider.currentCarouselID
+    );
 
     this.changeDetection.detectChanges();
   }

@@ -87,6 +87,7 @@ export class Carousel {
     const slideWidthPlusGap = this.originalSlideWidth + this.gap;
 
     const referenceWidth = Math.min(
+      this.carouselWidth,
       this.maxWidthCarousel || Infinity,
       window.innerWidth
     );
@@ -117,6 +118,7 @@ export class Carousel {
     const slideWidthPlusGap = this.slideWidth + this.gap;
 
     const referenceWidth = Math.min(
+      this.carouselWidth,
       this.maxWidthCarousel || Infinity,
       window.innerWidth
     );
