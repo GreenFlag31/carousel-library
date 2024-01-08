@@ -35,7 +35,7 @@ Finally, add your cards content within the `<carousel></carousel>` selector in t
 
 # Inputs
 
-This carousel is configured by default and all inputs are optional.
+The carousel is configured by default and all inputs are optional.
 
 | Name                                                                     | Default                                                   | Description                                                                                                                                                                                                                                                |
 | ------------------------------------------------------------------------ | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
