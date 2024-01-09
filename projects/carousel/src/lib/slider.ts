@@ -364,8 +364,6 @@ export class Slider {
       ) {
         slides[i].remove();
       }
-
-      // this.resetViewLeftDirection();
     }
   }
 
@@ -385,6 +383,7 @@ export class Slider {
     this.slidesContainer.style.transform = `translate3d(${
       this.dragging ? -this.initialFullWidth : -translation
     }px, 0px, 0px)`;
+
     this.slidesContainer.offsetHeight;
   }
 
@@ -400,6 +399,7 @@ export class Slider {
     this.slidesContainer.style.transition = 'none';
     this.slidesContainer.style.transform = `translate3d(${translation}px, 0px, 0px)`;
     this.previousTranslation = translation - this.positionChange;
+
     this.slidesContainer.offsetHeight;
   }
 

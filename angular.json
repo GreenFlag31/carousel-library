@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "carousel-librairy": {
+    "carousel-library": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/carousel-librairy",
+            "outputPath": "dist/carousel-library",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -59,10 +59,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "carousel-librairy:build:production"
+              "buildTarget": "carousel-library:build:production"
             },
             "development": {
-              "buildTarget": "carousel-librairy:build:development"
+              "buildTarget": "carousel-library:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -70,7 +70,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "carousel-librairy:build"
+            "buildTarget": "carousel-library:build"
           }
         },
         "test": {
