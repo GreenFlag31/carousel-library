@@ -384,7 +384,7 @@ export class Slider {
       this.dragging ? -this.initialFullWidth : -translation
     }px, 0px, 0px)`;
 
-    this.slidesContainer.offsetHeight;
+    this.slidesContainer.getBoundingClientRect();
   }
 
   /**
@@ -400,7 +400,7 @@ export class Slider {
     this.slidesContainer.style.transform = `translate3d(${translation}px, 0px, 0px)`;
     this.previousTranslation = translation - this.positionChange;
 
-    this.slidesContainer.offsetHeight;
+    this.slidesContainer.getBoundingClientRect();
   }
 
   /**

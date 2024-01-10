@@ -207,3 +207,13 @@
   background-image: url("../../assets/pictures/third-carousel/parrot.jpg");
   background-size: 100% 120%;
 }
+
+.author {
+  margin-top: 12rem;
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+}
+.author a {
+  color: green;
+}
