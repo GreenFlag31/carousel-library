@@ -1,5 +1,5 @@
 import { Component, ViewEncapsulation } from '@angular/core';
-import { CarouselService } from 'carousel';
+import { CarouselService } from 'projects/carousel/src/public-api';
 
 interface Colors {
   [index: number]: string;
