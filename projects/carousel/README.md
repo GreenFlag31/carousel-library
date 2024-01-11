@@ -103,6 +103,10 @@ Ensuring a seamless Developer Experience (DX), basic validation is performed on 
 
 Emphasis has been placed on performance, adopting `ChangeDetectionStrategy.OnPush` and utilizing `translate3d` instead of `translateX`. This choice aims to enable hardware acceleration in specific scenarios, which can contribute to a smoother and more efficient user experience. By default, if infinite mode is enabled, a function will prevent infinite DOM growth by removing invisible cards.
 
+# Change log
+
+Version 0.0.7: Support for dynamically HTML generated content (ngFor, @for) for slide creation. Correction of a validation bug.
+
 # Report a Bug
 
 Please provide a detailed description of the encountered bug, including your carousel configuration and the steps/actions that led to the issue. An accurate description will help me to reproduce the issue.
