@@ -372,7 +372,7 @@ export class Slider {
    * New slides added to the left, so the view has to be updated accordingly.
    * If the carousel is moved with the mouse | touch event (dragging is true), the offset should be equal to a full carousel width. Otherwise (with the buttons), the computed translation should be taken into account.
    * Side comment: the view does not have to be updated for slides added to the right, since relative order does not change.
-   * offsetHeight triggers reflow of the element.
+   * getBoundingClientRect triggers reflow of the element.
    */
   resetViewLeftDirection() {
     const translation =
@@ -391,7 +391,7 @@ export class Slider {
    * Reset the view in a movement to the right
    * First set of slides have been deleted, so the translation has to be updated accordingly.
    * currentTranslation is a negative number so it will be decreased by a set of slides.
-   * offsetHeight triggers reflow of the element.
+   * getBoundingClientRect triggers reflow of the element.
    */
   resetViewRightDirection() {
     const translation = this.currentTranslation + this.initialFullWidth;

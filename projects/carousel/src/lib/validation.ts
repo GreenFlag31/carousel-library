@@ -32,9 +32,9 @@ export class Validation {
     const carouselSlides: NodeListOf<HTMLDivElement> | undefined =
       this.carousel.querySelectorAll('.carousel-slide');
 
-    if (!carouselSlides) {
+    if (carouselSlides.length === 0) {
       throw new Error(
-        'No elements with "carousel-slide" as class have been found. Please add this class to each of your cards.'
+        'No elements with "carousel-slide" as class have been found. Please add this class to each of your cards/slides.'
       );
     }
   }

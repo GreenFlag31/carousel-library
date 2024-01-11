@@ -1,11 +1,11 @@
 import {
+  AfterContentInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   ElementRef,
   Inject,
   Input,
-  OnInit,
   PLATFORM_ID,
 } from '@angular/core';
 import { Subscription, fromEvent } from 'rxjs';
@@ -24,7 +24,7 @@ import { CarouselService } from './carousel.service';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CarouselComponent implements OnInit {
+export class CarouselComponent implements AfterContentInit {
   @Input() maxWidthCarousel!: number;
   @Input() infinite = false;
   @Input() responsive = true;
@@ -53,7 +53,7 @@ export class CarouselComponent implements OnInit {
   isBrowser = true;
 
   constructor(
-    private elementRef: ElementRef,
+    private elementRef: ElementRef<HTMLDivElement>,
     private changeDetection: ChangeDetectorRef,
     private carouselService: CarouselService,
     @Inject(PLATFORM_ID) platformId: Object
@@ -61,11 +61,11 @@ export class CarouselComponent implements OnInit {
     this.isBrowser = isPlatformBrowser(platformId);
   }
 
-  ngOnInit() {
+  ngAfterContentInit() {
     if (!this.isBrowser) return;
 
-    const carouselContainer: HTMLDivElement =
-      this.elementRef.nativeElement.children[0];
+    const carouselContainer = this.elementRef.nativeElement
+      .firstChild as HTMLDivElement;
 
     new Validation(
       carouselContainer,
