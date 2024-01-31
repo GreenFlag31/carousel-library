@@ -28,7 +28,7 @@ export class CarouselComponent implements AfterContentInit {
   @Input() maxWidthCarousel!: number;
   @Input() infinite = false;
   @Input() responsive = true;
-  @Input() autoSlide = false;
+  @Input() autoSlide = true;
   @Input() slideToShow = 3;
   @Input() slideToScroll = 2;
   @Input() autoslideLimitPercentCard = 30;

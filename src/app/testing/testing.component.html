@@ -1,11 +1,13 @@
 <div class="carousel-demo">
-  <h1>ngx-carousel-ease demo</h1>
+  <h1>ngx-carousel-ease</h1>
 
   <section class="infinite-carousel-responsive carousel-example first-example">
     <div class="description-title">
       <div class="properties-container">
         <p>Infinite</p>
         <p>Responsive</p>
+        <p>Auto slide</p>
+        <p>Auto slide limit: 40%</p>
         <p>Slide to show: 3</p>
         <p>Slide to scroll: 2</p>
       </div>
@@ -13,6 +15,7 @@
     <carousel
       [infinite]="true"
       [responsive]="true"
+      [autoslideLimitPercentCard]="40"
       class="first-carousel"
       [slideToShow]="3"
     >
@@ -233,6 +236,8 @@
       <div class="properties-container">
         <p>Finite</p>
         <p>Not responsive</p>
+        <p>Auto slide</p>
+        <p>Auto slide limit: 40%</p>
         <p>Slide to show: 3</p>
         <p>Slide to scroll: 1</p>
       </div>
@@ -241,6 +246,7 @@
     <carousel
       [infinite]="false"
       [responsive]="false"
+      [autoslideLimitPercentCard]="40"
       [slideToScroll]="1"
       class="second-carousel"
     >

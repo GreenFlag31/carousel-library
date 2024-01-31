@@ -2,7 +2,7 @@
 
 # Description
 
-ngx-carousel-ease is a versatile Angular providing a feature-rich, simple, and performant carousel component. This librairy supports infinite and responsive mode, mouse and touch event. Attention has been put to accessibility, performance, and friendly developer experience.
+ngx-carousel-ease is a versatile Angular library providing a feature-rich, simple, and performant carousel component. This library supports infinite and responsive mode, mouse and touch event. Attention has been put to accessibility, performance, and friendly developer experience.
 
 Support Angular version starts at v17.
 
@@ -42,7 +42,7 @@ The carousel is configured by default and all inputs are optional.
 | <span style="background-color:#f2f2f2;">maxWidthCarousel</span>          | <span style="background-color:#f2f2f2;">undefined</span>  | <span style="background-color:#f2f2f2;">Define the max width of the carousel in pixels.</span>                                                                                                                                                                               |
 | infinite                                                                 | false                                                     | Enable infinite loop of slides.                                                                                                                                                                                                                                              |
 | <span style="background-color:#f2f2f2;">responsive</span>                | <span style="background-color:#f2f2f2;">true</span>       | <span style="background-color:#f2f2f2;">Width of the slides will be automatically adapted. In non-responsive mode, the width of the slides won't be adapted.</span>                                                                                                          |
-| autoSlide                                                                | false                                                     | Enable automatic sliding.                                                                                                                                                                                                                                                    |
+| autoSlide                                                                | true                                                      | Enable automatic sliding.                                                                                                                                                                                                                                                    |
 | <span style="background-color:#f2f2f2;">autoslideLimitPercentCard</span> | <span style="background-color:#f2f2f2;">30</span>         | <span style="background-color:#f2f2f2;">Percentage of the card compared to mouvement to trigger automatic sliding.</span>                                                                                                                                                    |
 | <span style="background-color:#f2f2f2;">slideToShow</span>               | <span style="background-color:#f2f2f2;">3</span>          | <span style="background-color:#f2f2f2;">Number of slides to show at a time. The number of slides to show is dependant of the available space.</span>                                                                                                                         |
 | <span style="background-color:#f2f2f2;">slideToScroll</span>             | <span style="background-color:#f2f2f2;">2</span>          | <span style="background-color:#f2f2f2;">Number of slides to scroll at a time.</span>                                                                                                                                                                                         |
@@ -62,7 +62,7 @@ The carousel is configured by default and all inputs are optional.
 
 # Service
 
-This librairy provides a CarouselService containing an RxJs Subject `onSlideChange` that is triggered at every slide change. `onSlideChange` returns an object containing the current slide number and the carousel ID (useful if multiple carousel on a page to target a specific carousel instance). The slide number and carousel ID are zero indexed.
+This library provides a CarouselService containing an RxJs Subject `onSlideChange` that is triggered at every slide change. `onSlideChange` returns an object containing the current slide number and the carousel ID (useful if multiple carousel on a page to target a specific carousel instance). The slide number and carousel ID are zero indexed.
 
 Inject the CarouselService through regular dependency injection in your hosting component.
 
@@ -106,6 +106,8 @@ Emphasis has been placed on performance, adopting `ChangeDetectionStrategy.OnPus
 # Change log
 
 Version 0.0.7: Support for dynamically HTML generated content (ngFor, @for) for slide creation. Correction of a validation bug.
+
+Version 0.0.9: Change in the behavior of the auto slide. Auto slide will now occur on drag stop (when the user releases the mouse), and will automatically slide towards the nearest slide based on the set threshold. Auto slide is set to true by default.
 
 # Report a Bug
 
