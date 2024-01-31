@@ -2,7 +2,7 @@
 
 # Description
 
-ngx-carousel-ease is a versatile Angular providing a feature-rich, simple, and performant carousel component. This librairy supports infinite and responsive mode, mouse and touch event. Attention has been put to accessibility, performance, and friendly developer experience.
+ngx-carousel-ease is a versatile Angular library providing a feature-rich, simple, and performant carousel component. This library supports infinite and responsive mode, mouse and touch event. Attention has been put to accessibility, performance, and friendly developer experience.
 
 Support Angular version starts at v17.
 
@@ -62,7 +62,7 @@ The carousel is configured by default and all inputs are optional.
 
 # Service
 
-This librairy provides a CarouselService containing an RxJs Subject `onSlideChange` that is triggered at every slide change. `onSlideChange` returns an object containing the current slide number and the carousel ID (useful if multiple carousel on a page to target a specific carousel instance). The slide number and carousel ID are zero indexed.
+This library provides a CarouselService containing an RxJs Subject `onSlideChange` that is triggered at every slide change. `onSlideChange` returns an object containing the current slide number and the carousel ID (useful if multiple carousel on a page to target a specific carousel instance). The slide number and carousel ID are zero indexed.
 
 Inject the CarouselService through regular dependency injection in your hosting component.
 
