@@ -109,6 +109,8 @@ Version 0.0.7: Support for dynamically HTML generated content (ngFor, @for) for 
 
 Version 0.0.9: Change in the behavior of the auto slide. Auto slide will now occur on drag stop (when the user releases the mouse), and will automatically slide towards the nearest slide based on the set threshold. Auto slide is set to true by default.
 
+Version 0.1.1: Fixed a race condition that could occur betweeen evaluation of the template and initialisation of the variables.
+
 # Report a Bug
 
 Please provide a detailed description of the encountered bug, including your carousel configuration and the steps/actions that led to the issue. An accurate description will help me to reproduce the issue.
