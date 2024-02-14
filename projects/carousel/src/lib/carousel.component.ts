@@ -1,5 +1,6 @@
 import {
   AfterContentInit,
+  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
@@ -24,7 +25,7 @@ import { CarouselService } from './carousel.service';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CarouselComponent implements AfterContentInit {
+export class CarouselComponent implements AfterContentInit, AfterViewInit {
   @Input() maxWidthCarousel!: number;
   @Input() infinite = false;
   @Input() responsive = true;
@@ -48,8 +49,8 @@ export class CarouselComponent implements AfterContentInit {
   mouseupSubscription!: Subscription;
   VChangeSubscription!: Subscription;
   resizeSubscription!: Subscription;
-  carousel!: Carousel;
-  slider!: Slider;
+  carousel!: Carousel | undefined;
+  slider!: Slider | undefined;
   isBrowser = true;
 
   constructor(
@@ -61,7 +62,7 @@ export class CarouselComponent implements AfterContentInit {
     this.isBrowser = isPlatformBrowser(platformId);
   }
 
-  ngAfterContentInit() {
+  ngAfterViewInit() {
     if (!this.isBrowser) return;
 
     const carouselContainer = this.elementRef.nativeElement
@@ -102,21 +103,24 @@ export class CarouselComponent implements AfterContentInit {
     );
 
     this.listeners();
+    this.changeDetection.markForCheck();
   }
+
+  ngAfterContentInit() {}
 
   listeners() {
     this.mouseupSubscription = fromEvent(window, 'mouseup').subscribe(
       (event: any) => {
-        if (!this.slider.dragging) return;
+        if (!this.slider?.dragging) return;
 
-        this.slider.dragStop(event);
+        this.slider?.dragStop(event);
       }
     );
     this.VChangeSubscription = fromEvent(
       document,
       'visibilitychange'
     ).subscribe((event) => {
-      this.slider.unActiveTab(event);
+      this.slider?.unActiveTab(event);
     });
 
     this.resizeSubscription = fromEvent(window, 'resize').subscribe(() => {
@@ -128,7 +132,9 @@ export class CarouselComponent implements AfterContentInit {
    * Reinitialise variables at resize
    */
   resize() {
-    this.carousel.updateProperties();
+    if (!this.slider) return;
+
+    this.carousel?.updateProperties();
     this.slider.updateProperties();
 
     this.slider.currentSlide = 0;
@@ -140,7 +146,7 @@ export class CarouselComponent implements AfterContentInit {
       this.slider.currentCarouselID
     );
 
-    this.changeDetection.detectChanges();
+    this.changeDetection.markForCheck();
   }
 
   ngOnDestroy() {

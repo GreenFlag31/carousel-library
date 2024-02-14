@@ -4,11 +4,12 @@
       <button
         class="prev"
         aria-label="previous button navigation"
-        (click)="slider.prev()"
+        (click)="slider?.prev()"
         [disabled]="
           !infinite &&
-          ((slider.currentSlide === 0 && slider.currentTranslation >= 0) ||
-            carousel.numberDots === 1)
+          ((slider?.currentSlide === 0 &&
+            (slider?.currentTranslation || 0) >= 0) ||
+            carousel?.numberDots === 1)
         "
       >
         <svg
@@ -25,12 +26,13 @@
       <button
         class="next"
         aria-label="next button navigation"
-        (click)="slider.next()"
+        (click)="slider?.next()"
         [disabled]="
           !infinite &&
-          ((slider.currentSlide === carousel.numberDots - 1 &&
-            slider.currentTranslation <= -carousel.maxScrollableContent) ||
-            carousel.numberDots === 1)
+          ((slider?.currentSlide === (carousel?.numberDots || 0) - 1 &&
+            (slider?.currentTranslation || 0) <=
+              -(carousel?.maxScrollableContent || 0)) ||
+            carousel?.numberDots === 1)
         "
       >
         <svg
@@ -47,20 +49,20 @@
     </div>
     <div class="counter" *ngIf="counter">
       <p>
-        {{ slider.currentSlide + 1 }} {{ counterSeparator }}
-        {{ carousel.numberDots }}
+        {{ (slider?.currentSlide || 0) + 1 }} {{ counterSeparator }}
+        {{ carousel?.numberDots }}
       </p>
     </div>
   </div>
 
   <div
     class="slides-container"
-    [class.dragging]="slider.dragging"
-    (mousedown)="slider.dragStart($event)"
-    (touchstart)="slider.dragStart($event)"
-    (mousemove)="slider.dragMove($event)"
-    (touchmove)="slider.dragMove($event)"
-    (touchend)="slider.dragStop($event)"
+    [class.dragging]="slider?.dragging"
+    (mousedown)="slider?.dragStart($event)"
+    (touchstart)="slider?.dragStart($event)"
+    (mousemove)="slider?.dragMove($event)"
+    (touchmove)="slider?.dragMove($event)"
+    (touchend)="slider?.dragStop($event)"
     #slides
   >
     <ng-content></ng-content>
@@ -70,9 +72,9 @@
     <button
       class="bullet"
       aria-label="bullet point navigation"
-      *ngFor="let bullet of carousel.arrayNumberDots"
-      [class.current]="bullet === slider.currentSlide"
-      (click)="slider.goTo(bullet)"
+      *ngFor="let bullet of carousel?.arrayNumberDots"
+      [class.current]="bullet === slider?.currentSlide"
+      (click)="slider?.goTo(bullet)"
     ></button>
   </div>
 </div>

@@ -348,7 +348,7 @@ export class Slider {
 
     if (this.totalAmountOfSlides >= this.MAX_DOM_SIZE * this.totalSlides) {
       // Limit DOM growth, max X times original DOM
-      console.log('dom limit reached');
+      // console.log('dom limit reached');
       this.limitDOMGrowth();
       this.DOMLimitReached = true;
     } else {
