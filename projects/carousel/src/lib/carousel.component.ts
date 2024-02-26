@@ -1,5 +1,4 @@
 import {
-  AfterContentInit,
   AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -7,7 +6,9 @@ import {
   ElementRef,
   Inject,
   Input,
+  OnInit,
   PLATFORM_ID,
+  ViewChild,
 } from '@angular/core';
 import { Subscription, fromEvent } from 'rxjs';
 import { Carousel } from './carousel';
@@ -25,7 +26,7 @@ import { CarouselService } from './carousel.service';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CarouselComponent implements AfterContentInit, AfterViewInit {
+export class CarouselComponent implements AfterViewInit {
   @Input() maxWidthCarousel!: number;
   @Input() infinite = false;
   @Input() responsive = true;
@@ -46,6 +47,15 @@ export class CarouselComponent implements AfterContentInit, AfterViewInit {
   @Input() animationTimingMs = 300;
   @Input() maxDomSize = 4;
   @Input() animationTimingFn: AnimationTimingFn = 'ease-out';
+
+  @Input() autoPlay = true;
+  @Input() autoPlayTiming = 1500;
+  @Input() autoPlayAtStart = false;
+  @Input() autoPlaySlideToScroll = 1;
+  @Input() playDirection: 'ltr' | 'rtl' = 'ltr';
+
+  @ViewChild('carouselContainer')
+  carouselContainer!: ElementRef<HTMLDivElement>;
   mouseupSubscription!: Subscription;
   VChangeSubscription!: Subscription;
   resizeSubscription!: Subscription;
@@ -54,8 +64,7 @@ export class CarouselComponent implements AfterContentInit, AfterViewInit {
   isBrowser = true;
 
   constructor(
-    private elementRef: ElementRef<HTMLDivElement>,
-    private changeDetection: ChangeDetectorRef,
+    private cd: ChangeDetectorRef,
     private carouselService: CarouselService,
     @Inject(PLATFORM_ID) platformId: Object
   ) {
@@ -65,14 +74,14 @@ export class CarouselComponent implements AfterContentInit, AfterViewInit {
   ngAfterViewInit() {
     if (!this.isBrowser) return;
 
-    const carouselContainer = this.elementRef.nativeElement
-      .firstChild as HTMLDivElement;
+    const carouselContainer = this.carouselContainer.nativeElement;
 
     new Validation(
       carouselContainer,
       this.slideWidth,
       this.slideMaxWidth,
-      this.gapBetweenSlides
+      this.gapBetweenSlides,
+      this.slideToScroll
     );
 
     this.carousel = new Carousel(
@@ -99,14 +108,18 @@ export class CarouselComponent implements AfterContentInit, AfterViewInit {
       this.enableMouseDrag,
       this.enableTouch,
       this.infinite,
-      this.carouselService
+      this.autoPlay,
+      this.autoPlayTiming,
+      this.autoPlayAtStart,
+      this.playDirection,
+      this.autoPlaySlideToScroll,
+      this.carouselService,
+      this.cd
     );
 
     this.listeners();
-    this.changeDetection.markForCheck();
+    this.cd.markForCheck();
   }
-
-  ngAfterContentInit() {}
 
   listeners() {
     this.mouseupSubscription = fromEvent(window, 'mouseup').subscribe(
@@ -120,6 +133,7 @@ export class CarouselComponent implements AfterContentInit, AfterViewInit {
       document,
       'visibilitychange'
     ).subscribe((event) => {
+      this.slider?.stopAutoPlay();
       this.slider?.unActiveTab(event);
     });
 
@@ -137,6 +151,7 @@ export class CarouselComponent implements AfterContentInit, AfterViewInit {
     this.carousel?.updateProperties();
     this.slider.updateProperties();
 
+    this.slider.stopAutoPlay();
     this.slider.currentSlide = 0;
     this.slider.accumulatedSlide = 0;
     this.slider.computeTransformation(0);
@@ -146,12 +161,13 @@ export class CarouselComponent implements AfterContentInit, AfterViewInit {
       this.slider.currentCarouselID
     );
 
-    this.changeDetection.markForCheck();
+    this.cd.markForCheck();
   }
 
   ngOnDestroy() {
     this.mouseupSubscription?.unsubscribe();
     this.VChangeSubscription?.unsubscribe();
     this.resizeSubscription?.unsubscribe();
+    this.slider?.stopAutoPlay();
   }
 }

@@ -7,6 +7,7 @@
         <p>Infinite</p>
         <p>Responsive</p>
         <p>Auto slide</p>
+        <p>Auto play</p>
         <p>Auto slide limit: 40%</p>
         <p>Slide to show: 3</p>
         <p>Slide to scroll: 2</p>
@@ -15,6 +16,9 @@
     <carousel
       [infinite]="true"
       [responsive]="true"
+      [autoPlay]="true"
+      [autoSlide]="true"
+      [autoPlaySlideToScroll]="1"
       [autoslideLimitPercentCard]="40"
       class="first-carousel"
       [slideToShow]="3"
@@ -292,7 +296,6 @@
       [slideToShow]="1"
       [slideToScroll]="1"
       [slideMaxWidth]="550"
-      [autoSlide]="true"
       [autoslideLimitPercentCard]="20"
       class="third-carousel"
     >

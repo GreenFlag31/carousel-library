@@ -1,3 +1,4 @@
+import { ChangeDetectorRef } from '@angular/core';
 import { Carousel } from './carousel';
 import { CarouselService } from './carousel.service';
 
@@ -17,7 +18,7 @@ export class Slider {
   slidesContainer!: HTMLDivElement;
   arrayOfSlides!: HTMLDivElement[];
   totalAmountOfSlides!: number;
-  initialFullWidth = 0;
+  fullWidthInf = 0;
   lastWindowTranslation = 0;
   totalSlides = 0;
   DOMLimitReached = false;
@@ -25,6 +26,9 @@ export class Slider {
   invisibleOffsetCardNotResponsive = 0;
   accumulatedSlide = 0;
   currentCarouselID = 0;
+  autoInterval!: number;
+  playActive = false;
+  playButtonDisabled = false;
 
   constructor(
     private readonly carousel: Carousel,
@@ -39,7 +43,13 @@ export class Slider {
     private readonly enableMouseDrag: boolean,
     private readonly enableTouch: boolean,
     private readonly infinite: boolean,
-    private carouselService: CarouselService
+    private readonly autoPlay: boolean,
+    private readonly autoPlayTiming: number,
+    private readonly autoPlayAtStart: boolean,
+    private readonly playDirection: string,
+    private readonly autoplaySlideToScroll: number,
+    private carouselService: CarouselService,
+    private cd: ChangeDetectorRef
   ) {
     this.initProperties();
     this.updateProperties();
@@ -58,6 +68,66 @@ export class Slider {
 
     this.carouselService.carouselID += 1;
     this.currentCarouselID = this.carouselService.carouselID;
+    if (this.autoPlayAtStart) this.launchAutoPlay();
+    this.disableAutoPlayBtn();
+  }
+
+  disableAutoPlayBtn() {
+    if (!this.autoPlay || this.infinite) return;
+    this.playButtonDisabled = false;
+
+    // start
+    if (
+      this.currentSlide === 0 &&
+      this.playDirection === 'rtl' &&
+      this.currentTranslation === 0
+    ) {
+      this.playButtonDisabled = true;
+      this.playActive = false;
+      clearInterval(this.autoInterval);
+    }
+
+    // end
+    if (
+      this.currentSlide === this.lastWindow &&
+      this.playDirection === 'ltr' &&
+      this.currentTranslation <= -this.carousel.maxScrollableContent
+    ) {
+      this.playButtonDisabled = true;
+      this.playActive = false;
+      clearInterval(this.autoInterval);
+    }
+
+    console.log(this.playButtonDisabled);
+
+    if (this.carousel.numberDots === 1) this.playButtonDisabled = true;
+  }
+
+  launchAutoPlay() {
+    if (!this.autoPlay) return;
+
+    this.playActive = true;
+    this.playButtonDisabled = true;
+    let direction = (stop: boolean) => {};
+
+    if (this.playDirection === 'ltr') {
+      direction = this.next.bind(this);
+    } else {
+      direction = this.prev.bind(this);
+    }
+
+    this.autoInterval = window.setInterval(() => {
+      direction(false);
+      this.cd.markForCheck();
+    }, this.autoPlayTiming);
+  }
+
+  stopAutoPlay() {
+    if (!this.autoPlay) return;
+
+    this.playActive = false;
+    this.playButtonDisabled = false;
+    clearInterval(this.autoInterval);
   }
 
   /**
@@ -65,11 +135,10 @@ export class Slider {
    * Fired at start and at resizing.
    */
   updateProperties() {
-    this.lastWindow = this.carousel.numberDots - 1;
-
     this.updateNotResponsive();
 
-    this.initialFullWidth = this.totalSlides * this.carousel.slideWidthWithGap;
+    this.lastWindow = this.carousel.numberDots - 1;
+    this.fullWidthInf = this.totalSlides * this.carousel.slideWidthWithGap;
 
     this.lastWindowTranslation =
       this.slidesContainer.clientWidth -
@@ -123,8 +192,9 @@ export class Slider {
    */
   dragStart(event: MouseEvent | TouchEvent) {
     if (this.currentEventIsDisabled(event)) return;
-
     this.dragging = true;
+    this.stopAutoPlay();
+    this.disableAutoPlayBtn();
 
     this.startX =
       event instanceof MouseEvent ? event.pageX : event.touches[0].pageX;
@@ -144,6 +214,7 @@ export class Slider {
     this.previousTranslation = this.currentTranslation;
 
     if (this.autoSlide) this.autoSlider();
+    this.disableAutoPlayBtn();
 
     if (this.infinite) return;
 
@@ -192,7 +263,7 @@ export class Slider {
     this.positionChange = this.currentX - this.startX;
     this.currentTranslation = this.positionChange + this.previousTranslation;
 
-    // Current translation exceeding start of end limits, finite mode
+    // Current translation exceeding start or end limits, finite mode
     if (!this.infinite) {
       if (this.strechingEffect()) return;
     }
@@ -234,9 +305,11 @@ export class Slider {
     if (-this.currentTranslation < this.prevLimit) {
       this.changeSlideNumber(-1);
       this.decreaseLimits();
+      this.cd.markForCheck();
     } else if (-this.currentTranslation >= this.nextLimit) {
       this.changeSlideNumber(1);
       this.increaseLimits();
+      this.cd.markForCheck();
     }
   }
 
@@ -391,15 +464,16 @@ export class Slider {
    * getBoundingClientRect triggers reflow of the element.
    */
   resetViewLeftDirection() {
-    const translation =
-      Math.abs(this.previousTranslation) + this.initialFullWidth;
+    let translation = Math.abs(this.previousTranslation) + this.fullWidthInf;
+
     this.previousTranslation = -translation;
 
     this.slidesContainer.style.transition = 'none';
     this.slidesContainer.style.transform = `translate3d(${
-      this.dragging ? -this.initialFullWidth : -translation
+      this.dragging ? -this.fullWidthInf : -translation
     }px, 0px, 0px)`;
 
+    // debugger;
     this.slidesContainer.getBoundingClientRect();
   }
 
@@ -410,7 +484,7 @@ export class Slider {
    * getBoundingClientRect triggers reflow of the element.
    */
   resetViewRightDirection() {
-    const translation = this.currentTranslation + this.initialFullWidth;
+    let translation = this.currentTranslation + this.fullWidthInf;
 
     this.slidesContainer.style.transition = 'none';
     this.slidesContainer.style.transform = `translate3d(${translation}px, 0px, 0px)`;
@@ -452,7 +526,7 @@ export class Slider {
     let translationCorrectionAfterClone = this.prevLimit;
 
     if (slidesCreatedOnTheLeft) {
-      translationCorrectionAfterClone = this.initialFullWidth;
+      translationCorrectionAfterClone = this.fullWidthInf;
     }
 
     this.prevLimit =
@@ -522,29 +596,45 @@ export class Slider {
   /**
    * Previous button navigation
    */
-  prev() {
+  prev(stopAP = true) {
+    if (stopAP) this.stopAutoPlay();
+
     this.direction = 'left';
+    const scrollTo =
+      this.autoPlay && this.playActive
+        ? this.autoplaySlideToScroll
+        : this.slideToScroll;
+
     if (this.infinite) {
-      this.handleBtnInfinite(-this.slideToScroll);
+      this.handleBtnInfinite(-scrollTo);
     }
 
-    this.changeSlideNumber(-this.slideToScroll);
+    this.changeSlideNumber(-scrollTo);
     this.changePrevAndNextLimits(this.accumulatedSlide);
     this.computeTransformation(this.accumulatedSlide);
+    this.disableAutoPlayBtn();
   }
 
   /**
    * Next button navigation
    */
-  next() {
+  next(stopAP = true) {
+    if (stopAP) this.stopAutoPlay();
+
     this.direction = 'right';
+    const scrollTo =
+      this.autoPlay && this.playActive
+        ? this.autoplaySlideToScroll
+        : this.slideToScroll;
+
     if (this.infinite) {
-      this.handleBtnInfinite(this.slideToScroll);
+      this.handleBtnInfinite(scrollTo);
     }
 
-    this.changeSlideNumber(this.slideToScroll);
+    this.changeSlideNumber(scrollTo);
     this.changePrevAndNextLimits(this.accumulatedSlide);
     this.computeTransformation(this.accumulatedSlide);
+    this.disableAutoPlayBtn();
   }
 
   /**
@@ -574,6 +664,7 @@ export class Slider {
    */
   goTo(bullet: number) {
     this.direction = this.currentSlide < bullet ? 'right' : 'left';
+    this.stopAutoPlay();
 
     this.currentSlide = bullet;
     this.carouselService.onChange(this.currentSlide, this.currentCarouselID);
@@ -586,6 +677,7 @@ export class Slider {
     this.accumulatedSlide = this.currentSlide;
     this.changePrevAndNextLimits(bullet);
     this.computeTransformation(bullet);
+    this.disableAutoPlayBtn();
   }
 
   /**

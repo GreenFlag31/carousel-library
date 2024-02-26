@@ -21,6 +21,31 @@
   align-items: flex-end;
   margin-bottom: 0.5rem;
 }
+.btn-container {
+  min-width: 3.75rem;
+}
+.autoplay-container {
+  display: flex;
+  gap: 1rem;
+}
+.autoplay-container button {
+  border: none;
+  background: none;
+  display: flex;
+  cursor: pointer;
+}
+.autoplay-container svg {
+  fill: #3b3b3b;
+  width: 1.8rem;
+  height: 1.8rem;
+  transition: fill 0.3s;
+}
+.play:disabled svg,
+.pause:disabled svg {
+  fill: #b1b1b1;
+  cursor: not-allowed;
+}
+
 .counter {
   background: #e6e6e6;
   padding: 0.3rem 0.7rem;
