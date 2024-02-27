@@ -6,7 +6,6 @@ import {
   ElementRef,
   Inject,
   Input,
-  OnInit,
   PLATFORM_ID,
   ViewChild,
 } from '@angular/core';
@@ -48,8 +47,8 @@ export class CarouselComponent implements AfterViewInit {
   @Input() maxDomSize = 4;
   @Input() animationTimingFn: AnimationTimingFn = 'ease-out';
 
-  @Input() autoPlay = true;
-  @Input() autoPlayTiming = 1500;
+  @Input() autoPlay = false;
+  @Input() autoPlayInterval = 1500;
   @Input() autoPlayAtStart = false;
   @Input() autoPlaySlideToScroll = 1;
   @Input() playDirection: 'ltr' | 'rtl' = 'ltr';
@@ -109,7 +108,7 @@ export class CarouselComponent implements AfterViewInit {
       this.enableTouch,
       this.infinite,
       this.autoPlay,
-      this.autoPlayTiming,
+      this.autoPlayInterval,
       this.autoPlayAtStart,
       this.playDirection,
       this.autoPlaySlideToScroll,
@@ -135,6 +134,7 @@ export class CarouselComponent implements AfterViewInit {
     ).subscribe((event) => {
       this.slider?.stopAutoPlay();
       this.slider?.unActiveTab(event);
+      this.cd.markForCheck();
     });
 
     this.resizeSubscription = fromEvent(window, 'resize').subscribe(() => {
@@ -164,6 +164,9 @@ export class CarouselComponent implements AfterViewInit {
     this.cd.markForCheck();
   }
 
+  /**
+   * Removes active subscriptions and clear interval autoplay.
+   */
   ngOnDestroy() {
     this.mouseupSubscription?.unsubscribe();
     this.VChangeSubscription?.unsubscribe();

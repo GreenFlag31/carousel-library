@@ -44,7 +44,7 @@ export class Slider {
     private readonly enableTouch: boolean,
     private readonly infinite: boolean,
     private readonly autoPlay: boolean,
-    private readonly autoPlayTiming: number,
+    private readonly autoPlayInterval: number,
     private readonly autoPlayAtStart: boolean,
     private readonly playDirection: string,
     private readonly autoplaySlideToScroll: number,
@@ -72,6 +72,9 @@ export class Slider {
     this.disableAutoPlayBtn();
   }
 
+  /**
+   * In finite carousel, disable/enable play button.
+   */
   disableAutoPlayBtn() {
     if (!this.autoPlay || this.infinite) return;
     this.playButtonDisabled = false;
@@ -98,9 +101,8 @@ export class Slider {
       clearInterval(this.autoInterval);
     }
 
-    console.log(this.playButtonDisabled);
-
     if (this.carousel.numberDots === 1) this.playButtonDisabled = true;
+    if (this.playActive) this.playButtonDisabled = true;
   }
 
   launchAutoPlay() {
@@ -119,7 +121,7 @@ export class Slider {
     this.autoInterval = window.setInterval(() => {
       direction(false);
       this.cd.markForCheck();
-    }, this.autoPlayTiming);
+    }, this.autoPlayInterval);
   }
 
   stopAutoPlay() {
@@ -192,10 +194,10 @@ export class Slider {
    */
   dragStart(event: MouseEvent | TouchEvent) {
     if (this.currentEventIsDisabled(event)) return;
-    this.dragging = true;
     this.stopAutoPlay();
     this.disableAutoPlayBtn();
 
+    this.dragging = true;
     this.startX =
       event instanceof MouseEvent ? event.pageX : event.touches[0].pageX;
 
