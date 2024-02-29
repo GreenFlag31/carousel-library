@@ -40,10 +40,11 @@ The carousel is configured by default and all inputs are optional.
 | responsive                | true       | Width of the slides will be automatically adapted. In non-responsive mode, the width of the slides won't be adapted.                                                                                                          |
 | autoSlide                 | true       | Enable sliding on drag stop. Carousel will slide towards the nearest slide.                                                                                                                                                   |
 | autoslideLimitPercentCard | 30         | Percentage of the card compared to mouvement to trigger automatic sliding.                                                                                                                                                    |
-| autoPlay                  | false      | Enable automatic sliding within an interval of time. In finite carousel, autoPlay will stop if the start or the end of the carousel is reached. Any interaction with the carousel will pause this feature.                    |
+| autoPlay                  | false      | Enable automatic sliding within an interval of time. In finite carousel, autoPlay will stop if the start or the end of the carousel is reached.                                                                               |
 | autoPlayInterval          | 1500       | Interval of time in milliseconds for automatic sliding (autoPlay).                                                                                                                                                            |
 | autoPlayAtStart           | false      | Enable autoPlay at start.                                                                                                                                                                                                     |
 | autoPlaySlideToScroll     | 1          | Number of slides to scroll for the autoPlay.                                                                                                                                                                                  |
+| displayAutoPlayControls   | true       | Display the play and pause autoPlay controls.                                                                                                                                                                                 |
 | playDirection             | ltr        | Direction of the autoPlay. Accepts: ltr or rtl (left to right or right to left).                                                                                                                                              |
 | slideToShow               | 3          | Number of slides to show at a time. The number of slides to show is dependant of the available space.                                                                                                                         |
 | slideToScroll             | 2          | Number of slides to scroll at a time.                                                                                                                                                                                         |
@@ -117,3 +118,7 @@ Version 0.1.2: Adding an autoPlay feature.
 # Report a Bug
 
 Please provide a detailed description of the encountered bug, including your carousel configuration and the steps/actions that led to the issue. An accurate description will help me to reproduce the issue.
+
+# Ngx-ease serie
+
+You like this library? Discover the ngx-ease serie [here](https://www.npmjs.com/~greenflag31).

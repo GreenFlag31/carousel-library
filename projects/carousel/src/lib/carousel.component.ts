@@ -11,7 +11,6 @@ import {
 } from '@angular/core';
 import { Subscription, fromEvent } from 'rxjs';
 import { Carousel } from './carousel';
-import { AnimationTimingFn } from './interfaces';
 import { Slider } from './slider';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Validation } from './validation';
@@ -45,13 +44,14 @@ export class CarouselComponent implements AfterViewInit {
   @Input() gapBetweenSlides = 16;
   @Input() animationTimingMs = 300;
   @Input() maxDomSize = 4;
-  @Input() animationTimingFn: AnimationTimingFn = 'ease-out';
+  @Input() animationTimingFn = 'ease-out';
 
   @Input() autoPlay = false;
   @Input() autoPlayInterval = 1500;
   @Input() autoPlayAtStart = false;
+  @Input() displayAutoPlayControls = true;
   @Input() autoPlaySlideToScroll = 1;
-  @Input() playDirection: 'ltr' | 'rtl' = 'ltr';
+  @Input() autoPlayDirection: 'ltr' | 'rtl' = 'ltr';
 
   @ViewChild('carouselContainer')
   carouselContainer!: ElementRef<HTMLDivElement>;
@@ -110,7 +110,7 @@ export class CarouselComponent implements AfterViewInit {
       this.autoPlay,
       this.autoPlayInterval,
       this.autoPlayAtStart,
-      this.playDirection,
+      this.autoPlayDirection,
       this.autoPlaySlideToScroll,
       this.carouselService,
       this.cd
@@ -121,19 +121,32 @@ export class CarouselComponent implements AfterViewInit {
   }
 
   listeners() {
-    this.mouseupSubscription = fromEvent(window, 'mouseup').subscribe(
-      (event: any) => {
-        if (!this.slider?.dragging) return;
+    this.mouseupSubscription = fromEvent<MouseEvent | TouchEvent>(
+      window,
+      'mouseup'
+    ).subscribe((event) => {
+      if (!this.slider!.dragging) return;
 
-        this.slider?.dragStop(event);
-      }
-    );
+      this.slider!.dragStop(event);
+      this.slider!.relaunchAutoPlay();
+    });
+
+    // User navigate away/comes back
     this.VChangeSubscription = fromEvent(
       document,
       'visibilitychange'
-    ).subscribe((event) => {
-      this.slider?.stopAutoPlay();
-      this.slider?.unActiveTab(event);
+    ).subscribe((event: any) => {
+      const visibility = event.target.visibilityState;
+      this.slider!.dragStop(event);
+
+      if (visibility === 'hidden') {
+        clearInterval(this.slider!.autoInterval);
+      }
+
+      if (visibility === 'visible') {
+        this.slider!.relaunchAutoPlay();
+      }
+
       this.cd.markForCheck();
     });
 
@@ -146,9 +159,9 @@ export class CarouselComponent implements AfterViewInit {
    * Reinitialise variables at resize
    */
   resize() {
-    if (!this.slider) return;
+    if (!this.slider || !this.carousel) return;
 
-    this.carousel?.updateProperties();
+    this.carousel.updateProperties();
     this.slider.updateProperties();
 
     this.slider.stopAutoPlay();

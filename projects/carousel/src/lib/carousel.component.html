@@ -48,11 +48,11 @@
         </svg>
       </button>
     </div>
-    } @if (autoPlay) {
+    } @if (autoPlay && displayAutoPlayControls) {
     <div class="autoplay-container">
       <button
         class="play"
-        [disabled]="slider?.playButtonDisabled"
+        [disabled]="slider?.playActive || slider?.playButtonDisabled"
         (click)="slider?.launchAutoPlay()"
         aria-label="play button navigation"
       >
@@ -92,7 +92,7 @@
     (touchstart)="slider?.dragStart($event)"
     (mousemove)="slider?.dragMove($event)"
     (touchmove)="slider?.dragMove($event)"
-    (touchend)="slider?.dragStop($event)"
+    (touchend)="slider?.dragStop($event); this.slider?.relaunchAutoPlay()"
   >
     <ng-content></ng-content>
   </div>

@@ -29,6 +29,7 @@ export class Slider {
   autoInterval!: number;
   playActive = false;
   playButtonDisabled = false;
+  directionAutoPlay = (slides: number) => {};
 
   constructor(
     private readonly carousel: Carousel,
@@ -68,12 +69,13 @@ export class Slider {
 
     this.carouselService.carouselID += 1;
     this.currentCarouselID = this.carouselService.carouselID;
+    this.defineAutoPlayDirection();
     if (this.autoPlayAtStart) this.launchAutoPlay();
     this.disableAutoPlayBtn();
   }
 
   /**
-   * In finite carousel, disable/enable play button.
+   * In finite carousel, clear autoPlay interval if limits are reached.
    */
   disableAutoPlayBtn() {
     if (!this.autoPlay || this.infinite) return;
@@ -102,24 +104,23 @@ export class Slider {
     }
 
     if (this.carousel.numberDots === 1) this.playButtonDisabled = true;
-    if (this.playActive) this.playButtonDisabled = true;
+  }
+
+  defineAutoPlayDirection() {
+    if (this.playDirection === 'ltr') {
+      this.directionAutoPlay = this.next.bind(this);
+    } else {
+      this.directionAutoPlay = this.prev.bind(this);
+    }
   }
 
   launchAutoPlay() {
     if (!this.autoPlay) return;
 
     this.playActive = true;
-    this.playButtonDisabled = true;
-    let direction = (stop: boolean) => {};
-
-    if (this.playDirection === 'ltr') {
-      direction = this.next.bind(this);
-    } else {
-      direction = this.prev.bind(this);
-    }
 
     this.autoInterval = window.setInterval(() => {
-      direction(false);
+      this.directionAutoPlay(this.autoplaySlideToScroll);
       this.cd.markForCheck();
     }, this.autoPlayInterval);
   }
@@ -128,7 +129,6 @@ export class Slider {
     if (!this.autoPlay) return;
 
     this.playActive = false;
-    this.playButtonDisabled = false;
     clearInterval(this.autoInterval);
   }
 
@@ -194,7 +194,7 @@ export class Slider {
    */
   dragStart(event: MouseEvent | TouchEvent) {
     if (this.currentEventIsDisabled(event)) return;
-    this.stopAutoPlay();
+    clearInterval(this.autoInterval);
     this.disableAutoPlayBtn();
 
     this.dragging = true;
@@ -204,6 +204,17 @@ export class Slider {
     // Useful for direction detection
     this.previousX = this.startX;
     this.slidesContainer.style.transition = 'none';
+  }
+
+  /**
+   * Relaunch autoPlay if not disabled or infinite mode (never disabled by limits)
+   * Restart only if started (playActive). Play button disabled when limits reached (finite carousel).
+   */
+  relaunchAutoPlay() {
+    if ((!this.playButtonDisabled || this.infinite) && this.playActive) {
+      clearInterval(this.autoInterval);
+      this.launchAutoPlay();
+    }
   }
 
   /**
@@ -598,45 +609,35 @@ export class Slider {
   /**
    * Previous button navigation
    */
-  prev(stopAP = true) {
-    if (stopAP) this.stopAutoPlay();
-
+  prev(slides = this.slideToScroll) {
     this.direction = 'left';
-    const scrollTo =
-      this.autoPlay && this.playActive
-        ? this.autoplaySlideToScroll
-        : this.slideToScroll;
 
     if (this.infinite) {
-      this.handleBtnInfinite(-scrollTo);
+      this.handleBtnInfinite(-slides);
     }
 
-    this.changeSlideNumber(-scrollTo);
+    this.changeSlideNumber(-slides);
     this.changePrevAndNextLimits(this.accumulatedSlide);
     this.computeTransformation(this.accumulatedSlide);
     this.disableAutoPlayBtn();
+    this.relaunchAutoPlay();
   }
 
   /**
    * Next button navigation
    */
-  next(stopAP = true) {
-    if (stopAP) this.stopAutoPlay();
-
+  next(slides = this.slideToScroll) {
     this.direction = 'right';
-    const scrollTo =
-      this.autoPlay && this.playActive
-        ? this.autoplaySlideToScroll
-        : this.slideToScroll;
 
     if (this.infinite) {
-      this.handleBtnInfinite(scrollTo);
+      this.handleBtnInfinite(slides);
     }
 
-    this.changeSlideNumber(scrollTo);
+    this.changeSlideNumber(slides);
     this.changePrevAndNextLimits(this.accumulatedSlide);
     this.computeTransformation(this.accumulatedSlide);
     this.disableAutoPlayBtn();
+    this.relaunchAutoPlay();
   }
 
   /**
@@ -666,10 +667,11 @@ export class Slider {
    */
   goTo(bullet: number) {
     this.direction = this.currentSlide < bullet ? 'right' : 'left';
-    this.stopAutoPlay();
 
     this.currentSlide = bullet;
     this.carouselService.onChange(this.currentSlide, this.currentCarouselID);
+    this.disableAutoPlayBtn();
+    this.relaunchAutoPlay();
 
     if (this.infinite) {
       this.navInfiniteBullets(bullet);
@@ -679,7 +681,6 @@ export class Slider {
     this.accumulatedSlide = this.currentSlide;
     this.changePrevAndNextLimits(bullet);
     this.computeTransformation(bullet);
-    this.disableAutoPlayBtn();
   }
 
   /**
@@ -786,16 +787,5 @@ export class Slider {
     this.dragging = false;
     this.previousTranslation = -transformation;
     this.currentTranslation = -transformation;
-  }
-
-  /**
-   * Trigger drag stop
-   * If client leaves the page (navigating to another tab) and comes back, stop the dragging.
-   * Correct Typescript typing not possible?
-   */
-  unActiveTab(event: any) {
-    if (event.target.visibilityState === 'visible') {
-      this.dragStop(event);
-    }
   }
 }
