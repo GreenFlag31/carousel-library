@@ -21,7 +21,8 @@ export class TestingComponent {
   };
 
   ngOnInit() {
-    console.log('carousel v0.1.2');
+    console.log('carousel v0.1.4');
+
     this.carouselService.onSlideChange.subscribe((slideAndID) => {
       const { slide, carouselID } = slideAndID;
       // console.log(slideAndID);
