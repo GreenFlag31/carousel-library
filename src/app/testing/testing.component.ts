@@ -1,5 +1,9 @@
 import { Component, ViewEncapsulation } from '@angular/core';
-import { CarouselService } from 'projects/carousel/src/public-api';
+import { RouterOutlet } from '@angular/router';
+import {
+  CarouselModule,
+  CarouselService,
+} from 'projects/carousel/src/public-api';
 
 interface Colors {
   [index: number]: string;
@@ -9,6 +13,8 @@ interface Colors {
   selector: 'app-testing',
   templateUrl: './testing.component.html',
   styleUrls: ['./testing.component.css'],
+  standalone: true,
+  imports: [RouterOutlet, CarouselModule],
   encapsulation: ViewEncapsulation.None,
 })
 export class TestingComponent {
@@ -21,12 +27,8 @@ export class TestingComponent {
   };
 
   ngOnInit() {
-    console.log('carousel v0.1.4');
-
     this.carouselService.onSlideChange.subscribe((slideAndID) => {
       const { slide, carouselID } = slideAndID;
-      // console.log(slideAndID);
-
       if (carouselID !== 2) return;
 
       this.changeColorArrowsAndBullets(slide, this.colorPalette[slide]);

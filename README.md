@@ -12,11 +12,12 @@ Live demonstration of the ngx-carousel-ease library [here](https://greenflag31.g
 
 # Installation
 
-You can install the library using the following command:
+# Installation
 
-```
-npm i ngx-carousel-ease
-```
+| Version | Command                       | Description                                                                                         |
+| ------- | ----------------------------- | --------------------------------------------------------------------------------------------------- |
+| V17     | npm i ngx-carousel-ease@0.1.4 | Install the V17 compatible version.                                                                 |
+| V18     | npm i ngx-carousel-ease       | Install the V18 compatible version. This version is compatible with a zoneless Angular application. |
 
 Then, add the `CarouselModule` in the imports array of the hosting component (if standalone) or to your `appModule`.
 Finally, add your cards content within the `<carousel></carousel>` selector in the hosting component. Each of your card should contain the class `carousel-slide`.

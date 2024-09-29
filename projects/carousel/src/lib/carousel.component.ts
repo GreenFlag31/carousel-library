@@ -117,7 +117,7 @@ export class CarouselComponent implements AfterViewInit {
     );
 
     this.listeners();
-    this.cd.markForCheck();
+    this.cd.detectChanges();
   }
 
   listeners() {
@@ -129,6 +129,7 @@ export class CarouselComponent implements AfterViewInit {
 
       this.slider!.dragStop(event);
       this.slider!.relaunchAutoPlay();
+      this.cd.markForCheck();
     });
 
     // User navigate away/comes back

@@ -318,11 +318,9 @@ export class Slider {
     if (-this.currentTranslation < this.prevLimit) {
       this.changeSlideNumber(-1);
       this.decreaseLimits();
-      this.cd.markForCheck();
     } else if (-this.currentTranslation >= this.nextLimit) {
       this.changeSlideNumber(1);
       this.increaseLimits();
-      this.cd.markForCheck();
     }
   }
 
