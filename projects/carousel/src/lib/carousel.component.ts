@@ -9,7 +9,6 @@ import {
   PLATFORM_ID,
   ViewChild,
 } from '@angular/core';
-import { Subscription, fromEvent } from 'rxjs';
 import { Carousel } from './carousel';
 import { Slider } from './slider';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
@@ -55,9 +54,9 @@ export class CarouselComponent implements AfterViewInit {
 
   @ViewChild('carouselContainer')
   private carouselContainer!: ElementRef<HTMLDivElement>;
-  private mouseupSubscription!: Subscription;
-  private VChangeSubscription!: Subscription;
   private resizeEvent!: () => void;
+  private mouseUpEvent!: (event: MouseEvent | TouchEvent) => void;
+  private visibilityEvent!: (event: any) => void;
   private previousWidth = 0;
   private currentWidth = 0;
   private isBrowser = true;
@@ -125,22 +124,14 @@ export class CarouselComponent implements AfterViewInit {
   }
 
   listeners() {
-    this.mouseupSubscription = fromEvent<MouseEvent | TouchEvent>(
-      window,
-      'mouseup'
-    ).subscribe((event) => {
+    this.mouseUpEvent = (event) => {
       if (!this.slider!.dragging) return;
 
       this.slider!.dragStop(event);
       this.slider!.relaunchAutoPlay();
       this.cd.markForCheck();
-    });
-
-    // User navigate away/comes back
-    this.VChangeSubscription = fromEvent(
-      document,
-      'visibilitychange'
-    ).subscribe((event: any) => {
+    };
+    this.visibilityEvent = (event) => {
       const visibility = event.target.visibilityState;
       this.slider!.dragStop(event);
 
@@ -153,12 +144,14 @@ export class CarouselComponent implements AfterViewInit {
       }
 
       this.cd.markForCheck();
-    });
-
+    };
     this.resizeEvent = () => {
       this.resize();
     };
+
+    window.addEventListener('mouseup', this.mouseUpEvent);
     window.addEventListener('resize', this.resizeEvent);
+    document.addEventListener('visibilitychange', this.visibilityEvent);
   }
 
   /**
@@ -192,10 +185,8 @@ export class CarouselComponent implements AfterViewInit {
    * Removes active subscriptions and clear interval autoplay.
    */
   ngOnDestroy() {
-    this.mouseupSubscription?.unsubscribe();
-    this.VChangeSubscription?.unsubscribe();
     window.removeEventListener('resize', this.resizeEvent);
-    // this.resizeEvent?.unsubscribe();
+    window.removeEventListener('mouseup', this.mouseUpEvent);
     this.slider?.stopAutoPlay();
   }
 }

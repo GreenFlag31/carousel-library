@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { Sliding } from './interfaces';
 
 @Injectable({
@@ -7,7 +7,7 @@ import { Sliding } from './interfaces';
 })
 export class CarouselService {
   /**
-   * An RXJS Subject that will be triggered at every slide change. Returns an object containing the zero indexed current slide number and the zero indexed carousel ID.
+   * An RXJS BehaviorSubject that will be triggered at every slide change. Returns an object containing the zero indexed current slide number and the zero indexed carousel ID.
    */
   onSlideChange = new BehaviorSubject<Sliding>({ slide: 0, carouselID: 0 });
   /**

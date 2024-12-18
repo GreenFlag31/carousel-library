@@ -65,7 +65,7 @@ The carousel is configured by default and all inputs are optional.
 
 # Service
 
-This library provides a CarouselService containing an RxJs Subject `onSlideChange` that is triggered at every slide change. `onSlideChange` returns an object containing the current slide number and the carousel ID (useful if multiple carousel on a page to target a specific carousel instance). The slide number and carousel ID are zero indexed.
+This library provides a CarouselService containing an RxJs BehaviorSubject `onSlideChange` that is triggered at every slide change. `onSlideChange` returns an object containing the current slide number and the carousel ID (useful if multiple carousel on a page to target a specific carousel instance). The slide number and carousel ID are zero indexed.
 
 Inject the CarouselService through regular dependency injection in your hosting component.
 
@@ -115,6 +115,8 @@ Version 0.0.9: Change in the behavior of the auto slide. Auto slide will now occ
 Version 0.1.1: Fixed a race condition that could occur betweeen evaluation of the template and initialisation of the variables.
 
 Version 0.1.2: Adding an autoPlay feature.
+
+Version 0.1.6: Blocking resize event triggered at vertical scrolling on phones.
 
 # Report a Bug
 
