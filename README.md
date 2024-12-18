@@ -116,6 +116,8 @@ Version 0.1.1: Fixed a race condition that could occur betweeen evaluation of th
 
 Version 0.1.2: Adding an autoPlay feature.
 
+Version 0.1.6: Blocking resize event triggered at vertical scrolling on phones.
+
 # Report a Bug
 
 Please provide a detailed description of the encountered bug, including your carousel configuration and the steps/actions that led to the issue. An accurate description will help me to reproduce the issue.
