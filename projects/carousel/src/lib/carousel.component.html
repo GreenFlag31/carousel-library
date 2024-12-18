@@ -99,13 +99,14 @@
 
   @if (dots) {
   <div class="bullets-container">
+    @for (bullet of carousel?.arrayNumberDots; track $index) {
     <button
       class="bullet"
       aria-label="bullet point navigation"
-      *ngFor="let bullet of carousel?.arrayNumberDots"
       [class.current]="bullet === slider?.currentSlide"
       (click)="slider?.goTo(bullet)"
     ></button>
+    }
   </div>
   }
 </div>

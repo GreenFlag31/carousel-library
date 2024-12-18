@@ -33,6 +33,14 @@ export class Validation {
     }
   }
 
+  requiredClassShouldBeAdded() {
+    if (this.carouselSlides === undefined || this.carouselSlides.length === 0) {
+      throw new Error(
+        'No elements with "carousel-slide" as class have been found. Please add this class to each of your slides.'
+      );
+    }
+  }
+
   slideToScrollNotGreaterThanTotalSlides() {
     if (
       this.carouselSlides &&
@@ -40,14 +48,6 @@ export class Validation {
     ) {
       throw new Error(
         'slideToScroll value is greater than the total amount of slide. This can cause invisible cards in infinite mode. Please lower the slideToScroll value.'
-      );
-    }
-  }
-
-  requiredClassShouldBeAdded() {
-    if (this.carouselSlides === undefined || this.carouselSlides.length === 0) {
-      throw new Error(
-        'No elements with "carousel-slide" as class have been found. Please add this class to each of your slides.'
       );
     }
   }

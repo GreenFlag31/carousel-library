@@ -54,13 +54,15 @@ export class CarouselComponent implements AfterViewInit {
   @Input() autoPlayDirection: 'ltr' | 'rtl' = 'ltr';
 
   @ViewChild('carouselContainer')
-  carouselContainer!: ElementRef<HTMLDivElement>;
-  mouseupSubscription!: Subscription;
-  VChangeSubscription!: Subscription;
-  resizeSubscription!: Subscription;
+  private carouselContainer!: ElementRef<HTMLDivElement>;
+  private mouseupSubscription!: Subscription;
+  private VChangeSubscription!: Subscription;
+  private resizeEvent!: () => void;
+  private previousWidth = 0;
+  private currentWidth = 0;
+  private isBrowser = true;
   carousel!: Carousel | undefined;
   slider!: Slider | undefined;
-  isBrowser = true;
 
   constructor(
     private cd: ChangeDetectorRef,
@@ -74,6 +76,8 @@ export class CarouselComponent implements AfterViewInit {
     if (!this.isBrowser) return;
 
     const carouselContainer = this.carouselContainer.nativeElement;
+    this.previousWidth = window.innerWidth;
+    this.currentWidth = window.innerWidth;
 
     new Validation(
       carouselContainer,
@@ -151,9 +155,10 @@ export class CarouselComponent implements AfterViewInit {
       this.cd.markForCheck();
     });
 
-    this.resizeSubscription = fromEvent(window, 'resize').subscribe(() => {
+    this.resizeEvent = () => {
       this.resize();
-    });
+    };
+    window.addEventListener('resize', this.resizeEvent);
   }
 
   /**
@@ -162,6 +167,11 @@ export class CarouselComponent implements AfterViewInit {
   resize() {
     if (!this.slider || !this.carousel) return;
 
+    // on smartphones a vertical scroll triggers a resize event
+    this.currentWidth = window.innerWidth;
+    if (this.currentWidth === this.previousWidth) return;
+
+    this.previousWidth = window.innerWidth;
     this.carousel.updateProperties();
     this.slider.updateProperties();
 
@@ -184,7 +194,8 @@ export class CarouselComponent implements AfterViewInit {
   ngOnDestroy() {
     this.mouseupSubscription?.unsubscribe();
     this.VChangeSubscription?.unsubscribe();
-    this.resizeSubscription?.unsubscribe();
+    window.removeEventListener('resize', this.resizeEvent);
+    // this.resizeEvent?.unsubscribe();
     this.slider?.stopAutoPlay();
   }
 }

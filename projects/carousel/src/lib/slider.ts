@@ -722,6 +722,7 @@ export class Slider {
 
     const current =
       this.carousel.numberDots > 1 ? this.currentSlide : this.accumulatedSlide;
+
     this.carouselService.onChange(current, this.currentCarouselID);
   }
 

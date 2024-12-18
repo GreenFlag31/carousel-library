@@ -1,5 +1,4 @@
 import { Component, ViewEncapsulation } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
 import {
   CarouselModule,
   CarouselService,
@@ -14,7 +13,7 @@ interface Colors {
   templateUrl: './testing.component.html',
   styleUrls: ['./testing.component.css'],
   standalone: true,
-  imports: [RouterOutlet, CarouselModule],
+  imports: [CarouselModule],
   encapsulation: ViewEncapsulation.None,
 })
 export class TestingComponent {
