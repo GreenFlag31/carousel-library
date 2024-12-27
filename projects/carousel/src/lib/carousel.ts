@@ -15,7 +15,7 @@ export class Carousel {
 
   constructor(
     private readonly carousel: HTMLDivElement,
-    private readonly maxWidthCarousel: number,
+    private readonly maxWidthCarousel: number | undefined,
     public slideToShow: number,
     public slideWidth: number,
     public readonly slideMaxWidth: number,
@@ -24,6 +24,10 @@ export class Carousel {
     private readonly loop: boolean
   ) {
     this.init();
+  }
+
+  get carouselElement() {
+    return this.carousel;
   }
 
   init() {

@@ -67,8 +67,6 @@ export class Slider {
     this.nextLimit = Math.floor(this.carousel.slideWidthWithGap);
     this.prevLimit = -this.carousel.slideWidthWithGap;
 
-    this.carouselService.carouselID += 1;
-    this.currentCarouselID = this.carouselService.carouselID;
     this.defineAutoPlayDirection();
     if (this.autoPlayAtStart) this.launchAutoPlay();
     this.disableAutoPlayBtn();
@@ -664,10 +662,12 @@ export class Slider {
    * Update values accordingly.
    */
   goTo(bullet: number) {
+    const slideHasChanged = this.currentSlide !== bullet;
     this.direction = this.currentSlide < bullet ? 'right' : 'left';
 
     this.currentSlide = bullet;
-    this.carouselService.onChange(this.currentSlide, this.currentCarouselID);
+    this.fireSlideChangeEvent(slideHasChanged, this.currentSlide);
+
     this.disableAutoPlayBtn();
     this.relaunchAutoPlay();
 
@@ -710,6 +710,8 @@ export class Slider {
    * Exception: if only one window (numberDots === 1), update the accumulatedSlide to let the transformation occurs, but currentSlide should stay at 0.
    */
   changeSlideNumber(step: number) {
+    const slideNumberBeforeChange = this.currentSlide;
+
     if (this.infinite) {
       this.infiniteChangeSlideNumber(step);
     } else {
@@ -723,7 +725,15 @@ export class Slider {
     const current =
       this.carousel.numberDots > 1 ? this.currentSlide : this.accumulatedSlide;
 
-    this.carouselService.onChange(current, this.currentCarouselID);
+    const slideHasChanged = slideNumberBeforeChange !== this.currentSlide;
+
+    this.fireSlideChangeEvent(slideHasChanged, current);
+  }
+
+  fireSlideChangeEvent(slideHasChanged: boolean, slide: number) {
+    if (!slideHasChanged) return;
+
+    this.carouselService.emit(slide, this.carousel.carouselElement);
   }
 
   infiniteChangeSlideNumber(step: number) {

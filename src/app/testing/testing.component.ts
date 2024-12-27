@@ -1,8 +1,5 @@
-import { Component, ViewEncapsulation } from '@angular/core';
-import {
-  CarouselModule,
-  CarouselService,
-} from 'projects/carousel/src/public-api';
+import { AfterViewInit, Component, ViewEncapsulation } from '@angular/core';
+import { CarouselComponent } from 'projects/carousel/src/public-api';
 
 interface Colors {
   [index: number]: string;
@@ -13,11 +10,10 @@ interface Colors {
   templateUrl: './testing.component.html',
   styleUrls: ['./testing.component.css'],
   standalone: true,
-  imports: [CarouselModule],
+  imports: [CarouselComponent],
   encapsulation: ViewEncapsulation.None,
 })
-export class TestingComponent {
-  constructor(private carouselService: CarouselService) {}
+export class TestingComponent implements AfterViewInit {
   colorPalette: Colors = {
     0: '#008000',
     1: '#00a0a9',
@@ -25,10 +21,15 @@ export class TestingComponent {
     3: '#dfe400',
   };
 
-  ngOnInit() {
-    this.carouselService.onSlideChange.subscribe((slideAndID) => {
-      const { slide, carouselID } = slideAndID;
-      if (carouselID !== 2) return;
+  constructor() {}
+
+  ngAfterViewInit() {
+    const thirdCarousel = document.querySelector(
+      '.third-carousel'
+    ) as HTMLDivElement;
+
+    thirdCarousel.addEventListener('slideChange', (data: CustomEventInit) => {
+      const slide = data.detail;
 
       this.changeColorArrowsAndBullets(slide, this.colorPalette[slide]);
     });

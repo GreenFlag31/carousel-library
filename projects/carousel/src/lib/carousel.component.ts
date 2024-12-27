@@ -5,7 +5,7 @@ import {
   Component,
   ElementRef,
   Inject,
-  Input,
+  input,
   PLATFORM_ID,
   ViewChild,
 } from '@angular/core';
@@ -14,6 +14,7 @@ import { Slider } from './slider';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Validation } from './validation';
 import { CarouselService } from './carousel.service';
+import { AnimationsTiming } from './interfaces';
 
 @Component({
   selector: 'carousel',
@@ -24,33 +25,33 @@ import { CarouselService } from './carousel.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CarouselComponent implements AfterViewInit {
-  @Input() maxWidthCarousel!: number;
-  @Input() infinite = false;
-  @Input() responsive = true;
-  @Input() autoSlide = true;
-  @Input() slideToShow = 3;
-  @Input() slideToScroll = 2;
-  @Input() autoslideLimitPercentCard = 30;
-  @Input() strechingLimit = 60;
-  @Input() slideWidth = 300;
-  @Input() slideMaxWidth = 500;
-  @Input() dots = true;
-  @Input() arrows = true;
-  @Input() counter = true;
-  @Input() enableMouseDrag = true;
-  @Input() enableTouch = true;
-  @Input() counterSeparator = '/';
-  @Input() gapBetweenSlides = 16;
-  @Input() animationTimingMs = 300;
-  @Input() maxDomSize = 4;
-  @Input() animationTimingFn = 'ease-out';
+  maxWidthCarousel = input<number>();
+  infinite = input(false);
+  responsive = input(true);
+  autoSlide = input(true);
+  slideToShow = input(3);
+  slideToScroll = input(2);
+  autoslideLimitPercentCard = input(30);
+  strechingLimit = input(60);
+  slideWidth = input(300);
+  slideMaxWidth = input(500);
+  dots = input(true);
+  arrows = input(true);
+  counter = input(true);
+  enableMouseDrag = input(true);
+  enableTouch = input(true);
+  counterSeparator = input('/');
+  gapBetweenSlides = input(16);
+  animationTimingMs = input(300);
+  maxDomSize = input(4);
+  animationTimingFn = input<AnimationsTiming>('ease-out');
 
-  @Input() autoPlay = false;
-  @Input() autoPlayInterval = 1500;
-  @Input() autoPlayAtStart = false;
-  @Input() displayAutoPlayControls = true;
-  @Input() autoPlaySlideToScroll = 1;
-  @Input() autoPlayDirection: 'ltr' | 'rtl' = 'ltr';
+  autoPlay = input(false);
+  autoPlayInterval = input(1500);
+  autoPlayAtStart = input(false);
+  displayAutoPlayControls = input(true);
+  autoPlaySlideToScroll = input(1);
+  autoPlayDirection = input<'ltr' | 'rtl'>('ltr');
 
   @ViewChild('carouselContainer')
   private carouselContainer!: ElementRef<HTMLDivElement>;
@@ -80,41 +81,41 @@ export class CarouselComponent implements AfterViewInit {
 
     new Validation(
       carouselContainer,
-      this.slideWidth,
-      this.slideMaxWidth,
-      this.gapBetweenSlides,
-      this.slideToScroll
+      this.slideWidth(),
+      this.slideMaxWidth(),
+      this.gapBetweenSlides(),
+      this.slideToScroll()
     );
 
     this.carousel = new Carousel(
       carouselContainer,
-      this.maxWidthCarousel,
-      this.slideToShow,
-      this.slideWidth,
-      this.slideMaxWidth,
-      this.gapBetweenSlides,
-      this.responsive,
-      this.infinite
+      this.maxWidthCarousel(),
+      this.slideToShow(),
+      this.slideWidth(),
+      this.slideMaxWidth(),
+      this.gapBetweenSlides(),
+      this.responsive(),
+      this.infinite()
     );
 
     this.slider = new Slider(
       this.carousel,
-      this.responsive,
-      this.slideToScroll,
-      this.autoslideLimitPercentCard,
-      this.strechingLimit,
-      this.autoSlide,
-      this.animationTimingFn,
-      this.animationTimingMs,
-      this.maxDomSize,
-      this.enableMouseDrag,
-      this.enableTouch,
-      this.infinite,
-      this.autoPlay,
-      this.autoPlayInterval,
-      this.autoPlayAtStart,
-      this.autoPlayDirection,
-      this.autoPlaySlideToScroll,
+      this.responsive(),
+      this.slideToScroll(),
+      this.autoslideLimitPercentCard(),
+      this.strechingLimit(),
+      this.autoSlide(),
+      this.animationTimingFn(),
+      this.animationTimingMs(),
+      this.maxDomSize(),
+      this.enableMouseDrag(),
+      this.enableTouch(),
+      this.infinite(),
+      this.autoPlay(),
+      this.autoPlayInterval(),
+      this.autoPlayAtStart(),
+      this.autoPlayDirection(),
+      this.autoPlaySlideToScroll(),
       this.carouselService,
       this.cd
     );
@@ -169,14 +170,14 @@ export class CarouselComponent implements AfterViewInit {
     this.slider.updateProperties();
 
     this.slider.stopAutoPlay();
+    const slideNumberBeforeChange = this.slider.currentSlide;
     this.slider.currentSlide = 0;
+    const slideHasChanged =
+      slideNumberBeforeChange !== this.slider.currentSlide;
     this.slider.accumulatedSlide = 0;
     this.slider.computeTransformation(0);
     this.slider.changePrevAndNextLimits(0);
-    this.carouselService.onChange(
-      this.slider.currentSlide,
-      this.slider.currentCarouselID
-    );
+    this.slider.fireSlideChangeEvent(slideHasChanged, 0);
 
     this.cd.markForCheck();
   }
@@ -187,6 +188,7 @@ export class CarouselComponent implements AfterViewInit {
   ngOnDestroy() {
     window.removeEventListener('resize', this.resizeEvent);
     window.removeEventListener('mouseup', this.mouseUpEvent);
+    document.removeEventListener('visibilitychange', this.visibilityEvent);
     this.slider?.stopAutoPlay();
   }
 }

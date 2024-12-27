@@ -1,6 +1,6 @@
 <div class="carousel-container" #carouselContainer>
   <div class="banner-container">
-    @if (arrows) {
+    @if (arrows()) {
     <div class="btn-container">
       <button
         class="prev"
@@ -48,7 +48,7 @@
         </svg>
       </button>
     </div>
-    } @if (autoPlay && displayAutoPlayControls) {
+    } @if (autoPlay() && displayAutoPlayControls()) {
     <div class="autoplay-container">
       <button
         class="play"
@@ -75,10 +75,10 @@
         </svg>
       </button>
     </div>
-    } @if (counter) {
+    } @if (counter()) {
     <div class="counter">
       <p>
-        {{ (slider?.currentSlide || 0) + 1 }} {{ counterSeparator }}
+        {{ (slider?.currentSlide || 0) + 1 }} {{ counterSeparator() }}
         {{ carousel?.numberDots }}
       </p>
     </div>
@@ -97,7 +97,7 @@
     <ng-content></ng-content>
   </div>
 
-  @if (dots) {
+  @if (dots()) {
   <div class="bullets-container">
     @for (bullet of carousel?.arrayNumberDots; track $index) {
     <button

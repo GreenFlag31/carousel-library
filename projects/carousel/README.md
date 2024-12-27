@@ -12,14 +12,13 @@ Live demonstration of the ngx-carousel-ease library [here](https://greenflag31.g
 
 # Installation
 
-# Installation
-
 | Version | Command                       | Description                                                                                         |
 | ------- | ----------------------------- | --------------------------------------------------------------------------------------------------- |
 | V17     | npm i ngx-carousel-ease@0.1.4 | Install the V17 compatible version.                                                                 |
-| V18     | npm i ngx-carousel-ease       | Install the V18 compatible version. This version is compatible with a zoneless Angular application. |
+| V18     | npm i ngx-carousel-ease@0.1.6 | Install the V18 compatible version. This version is compatible with a zoneless Angular application. |
+| V19     | npm i ngx-carousel-ease       | Install the V19 compatible version. This version is RxJS-free.                                      |
 
-Then, add the `CarouselModule` in the imports array of the hosting component (if standalone) or to your `appModule`.
+Then, add the `CarouselComponent` in the imports array of the hosting component (if standalone) or to your `appModule`.
 Finally, add your cards content within the `<carousel></carousel>` selector in the hosting component. Each of your card should contain the class `carousel-slide`.
 
 ```html
@@ -69,12 +68,23 @@ This library provides a CarouselService containing an RxJs BehaviorSubject `onSl
 
 Inject the CarouselService through regular dependency injection in your hosting component.
 
+_From the V19, RxJs has been replaced by a Javascript CustomEvent._
+
 ```javascript
+// V16 => V18
 ngOnInit() {
   this.carouselService.onSlideChange.subscribe((slideAndID) => {
     // change carousel colors, trigger a function, ...
   });
 }
+
+// V19: target your carousel element, and listen for a `slideChange` event.
+thirdCarousel.addEventListener('slideChange', (data: CustomEventInit) => {
+  const slide = data.detail; // the slide number
+
+  // change carousel colors, trigger a function, ...
+});
+
 ```
 
 The third example in the demo uses this functionnality.
@@ -117,6 +127,8 @@ Version 0.1.1: Fixed a race condition that could occur betweeen evaluation of th
 Version 0.1.2: Adding an autoPlay feature.
 
 Version 0.1.6: Blocking resize event triggered at vertical scrolling on phones.
+
+Version 0.1.7: Removing RxJs to anticipate the future optional RxJs. Transforming inputs to signals.
 
 # Report a Bug
 

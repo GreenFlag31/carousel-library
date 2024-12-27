@@ -1,11 +1,11 @@
 {
   "name": "ngx-carousel-ease",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "author": "Manu Claeys",
   "license": "MIT",
   "peerDependencies": {
-    "@angular/common": "^18.0.0",
-    "@angular/core": "^18.0.0"
+    "@angular/common": "^19.0.0",
+    "@angular/core": "^19.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"
