@@ -241,7 +241,7 @@ export class Slider {
   currentEventIsDisabled(event: MouseEvent | TouchEvent) {
     return (
       (event instanceof MouseEvent && !this.enableMouseDrag) ||
-      (event instanceof TouchEvent && !this.enableTouch)
+      (window.TouchEvent && event instanceof TouchEvent && !this.enableTouch)
     );
   }
 
