@@ -130,6 +130,8 @@ Version 0.1.6: Blocking resize event triggered at vertical scrolling on phones.
 
 Version 0.1.7: Removing RxJs to anticipate the future optional RxJs. Transforming inputs to signals.
 
+Version 0.1.8: TouchEvent fix for Firefox. Thanks to @seba174.
+
 # Report a Bug
 
 Please provide a detailed description of the encountered bug, including your carousel configuration and the steps/actions that led to the issue. An accurate description will help me to reproduce the issue.
