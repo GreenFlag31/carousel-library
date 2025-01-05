@@ -238,10 +238,16 @@ export class Slider {
     }
   }
 
+  /**
+   * Checks if current event is allowed by user.
+   * TouchEvent partially supported on Firefox (and working on Safari despite the MDN docs).
+   */
   currentEventIsDisabled(event: MouseEvent | TouchEvent) {
+    const isMouseEvent = event instanceof MouseEvent;
+
     return (
-      (event instanceof MouseEvent && !this.enableMouseDrag) ||
-      (event instanceof TouchEvent && !this.enableTouch)
+      (isMouseEvent && !this.enableMouseDrag) ||
+      (!isMouseEvent && !this.enableTouch)
     );
   }
 
@@ -262,6 +268,9 @@ export class Slider {
    * Compute the translation, change the slide number, update the direction.
    */
   dragMove(event: MouseEvent | TouchEvent) {
+    // console.log((event as any).pageX);
+    // console.log((event as any).changedTouches[0].pageX);
+
     if (this.currentEventIsDisabled(event)) return;
     if (!this.dragging) return;
 
