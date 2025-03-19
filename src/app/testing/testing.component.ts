@@ -21,8 +21,6 @@ export class TestingComponent implements AfterViewInit {
     3: '#dfe400',
   };
 
-  constructor() {}
-
   ngAfterViewInit() {
     const thirdCarousel = document.querySelector(
       '.third-carousel'

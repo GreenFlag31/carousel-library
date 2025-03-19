@@ -4,6 +4,8 @@
 
 ngx-carousel-ease is a versatile Angular library providing a feature-rich, simple, and performant carousel component. This library supports infinite and responsive mode, mouse and touch event. Attention has been put to accessibility, performance, and friendly developer experience.
 
+This library is 100% signal based, compatible with a zoneless Angular application, and RxJs free (_available in the last version_).
+
 Support Angular version starts at v17.
 
 # Demo
@@ -78,7 +80,7 @@ ngOnInit() {
   });
 }
 
-// V19: target your carousel element, and listen for a `slideChange` event.
+// From V19: target your carousel element, and listen for a `slideChange` event.
 thirdCarousel.addEventListener('slideChange', (data: CustomEventInit) => {
   const slide = data.detail; // the slide number
 
@@ -131,6 +133,8 @@ Version 0.1.6: Blocking resize event triggered at vertical scrolling on phones.
 Version 0.1.7: Removing RxJs to anticipate the future optional RxJs. Transforming inputs to signals.
 
 Version 0.1.8: TouchEvent fix for Firefox. Thanks to @seba174.
+
+Version 0.1.9: Internal API refactoring, signal based template, and bug fix.
 
 # Report a Bug
 

@@ -5,12 +5,12 @@
       <button
         class="prev"
         aria-label="previous button navigation"
-        (click)="slider?.prev()"
+        (click)="slider.prev()"
         [disabled]="
-          !infinite &&
-          ((slider?.currentSlide === 0 &&
-            (slider?.currentTranslation || 0) >= 0) ||
-            carousel?.numberDots === 1)
+          !infinite() &&
+          ((this.sliderCurrentSlide() === 0 &&
+            this.sliderCurrentTranslation() >= 0) ||
+            carouselDots() === 1)
         "
       >
         <svg
@@ -27,13 +27,13 @@
       <button
         class="next"
         aria-label="next button navigation"
-        (click)="slider?.next()"
+        (click)="slider.next()"
         [disabled]="
-          !infinite &&
-          ((slider?.currentSlide === (carousel?.numberDots || 0) - 1 &&
-            (slider?.currentTranslation || 0) <=
-              -(carousel?.maxScrollableContent || 0)) ||
-            carousel?.numberDots === 1)
+          !infinite() &&
+          ((this.sliderCurrentSlide() === carouselDots() - 1 &&
+            this.sliderCurrentTranslation() <=
+              -this.carouselMaxScrollableContent()) ||
+            carouselDots() === 1)
         "
       >
         <svg
@@ -52,8 +52,8 @@
     <div class="autoplay-container">
       <button
         class="play"
-        [disabled]="slider?.playActive || slider?.playButtonDisabled"
-        (click)="slider?.launchAutoPlay()"
+        [disabled]="this.sliderPlayActive() || this.sliderPlayButtonDisabled()"
+        (click)="slider.launchAutoPlay()"
         aria-label="play button navigation"
       >
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
@@ -64,8 +64,8 @@
       </button>
       <button
         class="pause"
-        [disabled]="!slider?.playActive"
-        (click)="slider?.stopAutoPlay()"
+        [disabled]="!this.sliderPlayActive()"
+        (click)="slider.stopAutoPlay()"
         aria-label="pause button navigation"
       >
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
@@ -78,8 +78,8 @@
     } @if (counter()) {
     <div class="counter">
       <p>
-        {{ (slider?.currentSlide || 0) + 1 }} {{ counterSeparator() }}
-        {{ carousel?.numberDots }}
+        {{ this.sliderCurrentSlide() + 1 }} {{ counterSeparator() }}
+        {{ carouselDots() }}
       </p>
     </div>
     }
@@ -87,24 +87,24 @@
 
   <div
     class="slides-container"
-    [class.dragging]="slider?.dragging"
-    (mousedown)="slider?.dragStart($event)"
-    (touchstart)="slider?.dragStart($event)"
-    (mousemove)="slider?.dragMove($event)"
-    (touchmove)="slider?.dragMove($event)"
-    (touchend)="slider?.dragStop($event); this.slider?.relaunchAutoPlay()"
+    [class.dragging]="this.sliderDragging()"
+    (mousedown)="slider.dragStart($event)"
+    (touchstart)="slider.dragStart($event)"
+    (mousemove)="slider.dragMove($event)"
+    (touchmove)="slider.dragMove($event)"
+    (touchend)="slider.dragStop($event); this.slider.relaunchAutoPlay()"
   >
     <ng-content></ng-content>
   </div>
 
   @if (dots()) {
   <div class="bullets-container">
-    @for (bullet of carousel?.arrayNumberDots; track $index) {
+    @for (bullet of this.carouselArrayNumberDots(); track $index) {
     <button
       class="bullet"
       aria-label="bullet point navigation"
-      [class.current]="bullet === slider?.currentSlide"
-      (click)="slider?.goTo(bullet)"
+      [class.current]="bullet === slider.currentSlide()"
+      (click)="slider.goTo(bullet)"
     ></button>
     }
   </div>

@@ -2,6 +2,11 @@ import { ChangeDetectorRef } from '@angular/core';
 import { Carousel } from './carousel';
 import { CarouselService } from './carousel.service';
 
+/**
+ * LEGACY SLIDER
+ * CAN BE USEFULL EVENT. FOR BUGS CORRECTIONS
+ * NOT USED ANYMORE
+ */
 export class Slider {
   dragging = false;
   currentSlide = 0;
@@ -749,13 +754,14 @@ export class Slider {
     this.accumulatedSlide += step;
     this.currentSlide += step;
 
-    if (this.currentSlide > this.lastWindow) {
-      const surplus = this.currentSlide % this.lastWindow;
-      this.currentSlide = surplus - 1;
+    const lastSlide = this.totalSlides - 1;
+    if (this.currentSlide > lastSlide) {
+      this.currentSlide = this.currentSlide % this.totalSlides;
     } else if (this.currentSlide < 0) {
-      const surplus = this.currentSlide % this.lastWindow;
-      this.currentSlide = this.totalSlides + surplus;
+      this.currentSlide = this.totalSlides + this.currentSlide;
     }
+
+    console.log(this.currentSlide);
   }
 
   finiteChangeSlideNumber(step: number) {

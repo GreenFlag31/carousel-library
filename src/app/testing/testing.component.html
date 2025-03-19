@@ -5,13 +5,9 @@
     <div class="description-title">
       <div class="properties-container">
         <p>Infinite</p>
-        <p ngxTooltip content="Width of slides adapted on resize">Responsive</p>
-        <p ngxTooltip content="Slide towards nearest slide on mouse release">
-          Auto slide
-        </p>
-        <p ngxTooltip content="Auto slide based on an interval of time">
-          Auto play
-        </p>
+        <p>Responsive</p>
+        <p>Auto slide</p>
+        <p>Auto play</p>
         <p>Auto slide limit: 40%</p>
         <p>Slide to show: 3</p>
         <p>Slide to scroll: 2</p>
@@ -25,6 +21,43 @@
       [slideToShow]="3"
       class="first-carousel"
     >
+      <!-- @for(p of [1,2]; track $index){
+      <div class="carousel-slide" id="{{ $index }}">
+        <img
+          src="assets/pictures/1964-ford-mustang.jpg"
+          alt="Ford Mustang 1964"
+          title="Ford Mustang 1964"
+        />
+        <div class="card-content">
+          <div class="title-card">
+            <h3>{{ $index }}. Ford Mustang 1964</h3>
+          </div>
+          <div class="caracteristics">
+            <div class="power caracteristic">
+              <p>Power:</p>
+              <p>271 hp</p>
+            </div>
+            <div class="type caracteristic">
+              <p>Engine Type:</p>
+              <p>V8</p>
+            </div>
+            <div class="top-speed caracteristic">
+              <p>Top Speed:</p>
+              <p>210 km/h</p>
+            </div>
+            <div class="weight caracteristic">
+              <p>Weight:</p>
+              <p>1 340 kg</p>
+            </div>
+            <div class="origin caracteristic">
+              <p>Origin:</p>
+              <img src="assets/pictures/US.png" alt="Flag of USA" />
+            </div>
+          </div>
+        </div>
+      </div>
+      } -->
+
       <div class="carousel-slide" id="1">
         <img
           src="assets/pictures/1964-ford-mustang.jpg"
@@ -241,9 +274,7 @@
     <div class="description-title">
       <div class="properties-container">
         <p>Finite</p>
-        <p ngxTooltip content="Width of slides will not adapt on resize">
-          Not responsive
-        </p>
+        <p>Not responsive</p>
         <p>Auto slide</p>
         <p>Auto slide limit: 40%</p>
         <p>Slide to show: 3</p>

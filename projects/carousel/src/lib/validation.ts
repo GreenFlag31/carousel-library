@@ -47,7 +47,7 @@ export class Validation {
       this.slideToScroll > this.carouselSlides.length
     ) {
       throw new Error(
-        'slideToScroll value is greater than the total amount of slide. This can cause invisible cards in infinite mode. Please lower the slideToScroll value.'
+        `slideToScroll value (${this.slideToScroll}) is greater than the total amount of slide (${this.carouselSlides.length}). This can cause invisible cards in infinite mode. Please lower the slideToScroll value.`
       );
     }
   }

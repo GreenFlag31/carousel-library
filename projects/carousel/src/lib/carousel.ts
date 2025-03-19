@@ -1,11 +1,15 @@
+import { signal } from '@angular/core';
+
 export class Carousel {
   slides!: NodeListOf<HTMLDivElement>;
   originalSlideWidth!: number;
   slideWidthWithGap!: number;
-  numberDots!: number;
-  arrayNumberDots: number[] = [];
+
+  numberDots = signal(0);
+  maxScrollableContent = signal(0);
+  arrayNumberDots = signal<number[]>([]);
+
   slidesContainer!: HTMLDivElement;
-  maxScrollableContent = 0;
   totalSlides = 0;
   initialSlideToShow = 1;
   paddingCarousel = 0;
@@ -75,12 +79,12 @@ export class Carousel {
       this.updateSlideToShowNotResponsive();
     }
 
-    this.numberDots = this.setNumberDots();
-    this.arrayNumberDots = [...Array(this.numberDots).keys()];
+    this.numberDots.set(this.setNumberDots());
+    this.arrayNumberDots.set([...Array(this.numberDots()).keys()]);
 
     this.slideWidthWithGap = this.slideWidth + this.gap;
     this.setWidthSlideContainer();
-    this.maxScrollableContent = this.getMaxScroll();
+    this.maxScrollableContent.set(this.getMaxScroll());
   }
 
   /**
@@ -189,9 +193,7 @@ export class Carousel {
    * If infinite mode, one more window than normal mode.
    */
   setNumberDots() {
-    if (this.loop) {
-      return this.totalSlides === this.slideToShow ? 1 : this.totalSlides;
-    }
+    if (this.loop) return this.totalSlides;
 
     return this.slideToShow > 1
       ? this.totalSlides - this.slideToShow + 1
@@ -203,7 +205,7 @@ export class Carousel {
    * Useful for the streching effect (not infinite mode), end of the slides
    */
   getMaxScroll() {
-    return (this.numberDots - 1) * this.slideWidthWithGap;
+    return (this.numberDots() - 1) * this.slideWidthWithGap;
   }
 
   setDraggableImgToFalse() {
