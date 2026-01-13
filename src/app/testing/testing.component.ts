@@ -25,10 +25,8 @@ export class TestingComponent implements AfterViewInit {
     const thirdCarousel = document.querySelector(
       '.third-carousel'
     ) as HTMLDivElement;
-
     thirdCarousel.addEventListener('slideChange', (data: CustomEventInit) => {
       const slide = data.detail;
-
       this.changeColorArrowsAndBullets(slide, this.colorPalette[slide]);
     });
   }

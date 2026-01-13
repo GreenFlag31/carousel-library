@@ -19,254 +19,220 @@
       [autoPlay]="true"
       [autoslideLimitPercentCard]="40"
       [slideToShow]="3"
+      [autoPlayAtStart]="false"
       class="first-carousel"
     >
-      <!-- @for(p of [1,2]; track $index){
-      <div class="carousel-slide" id="{{ $index }}">
-        <img
-          src="assets/pictures/1964-ford-mustang.jpg"
-          alt="Ford Mustang 1964"
-          title="Ford Mustang 1964"
-        />
-        <div class="card-content">
-          <div class="title-card">
-            <h3>{{ $index }}. Ford Mustang 1964</h3>
-          </div>
-          <div class="caracteristics">
-            <div class="power caracteristic">
-              <p>Power:</p>
-              <p>271 hp</p>
+      <ng-template #carouselViewContainer #carouselTemplateRef>
+        <div class="carousel-slide" id="1">
+          <img
+            src="assets/pictures/1964-ford-mustang.jpg"
+            alt="Ford Mustang 1964"
+            title="Ford Mustang 1964"
+          />
+          <div class="card-content">
+            <div class="title-card">
+              <h3>1. Ford Mustang 1964</h3>
             </div>
-            <div class="type caracteristic">
-              <p>Engine Type:</p>
-              <p>V8</p>
-            </div>
-            <div class="top-speed caracteristic">
-              <p>Top Speed:</p>
-              <p>210 km/h</p>
-            </div>
-            <div class="weight caracteristic">
-              <p>Weight:</p>
-              <p>1 340 kg</p>
-            </div>
-            <div class="origin caracteristic">
-              <p>Origin:</p>
-              <img src="assets/pictures/US.png" alt="Flag of USA" />
+            <div class="caracteristics">
+              <div class="power caracteristic">
+                <p>Power:</p>
+                <p>271 hp</p>
+              </div>
+              <div class="type caracteristic">
+                <p>Engine Type:</p>
+                <p>V8</p>
+              </div>
+              <div class="top-speed caracteristic">
+                <p>Top Speed:</p>
+                <p>210 km/h</p>
+              </div>
+              <div class="weight caracteristic">
+                <p>Weight:</p>
+                <p>1 340 kg</p>
+              </div>
+              <div class="origin caracteristic">
+                <p>Origin:</p>
+                <img src="assets/pictures/US.png" alt="Flag of USA" />
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      } -->
 
-      <div class="carousel-slide" id="1">
-        <img
-          src="assets/pictures/1964-ford-mustang.jpg"
-          alt="Ford Mustang 1964"
-          title="Ford Mustang 1964"
-        />
-        <div class="card-content">
-          <div class="title-card">
-            <h3>1. Ford Mustang 1964</h3>
-          </div>
-          <div class="caracteristics">
-            <div class="power caracteristic">
-              <p>Power:</p>
-              <p>271 hp</p>
+        <div class="carousel-slide" id="2">
+          <img
+            src="assets/pictures/Bmw 2002 Turbo 1973.jpg"
+            alt="Bmw 2002 Turbo 1973"
+            title="Bmw 2002 Turbo 1973"
+          />
+          <div class="card-content">
+            <div class="title-card">
+              <h3>2. Bmw 2002 Turbo 1973</h3>
             </div>
-            <div class="type caracteristic">
-              <p>Engine Type:</p>
-              <p>V8</p>
-            </div>
-            <div class="top-speed caracteristic">
-              <p>Top Speed:</p>
-              <p>210 km/h</p>
-            </div>
-            <div class="weight caracteristic">
-              <p>Weight:</p>
-              <p>1 340 kg</p>
-            </div>
-            <div class="origin caracteristic">
-              <p>Origin:</p>
-              <img src="assets/pictures/US.png" alt="Flag of USA" />
+            <div class="caracteristics">
+              <div class="power caracteristic">
+                <p>Power:</p>
+                <p>170 hp</p>
+              </div>
+              <div class="type caracteristic">
+                <p>Engine Type:</p>
+                <p>M10 turbocharged</p>
+              </div>
+              <div class="top-speed caracteristic">
+                <p>Top Speed:</p>
+                <p>211 km/h</p>
+              </div>
+              <div class="weight caracteristic">
+                <p>Weight:</p>
+                <p>1 130 kg</p>
+              </div>
+              <div class="origin caracteristic">
+                <p>Origin:</p>
+                <img src="assets/pictures/Germany.png" alt="Flag of Germany" />
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="carousel-slide" id="2">
-        <img
-          src="assets/pictures/Bmw 2002 Turbo 1973.jpg"
-          alt="Bmw 2002 Turbo 1973"
-          title="Bmw 2002 Turbo 1973"
-        />
-        <div class="card-content">
-          <div class="title-card">
-            <h3>2. Bmw 2002 Turbo 1973</h3>
-          </div>
-          <div class="caracteristics">
-            <div class="power caracteristic">
-              <p>Power:</p>
-              <p>170 hp</p>
+        <div class="carousel-slide" id="3">
+          <img
+            src="assets/pictures/Porsche 911 1973.jpg"
+            alt="Porsche 911 1973"
+            title="Porsche 911 1973"
+          />
+          <div class="card-content">
+            <div class="title-card">
+              <h3>3. Porsche 911 1973</h3>
             </div>
-            <div class="type caracteristic">
-              <p>Engine Type:</p>
-              <p>M10 turbocharged</p>
-            </div>
-            <div class="top-speed caracteristic">
-              <p>Top Speed:</p>
-              <p>211 km/h</p>
-            </div>
-            <div class="weight caracteristic">
-              <p>Weight:</p>
-              <p>1 130 kg</p>
-            </div>
-            <div class="origin caracteristic">
-              <p>Origin:</p>
-              <img src="assets/pictures/Germany.png" alt="Flag of Germany" />
+            <div class="caracteristics">
+              <div class="power caracteristic">
+                <p>Power:</p>
+                <p>210 hp</p>
+              </div>
+              <div class="type caracteristic">
+                <p>Engine Type:</p>
+                <p>MFI flat-six</p>
+              </div>
+              <div class="top-speed caracteristic">
+                <p>Top Speed:</p>
+                <p>240 km/h</p>
+              </div>
+              <div class="weight caracteristic">
+                <p>Weight:</p>
+                <p>975 kg</p>
+              </div>
+              <div class="origin caracteristic">
+                <p>Origin:</p>
+                <img src="assets/pictures/Germany.png" alt="Flag of Germany" />
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="carousel-slide" id="3">
-        <img
-          src="assets/pictures/Porsche 911 1973.jpg"
-          alt="Porsche 911 1973"
-          title="Porsche 911 1973"
-        />
-        <div class="card-content">
-          <div class="title-card">
-            <h3>3. Porsche 911 1973</h3>
-          </div>
-          <div class="caracteristics">
-            <div class="power caracteristic">
-              <p>Power:</p>
-              <p>210 hp</p>
+        <div class="carousel-slide" id="4">
+          <img
+            src="assets/pictures/Ferrari Dino 1972.jpg"
+            alt="Ferrari Dino 1972"
+            title="Ferrari Dino 1972"
+          />
+          <div class="card-content">
+            <div class="title-card">
+              <h3>4. Ferrari Dino 1972</h3>
             </div>
-            <div class="type caracteristic">
-              <p>Engine Type:</p>
-              <p>MFI flat-six</p>
-            </div>
-            <div class="top-speed caracteristic">
-              <p>Top Speed:</p>
-              <p>240 km/h</p>
-            </div>
-            <div class="weight caracteristic">
-              <p>Weight:</p>
-              <p>975 kg</p>
-            </div>
-            <div class="origin caracteristic">
-              <p>Origin:</p>
-              <img src="assets/pictures/Germany.png" alt="Flag of Germany" />
+            <div class="caracteristics">
+              <div class="power caracteristic">
+                <p>Power:</p>
+                <p>195 hp</p>
+              </div>
+              <div class="type caracteristic">
+                <p>Engine Type:</p>
+                <p>V6</p>
+              </div>
+              <div class="top-speed caracteristic">
+                <p>Top Speed:</p>
+                <p>240 km/h</p>
+              </div>
+              <div class="weight caracteristic">
+                <p>Weight:</p>
+                <p>1 080 kg</p>
+              </div>
+              <div class="origin caracteristic">
+                <p>Origin:</p>
+                <img src="assets/pictures/Italy.png" alt="Flag of Italy" />
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="carousel-slide" id="4">
-        <img
-          src="assets/pictures/Ferrari Dino 1972.jpg"
-          alt="Ferrari Dino 1972"
-          title="Ferrari Dino 1972"
-        />
-        <div class="card-content">
-          <div class="title-card">
-            <h3>4. Ferrari Dino 1972</h3>
-          </div>
-          <div class="caracteristics">
-            <div class="power caracteristic">
-              <p>Power:</p>
-              <p>195 hp</p>
+        <div class="carousel-slide" id="5">
+          <img
+            src="assets/pictures/Shelby cobra 1965.jpg"
+            alt="Shelby cobra 1965"
+            title="Shelby cobra 1965"
+          />
+          <div class="card-content">
+            <div class="title-card">
+              <h3>5. Shelby cobra 1965</h3>
             </div>
-            <div class="type caracteristic">
-              <p>Engine Type:</p>
-              <p>V6</p>
-            </div>
-            <div class="top-speed caracteristic">
-              <p>Top Speed:</p>
-              <p>240 km/h</p>
-            </div>
-            <div class="weight caracteristic">
-              <p>Weight:</p>
-              <p>1 080 kg</p>
-            </div>
-            <div class="origin caracteristic">
-              <p>Origin:</p>
-              <img src="assets/pictures/Italy.png" alt="Flag of Italy" />
+            <div class="caracteristics">
+              <div class="power caracteristic">
+                <p>Power:</p>
+                <p>425 hp</p>
+              </div>
+              <div class="type caracteristic">
+                <p>Engine Type:</p>
+                <p>V8</p>
+              </div>
+              <div class="top-speed caracteristic">
+                <p>Top Speed:</p>
+                <p>265 km/h</p>
+              </div>
+              <div class="weight caracteristic">
+                <p>Weight:</p>
+                <p>1 080 kg</p>
+              </div>
+              <div class="origin caracteristic">
+                <p>Origin:</p>
+                <img src="assets/pictures/US.png" alt="Flag of USA" />
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="carousel-slide" id="5">
-        <img
-          src="assets/pictures/Shelby cobra 1965.jpg"
-          alt="Shelby cobra 1965"
-          title="Shelby cobra 1965"
-        />
-        <div class="card-content">
-          <div class="title-card">
-            <h3>5. Shelby cobra 1965</h3>
-          </div>
-          <div class="caracteristics">
-            <div class="power caracteristic">
-              <p>Power:</p>
-              <p>425 hp</p>
+        <div class="carousel-slide" id="6">
+          <img
+            src="assets/pictures/Ferrari 250 GTO 1962.jpg"
+            alt="Ferrari 250 GTO 1962"
+            title="Ferrari 250 GTO 1962"
+          />
+          <div class="card-content">
+            <div class="title-card">
+              <h3>6. Ferrari 250 GTO 1962</h3>
             </div>
-            <div class="type caracteristic">
-              <p>Engine Type:</p>
-              <p>V8</p>
-            </div>
-            <div class="top-speed caracteristic">
-              <p>Top Speed:</p>
-              <p>265 km/h</p>
-            </div>
-            <div class="weight caracteristic">
-              <p>Weight:</p>
-              <p>1 080 kg</p>
-            </div>
-            <div class="origin caracteristic">
-              <p>Origin:</p>
-              <img src="assets/pictures/US.png" alt="Flag of USA" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="carousel-slide" id="6">
-        <img
-          src="assets/pictures/Ferrari 250 GTO 1962.jpg"
-          alt="Ferrari 250 GTO 1962"
-          title="Ferrari 250 GTO 1962"
-        />
-        <div class="card-content">
-          <div class="title-card">
-            <h3>6. Ferrari 250 GTO 1962</h3>
-          </div>
-          <div class="caracteristics">
-            <div class="power caracteristic">
-              <p>Power:</p>
-              <p>300 hp</p>
-            </div>
-            <div class="type caracteristic">
-              <p>Engine Type:</p>
-              <p>V12</p>
-            </div>
-            <div class="top-speed caracteristic">
-              <p>Top Speed:</p>
-              <p>280 km/h</p>
-            </div>
-            <div class="weight caracteristic">
-              <p>Weight:</p>
-              <p>1 000 kg</p>
-            </div>
-            <div class="origin caracteristic">
-              <p>Origin:</p>
-              <img src="assets/pictures/Italy.png" alt="Flag of Italy" />
+            <div class="caracteristics">
+              <div class="power caracteristic">
+                <p>Power:</p>
+                <p>300 hp</p>
+              </div>
+              <div class="type caracteristic">
+                <p>Engine Type:</p>
+                <p>V12</p>
+              </div>
+              <div class="top-speed caracteristic">
+                <p>Top Speed:</p>
+                <p>280 km/h</p>
+              </div>
+              <div class="weight caracteristic">
+                <p>Weight:</p>
+                <p>1 000 kg</p>
+              </div>
+              <div class="origin caracteristic">
+                <p>Origin:</p>
+                <img src="assets/pictures/Italy.png" alt="Flag of Italy" />
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </ng-template>
     </carousel>
   </section>
 
@@ -289,26 +255,28 @@
       [slideToScroll]="1"
       class="second-carousel"
     >
-      <div class="carousel-slide second brazil" id="1">
-        <h3 class="title">Brazil</h3>
-        <div class="img-bg"></div>
-      </div>
-      <div class="carousel-slide second belize" id="2">
-        <h3 class="title">Belize</h3>
-        <div class="img-bg"></div>
-      </div>
-      <div class="carousel-slide second egypt" id="3">
-        <h3 class="title">Egypt</h3>
-        <div class="img-bg"></div>
-      </div>
-      <div class="carousel-slide second norway" id="4">
-        <h3 class="title">Norway</h3>
-        <div class="img-bg"></div>
-      </div>
-      <div class="carousel-slide second uk" id="5">
-        <h3 class="title">UK</h3>
-        <div class="img-bg"></div>
-      </div>
+      <ng-template #carouselViewContainer #carouselTemplateRef>
+        <div class="carousel-slide second brazil" id="1">
+          <h3 class="title">Brazil</h3>
+          <div class="img-bg"></div>
+        </div>
+        <div class="carousel-slide second belize" id="2">
+          <h3 class="title">Belize</h3>
+          <div class="img-bg"></div>
+        </div>
+        <div class="carousel-slide second egypt" id="3">
+          <h3 class="title">Egypt</h3>
+          <div class="img-bg"></div>
+        </div>
+        <div class="carousel-slide second norway" id="4">
+          <h3 class="title">Norway</h3>
+          <div class="img-bg"></div>
+        </div>
+        <div class="carousel-slide second uk" id="5">
+          <h3 class="title">UK</h3>
+          <div class="img-bg"></div>
+        </div>
+      </ng-template>
     </carousel>
   </section>
 
@@ -334,113 +302,115 @@
       [autoslideLimitPercentCard]="20"
       class="third-carousel"
     >
-      <div class="carousel-slide third humming" id="1">
-        <h3 class="title">Humming Bird</h3>
+      <ng-template #carouselViewContainer #carouselTemplateRef>
+        <div class="carousel-slide third humming" id="1">
+          <h3 class="title">Humming Bird</h3>
 
-        <div class="image-text-container">
-          <div class="img-bg"></div>
-          <p>
-            The hummingbird, with its iridescent feathers, is a small and agile
-            bird known for hovering in mid-air. Recognized for its rapid wing
-            beats and ability to feed on nectar, it's a delightful and
-            captivating creature in gardens and natural habitats.
-          </p>
-          <p class="last-p">
-            Their agility and speed in flight, paired with a high metabolism,
-            make them captivating and delightful creatures to observe. Despite
-            their small size, hummingbirds have high metabolic rates and must
-            consume large amounts of food to sustain their energy levels.
-          </p>
+          <div class="image-text-container">
+            <div class="img-bg"></div>
+            <p>
+              The hummingbird, with its iridescent feathers, is a small and
+              agile bird known for hovering in mid-air. Recognized for its rapid
+              wing beats and ability to feed on nectar, it's a delightful and
+              captivating creature in gardens and natural habitats.
+            </p>
+            <p class="last-p">
+              Their agility and speed in flight, paired with a high metabolism,
+              make them captivating and delightful creatures to observe. Despite
+              their small size, hummingbirds have high metabolic rates and must
+              consume large amounts of food to sustain their energy levels.
+            </p>
+          </div>
+          <div class="bullets-points">
+            <p>Agility</p>
+            <span></span>
+            <p>Iridescence</p>
+            <span></span>
+            <p>Nectarivorous</p>
+          </div>
         </div>
-        <div class="bullets-points">
-          <p>Agility</p>
-          <span></span>
-          <p>Iridescence</p>
-          <span></span>
-          <p>Nectarivorous</p>
+        <div class="carousel-slide third blue" id="2">
+          <h3 class="title">Blue Tailed Bee-eater</h3>
+          <div class="image-text-container">
+            <div class="img-bg"></div>
+            <p>
+              Found in various parts of Asia, including the Indian subcontinent
+              and Southeast Asia, the Blue-tailed Bee-eater (Merops philippinus)
+              inhabit open landscapes and are often observed near water bodies.
+              With a slender and pointed beak, the Blue-tailed Bee-eater is
+              adept at catching insects, particularly bees and wasps, in flight.
+            </p>
+            <p class="last-p">
+              Their agile and acrobatic flight, coupled with their vivid colors,
+              makes them a delightful sight in their natural habitats.
+            </p>
+          </div>
+          <div class="bullets-points">
+            <p>Acrobatic</p>
+            <span></span>
+            <p>Elegance</p>
+            <span></span>
+            <p>Vivid</p>
+          </div>
         </div>
-      </div>
-      <div class="carousel-slide third blue" id="2">
-        <h3 class="title">Blue Tailed Bee-eater</h3>
-        <div class="image-text-container">
-          <div class="img-bg"></div>
-          <p>
-            Found in various parts of Asia, including the Indian subcontinent
-            and Southeast Asia, the Blue-tailed Bee-eater (Merops philippinus)
-            inhabit open landscapes and are often observed near water bodies.
-            With a slender and pointed beak, the Blue-tailed Bee-eater is adept
-            at catching insects, particularly bees and wasps, in flight.
-          </p>
-          <p class="last-p">
-            Their agile and acrobatic flight, coupled with their vivid colors,
-            makes them a delightful sight in their natural habitats.
-          </p>
+        <div class="carousel-slide third kingfisher" id="3">
+          <h3 class="title">Kingfisher</h3>
+          <div class="image-text-container">
+            <div class="img-bg"></div>
+            <p>
+              The Kingfisher is a stunning bird celebrated for its vibrant
+              colors and remarkable fishing skills. Belonging to the Alcedinidae
+              family, these birds are found worldwide, inhabiting various
+              environments such as wetlands, rivers, and lakeshores. Known for
+              their distinctive plumage, often featuring hues of blue, green,
+              and orange, Kingfishers are easily identifiable.
+            </p>
+            <p class="last-p">
+              The unique adaptation of their bills, designed for rapid and
+              accurate strikes, showcases the evolutionary brilliance of these
+              fascinating birds.
+            </p>
+          </div>
+          <div class="bullets-points">
+            <p>Fishing</p>
+            <span></span>
+            <p>Diving</p>
+            <span></span>
+            <p>Precise</p>
+          </div>
         </div>
-        <div class="bullets-points">
-          <p>Acrobatic</p>
-          <span></span>
-          <p>Elegance</p>
-          <span></span>
-          <p>Vivid</p>
+        <div class="carousel-slide third parrot" id="4">
+          <h3 class="title">Parrot</h3>
+          <div class="image-text-container">
+            <div class="img-bg"></div>
+            <p>
+              Parrots are colorful and highly intelligent birds belonging to the
+              Psittacidae family, and they are renowned for their ability to
+              mimic sounds and human speech. Found in tropical and subtropical
+              regions around the world, parrots display a diverse range of vivid
+              plumage, with species like the Scarlet Macaw showcasing brilliant
+              red, blue, and yellow feathers.
+            </p>
+            <p class="last-p">
+              With powerful beaks adapted for cracking nuts and seeds, parrots
+              have a varied diet that also includes fruits and vegetation.
+            </p>
+          </div>
+          <div class="bullets-points">
+            <p>Mimic</p>
+            <span></span>
+            <p>Observe</p>
+            <span></span>
+            <p>Colorful</p>
+          </div>
         </div>
-      </div>
-      <div class="carousel-slide third kingfisher" id="3">
-        <h3 class="title">Kingfisher</h3>
-        <div class="image-text-container">
-          <div class="img-bg"></div>
-          <p>
-            The Kingfisher is a stunning bird celebrated for its vibrant colors
-            and remarkable fishing skills. Belonging to the Alcedinidae family,
-            these birds are found worldwide, inhabiting various environments
-            such as wetlands, rivers, and lakeshores. Known for their
-            distinctive plumage, often featuring hues of blue, green, and
-            orange, Kingfishers are easily identifiable.
-          </p>
-          <p class="last-p">
-            The unique adaptation of their bills, designed for rapid and
-            accurate strikes, showcases the evolutionary brilliance of these
-            fascinating birds.
-          </p>
-        </div>
-        <div class="bullets-points">
-          <p>Fishing</p>
-          <span></span>
-          <p>Diving</p>
-          <span></span>
-          <p>Precise</p>
-        </div>
-      </div>
-      <div class="carousel-slide third parrot" id="4">
-        <h3 class="title">Parrot</h3>
-        <div class="image-text-container">
-          <div class="img-bg"></div>
-          <p>
-            Parrots are colorful and highly intelligent birds belonging to the
-            Psittacidae family, and they are renowned for their ability to mimic
-            sounds and human speech. Found in tropical and subtropical regions
-            around the world, parrots display a diverse range of vivid plumage,
-            with species like the Scarlet Macaw showcasing brilliant red, blue,
-            and yellow feathers.
-          </p>
-          <p class="last-p">
-            With powerful beaks adapted for cracking nuts and seeds, parrots
-            have a varied diet that also includes fruits and vegetation.
-          </p>
-        </div>
-        <div class="bullets-points">
-          <p>Mimic</p>
-          <span></span>
-          <p>Observe</p>
-          <span></span>
-          <p>Colorful</p>
-        </div>
-      </div>
+      </ng-template>
     </carousel>
   </section>
 
   <section class="author">
-    <a href="https://manuclaeys.com/portfolio" target="_blank"
-      >manuclaeys.com</a
+    <a href="https://www.linkedin.com/in/manu-claeys/" target="_blank"
+      >Manu Claeys (LinkedIn)</a
     >
   </section>
 </div>

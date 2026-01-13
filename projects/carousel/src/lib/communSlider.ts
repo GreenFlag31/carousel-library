@@ -47,8 +47,7 @@ export class CommunSlider {
     readonly autoPlayAtStart: boolean,
     readonly playDirection: string,
     readonly autoplaySlideToScroll: number,
-    public carouselService: CarouselService,
-    public cd: ChangeDetectorRef
+    public carouselService: CarouselService
   ) {
     this.initProperties();
     this.updateProperties();
@@ -69,12 +68,10 @@ export class CommunSlider {
 
   launchAutoPlay() {
     if (!this.autoPlay) return;
-
     this.playActive.set(true);
 
     this.autoInterval = window.setInterval(() => {
       this.directionAutoPlay(this.autoplaySlideToScroll);
-      this.cd.markForCheck();
     }, this.autoPlayInterval);
   }
 
@@ -219,8 +216,6 @@ export class CommunSlider {
     this.prevLimit = Math.floor(
       this.nextLimit - this.carousel.slideWidthWithGap * 2
     );
-
-    // console.log(this.prevLimit, this.nextLimit);
   }
 
   /**
@@ -235,8 +230,6 @@ export class CommunSlider {
     this.prevLimit = Math.floor(
       this.nextLimit - this.carousel.slideWidthWithGap * 2
     );
-
-    // console.log(this.prevLimit, this.nextLimit);
   }
 
   fireSlideChangeEvent(slideHasChanged: boolean, slide: number) {

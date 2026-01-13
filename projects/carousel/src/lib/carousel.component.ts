@@ -4,13 +4,16 @@ import {
   ChangeDetectorRef,
   Component,
   computed,
+  ContentChild,
   ElementRef,
   Inject,
   input,
   PLATFORM_ID,
   Signal,
   signal,
+  TemplateRef,
   ViewChild,
+  ViewContainerRef,
 } from '@angular/core';
 import { Carousel } from './carousel';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
@@ -68,6 +71,12 @@ export class CarouselComponent implements AfterViewInit {
   private carousel!: Carousel;
   slider!: InfiniteSlider | FiniteSlider;
 
+  // view container and template reference for infinite
+  @ContentChild('carouselViewContainer', { read: ViewContainerRef })
+  carouselViewContainer!: ViewContainerRef;
+  @ContentChild('carouselTemplateRef', { read: TemplateRef })
+  carouselTemplateRef!: TemplateRef<any>;
+
   // Template variables
   carouselDots: Signal<number> = signal(0);
   carouselMaxScrollableContent: Signal<number> = signal(0);
@@ -93,12 +102,18 @@ export class CarouselComponent implements AfterViewInit {
     this.previousWidth = window.innerWidth;
     this.currentWidth = window.innerWidth;
 
+    if (this.carouselViewContainer && this.carouselTemplateRef) {
+      this.carouselViewContainer.createEmbeddedView(this.carouselTemplateRef);
+    }
+
     new Validation(
       carouselContainer,
       this.slideWidth(),
       this.slideMaxWidth(),
       this.gapBetweenSlides(),
-      this.slideToScroll()
+      this.slideToScroll(),
+      this.carouselViewContainer,
+      this.carouselTemplateRef
     );
 
     this.carousel = new Carousel(
@@ -137,7 +152,8 @@ export class CarouselComponent implements AfterViewInit {
         this.autoPlayDirection(),
         this.autoPlaySlideToScroll(),
         this.carouselService,
-        this.cd
+        this.carouselViewContainer,
+        this.carouselTemplateRef
       );
     } else {
       this.slider = new FiniteSlider(
@@ -156,8 +172,7 @@ export class CarouselComponent implements AfterViewInit {
         this.autoPlayAtStart(),
         this.autoPlayDirection(),
         this.autoPlaySlideToScroll(),
-        this.carouselService,
-        this.cd
+        this.carouselService
       );
     }
 
@@ -217,7 +232,7 @@ export class CarouselComponent implements AfterViewInit {
   }
 
   /**
-   * Reinitialise variables at resize
+   * Reinitialize variables at resize
    */
   resize() {
     // on smartphones a vertical scroll triggers a resize event
@@ -245,6 +260,9 @@ export class CarouselComponent implements AfterViewInit {
    * Removes active subscriptions and clear interval autoplay.
    */
   ngOnDestroy() {
+    if (!this.isBrowser) return;
+
+    this.carouselViewContainer.clear();
     window.removeEventListener('resize', this.resizeEvent);
     window.removeEventListener('mouseup', this.mouseUpEvent);
     document.removeEventListener('visibilitychange', this.visibilityEvent);

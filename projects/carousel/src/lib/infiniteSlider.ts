@@ -1,4 +1,4 @@
-import { ChangeDetectorRef } from '@angular/core';
+import { TemplateRef, ViewContainerRef } from '@angular/core';
 import { Carousel } from './carousel';
 import { CarouselService } from './carousel.service';
 import { CommunSlider } from './communSlider';
@@ -24,7 +24,8 @@ export class InfiniteSlider extends CommunSlider {
     playDirection: string,
     autoplaySlideToScroll: number,
     carouselService: CarouselService,
-    cd: ChangeDetectorRef
+    readonly carouselViewContainer: ViewContainerRef,
+    readonly carouselTemplateRef: TemplateRef<any>
   ) {
     super(
       carousel,
@@ -42,8 +43,7 @@ export class InfiniteSlider extends CommunSlider {
       autoPlayAtStart,
       playDirection,
       autoplaySlideToScroll,
-      carouselService,
-      cd
+      carouselService
     );
     this.MAX_DOM_SIZE = MAX_DOM_SIZE;
     this.initProperties();
@@ -169,7 +169,7 @@ export class InfiniteSlider extends CommunSlider {
 
   /**
    * Responsible for changing slide number and updating the limits.
-   * If createSlidesInfiniteModeIfLimitsReached() doesn't take action, slide change according to previous computed limits.
+   * If createSlidesInfiniteModeIfLimits() doesn't take action, slide change according to previous computed limits.
    */
   modifyCurrentSlide() {
     if (this.createSlidesInfiniteModeIfLimits()) return;
@@ -196,6 +196,7 @@ export class InfiniteSlider extends CommunSlider {
       if (this.currentSlide() > 0) {
         this.changeSlideNumber(-1);
       }
+
       return true;
     } else if (-this.currentTranslation() > this.lastWindowTranslation) {
       this.addSlidesToTheRight();
@@ -214,25 +215,26 @@ export class InfiniteSlider extends CommunSlider {
    * If new slides prepended, update the translation to the correct place (appending new slides do not change the translation).
    * Limit DOM growth or update last window translation if applicable.
    */
-  appendOrPrependNElements() {
+  appendOrPrependElements() {
     if (this.direction === 'left') {
-      for (let i = this.arrayOfSlides.length - 1; i >= 0; i--) {
-        const clonedElement = this.arrayOfSlides[i].cloneNode(true);
-        this.slidesContainer.prepend(clonedElement);
-      }
+      this.carouselViewContainer.createEmbeddedView(
+        this.carouselTemplateRef,
+        {},
+        { index: 0 }
+      );
 
       this.accumulatedSlide += this.totalSlides;
       this.resetViewLeftDirection();
     } else {
-      for (let i = 0; i < this.arrayOfSlides.length; i++) {
-        const clonedElement = this.arrayOfSlides[i].cloneNode(true);
-        this.slidesContainer.append(clonedElement);
-      }
+      this.carouselViewContainer.createEmbeddedView(this.carouselTemplateRef);
     }
 
+    // Update slide widths for both directions
+    this.carousel.setWidthSlides();
+    this.carousel.setDraggableImgToFalse();
+
+    // Limit DOM growth, max X times original DOM size
     if (this.totalAmountOfSlides >= this.MAX_DOM_SIZE * this.totalSlides) {
-      // Limit DOM growth, max X times original DOM
-      // console.log('dom limit reached');
       this.limitDOMGrowth();
       this.DOMLimitReached = true;
     } else {
@@ -247,23 +249,13 @@ export class InfiniteSlider extends CommunSlider {
    * Reset the view accordingly.
    */
   limitDOMGrowth() {
-    const slides = this.carousel.selectSlides();
-
     if (this.direction === 'right') {
-      for (let i = 0; i < this.totalSlides; i++) {
-        slides[i].remove();
-      }
+      this.carouselViewContainer.remove(0);
 
       this.resetViewRightDirection();
       this.accumulatedSlide -= this.totalSlides;
     } else {
-      for (
-        let i = slides.length - 1;
-        i > slides.length - this.totalSlides - 1;
-        i--
-      ) {
-        slides[i].remove();
-      }
+      this.carouselViewContainer.remove();
     }
   }
 
@@ -271,7 +263,6 @@ export class InfiniteSlider extends CommunSlider {
    * Reset the view in a movement to the left
    * New slides added to the left, so the view has to be updated accordingly.
    * If the carousel is moved with the mouse | touch event (dragging is true), the offset should be equal to a full carousel width. Otherwise (with the buttons), the computed translation should be taken into account.
-   * Side comment: the view does not have to be updated for slides added to the right, since relative order does not change.
    * getBoundingClientRect triggers reflow of the element.
    */
   resetViewLeftDirection() {
@@ -302,11 +293,11 @@ export class InfiniteSlider extends CommunSlider {
   }
 
   addSlidesToTheLeft() {
-    this.appendOrPrependNElements();
+    this.appendOrPrependElements();
   }
 
   addSlidesToTheRight() {
-    this.appendOrPrependNElements();
+    this.appendOrPrependElements();
   }
 
   /**
@@ -349,13 +340,11 @@ export class InfiniteSlider extends CommunSlider {
   /**
    * Buttons navigation in infinite mode
    * Create new slide if limits reached (start or end). Update slide, limits and apply transformation accordingly.
+   * There is (possibly) a card offset if not responsive
    */
   handleBtnInfinite(step: number) {
-    let cardOffset = 0;
+    const cardOffset = this.responsive ? 0 : 1;
     const goingTo = this.accumulatedSlide + step;
-
-    // there is (possibly) a card offset if not responsive
-    if (!this.responsive) cardOffset = 1;
 
     if (goingTo < 0) {
       this.addSlidesToTheLeft();
@@ -385,20 +374,19 @@ export class InfiniteSlider extends CommunSlider {
   /**
    * Bullets navigation
    * Create new slides if exceeding end of carousel.
+   * There is (possibly) a card offset if not responsive
    */
   navInfiniteBullets(bullet: number) {
-    let cardOffset = 0;
+    const cardOffset = this.responsive ? 0 : 1;
     const positionOfCurrentSlide = this.accumulatedSlide % this.totalSlides;
     const difference = bullet - positionOfCurrentSlide;
     this.accumulatedSlide += difference;
 
-    // there is (possibly) a card offset if not responsive
-    if (!this.responsive) cardOffset = 1;
-
-    if (
+    const newwSlidesShouldBeCreated =
       this.accumulatedSlide + this.carousel.slideToShow + cardOffset >
-      this.totalAmountOfSlides
-    ) {
+      this.totalAmountOfSlides;
+
+    if (newwSlidesShouldBeCreated) {
       this.addSlidesToTheRight();
     }
 

@@ -4,7 +4,7 @@
 
 ngx-carousel-ease is a versatile Angular library providing a feature-rich, simple, and performant carousel component. This library supports infinite and responsive mode, mouse and touch event. Attention has been put to accessibility, performance, and friendly developer experience.
 
-This library is 100% signal based, compatible with a zoneless Angular application, and RxJs free (_available in the last version_).
+This library is signal based, compatible with a zoneless Angular application, and RxJs free (_available from @0.1.9_).
 
 Support Angular version starts at v17.
 
@@ -18,10 +18,15 @@ Live demonstration of the ngx-carousel-ease library [here](https://greenflag31.g
 | ------- | ----------------------------- | --------------------------------------------------------------------------------------------------- |
 | V17     | npm i ngx-carousel-ease@0.1.4 | Install the V17 compatible version.                                                                 |
 | V18     | npm i ngx-carousel-ease@0.1.6 | Install the V18 compatible version. This version is compatible with a zoneless Angular application. |
-| V19     | npm i ngx-carousel-ease       | Install the V19 compatible version. This version is RxJS-free.                                      |
+| V19     | npm i ngx-carousel-ease@0.2.0 | Install the V19 compatible version. This version is RxJS-free.                                      |
 
 Then, add the `CarouselComponent` in the imports array of the hosting component (if standalone) or to your `appModule`.
 Finally, add your cards content within the `<carousel></carousel>` selector in the hosting component. Each of your card should contain the class `carousel-slide`.
+
+<details>
+  <summary>
+    <b>From ngx-carousel-ease@0.1.4 until 0.1.9</b>
+  </summary>
 
 ```html
 <carousel>
@@ -30,6 +35,27 @@ Finally, add your cards content within the `<carousel></carousel>` selector in t
   ...
 </carousel>
 ```
+
+</details>
+
+<details>
+  <summary>
+    <b>From ngx-carousel-ease@0.2.0</b>
+  </summary>
+
+Wrap your slides in a `ng-template` container and mark them with `#carouselViewContainer` and `#carouselTemplateRef`. This is necessary in infinite mode to keep Angular elements attached (see issue [#15](https://github.com/GreenFlag31/carousel-library/issues/15)).
+
+```html
+<carousel>
+  <ng-template #carouselViewContainer #carouselTemplateRef>
+    <div class="carousel-slide">...</div>
+    <div class="carousel-slide">...</div>
+    ...
+  </ng-template>
+</carousel>
+```
+
+</details>
 
 # Inputs
 
@@ -66,28 +92,42 @@ The carousel is configured by default and all inputs are optional.
 
 # Service
 
-This library provides a CarouselService containing an RxJs BehaviorSubject `onSlideChange` that is triggered at every slide change. `onSlideChange` returns an object containing the current slide number and the carousel ID (useful if multiple carousel on a page to target a specific carousel instance). The slide number and carousel ID are zero indexed.
-
 Inject the CarouselService through regular dependency injection in your hosting component.
 
-_From the V19, RxJs has been replaced by a Javascript CustomEvent._
+<details>
+  <summary>
+    <b>From ngx-carousel-ease@0.1.4 until 0.1.8</b>
+  </summary>
+
+This library provides a CarouselService containing an RxJs BehaviorSubject `onSlideChange` that is triggered at every slide change. `onSlideChange` returns an object containing the current slide number and the carousel ID (useful if multiple carousel on a page to target a specific carousel instance). The slide number and carousel ID are zero indexed.
 
 ```javascript
-// V16 => V18
 ngOnInit() {
   this.carouselService.onSlideChange.subscribe((slideAndID) => {
     // change carousel colors, trigger a function, ...
   });
 }
+```
 
-// From V19: target your carousel element, and listen for a `slideChange` event.
-thirdCarousel.addEventListener('slideChange', (data: CustomEventInit) => {
+</details>
+
+<details>
+  <summary>
+    <b>From ngx-carousel-ease@0.1.9</b>
+  </summary>
+
+From the @0.1.9, RxJs has been replaced by a Javascript CustomEvent. The slide number is zero indexed.
+
+```javascript
+// Target your carousel element, and listen for a `slideChange` event.
+thirdCarousel.addEventListener("slideChange", (data: CustomEventInit) => {
   const slide = data.detail; // the slide number
 
   // change carousel colors, trigger a function, ...
 });
-
 ```
+
+</details>
 
 The third example in the demo uses this functionnality.
 
@@ -135,6 +175,8 @@ Version 0.1.7: Removing RxJs to anticipate the future optional RxJs. Transformin
 Version 0.1.8: TouchEvent fix for Firefox. Thanks to @seba174.
 
 Version 0.1.9: Internal API refactoring, signal based template, and bug fix.
+
+Version 0.2.0: Change of the cloning process with the Angular API and SSR bug correction in the ngOnDestroy hook.
 
 # Report a Bug
 

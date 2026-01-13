@@ -52,17 +52,15 @@ export class Carousel {
   /**
    * Set the slide width and max width
    * NB: In responsive mode, width is automatically adapted through the setAutoColumnSlideContainer() method.
-   *
+   * Reselect slides for infinite mode slides creation (this method will be called).
    */
   setWidthSlides() {
+    this.slides = this.selectSlides();
+
     for (const slide of this.slides) {
       slide.style.maxWidth = `${this.slideMaxWidth}px`;
-      slide.style.width = '100%';
+      slide.style.width = this.responsive ? '100%' : `${this.slideWidth}px`;
       slide.style.userSelect = 'none';
-
-      if (!this.responsive) {
-        slide.style.width = `${this.slideWidth}px`;
-      }
     }
   }
 

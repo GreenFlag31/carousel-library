@@ -1,4 +1,3 @@
-import { ChangeDetectorRef } from '@angular/core';
 import { Carousel } from './carousel';
 import { CarouselService } from './carousel.service';
 import { CommunSlider } from './communSlider';
@@ -20,8 +19,7 @@ export class FiniteSlider extends CommunSlider {
     autoPlayAtStart: boolean,
     playDirection: string,
     autoplaySlideToScroll: number,
-    carouselService: CarouselService,
-    cd: ChangeDetectorRef
+    carouselService: CarouselService
   ) {
     super(
       carousel,
@@ -39,8 +37,7 @@ export class FiniteSlider extends CommunSlider {
       autoPlayAtStart,
       playDirection,
       autoplaySlideToScroll,
-      carouselService,
-      cd
+      carouselService
     );
     this.initProperties();
     this.updateProperties();

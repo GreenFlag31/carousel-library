@@ -1,3 +1,5 @@
+import { TemplateRef, ViewContainerRef } from '@angular/core';
+
 export class Validation {
   carouselSlides!: NodeListOf<HTMLDivElement> | undefined;
 
@@ -6,13 +8,34 @@ export class Validation {
     private readonly slideWidth: number,
     private readonly slideMaxWidth: number,
     private readonly gap: number,
-    private readonly slideToScroll: number
+    private readonly slideToScroll: number,
+    private readonly carouselViewContainer: ViewContainerRef,
+    private readonly carouselTemplateRef: TemplateRef<any>
   ) {
     this.carouselSlides = this.carousel.querySelectorAll('.carousel-slide');
+
+    this.checkIfCarouselViewContainerAndTemplateRefAreSet();
     this.slideMaxWidthShouldBeGreaterThanSlideWidth();
     this.slideWidthAndGapShouldBeGreaterThanZero();
     this.requiredClassShouldBeAdded();
     this.slideToScrollNotGreaterThanTotalSlides();
+  }
+
+  checkIfCarouselViewContainerAndTemplateRefAreSet() {
+    if (
+      this.carouselViewContainer === undefined ||
+      this.carouselTemplateRef === undefined
+    ) {
+      throw new Error(
+        `carouselViewContainer or carouselTemplateRef is undefined. Please wrap your slides as following : 
+  <carousel>
+    <ng-template #carouselTemplateRef #carouselViewContainer>
+      <!-- Your slides here -->
+    </ng-template>.
+  </carousel>
+This is necessary for infinite mode to keep Angular elements attached (click event, directives, etc).`
+      );
+    }
   }
 
   slideMaxWidthShouldBeGreaterThanSlideWidth() {
