@@ -28,7 +28,6 @@ import { FiniteSlider } from './finiteSlider';
   templateUrl: './carousel.component.html',
   styleUrls: ['./carousel.component.css'],
   imports: [CommonModule],
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CarouselComponent implements AfterViewInit {

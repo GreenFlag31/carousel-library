@@ -6,12 +6,11 @@ interface Colors {
 }
 
 @Component({
-  selector: 'app-testing',
-  templateUrl: './testing.component.html',
-  styleUrls: ['./testing.component.css'],
-  standalone: true,
-  imports: [CarouselComponent],
-  encapsulation: ViewEncapsulation.None,
+    selector: 'app-testing',
+    templateUrl: './testing.component.html',
+    styleUrls: ['./testing.component.css'],
+    imports: [CarouselComponent],
+    encapsulation: ViewEncapsulation.None
 })
 export class TestingComponent implements AfterViewInit {
   colorPalette: Colors = {
