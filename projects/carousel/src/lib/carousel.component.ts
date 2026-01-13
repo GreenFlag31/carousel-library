@@ -16,7 +16,7 @@ import {
   ViewContainerRef,
 } from '@angular/core';
 import { Carousel } from './carousel';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
 import { Validation } from './validation';
 import { CarouselService } from './carousel.service';
 import { AnimationsTiming } from './interfaces';
@@ -27,7 +27,7 @@ import { FiniteSlider } from './finiteSlider';
   selector: 'carousel',
   templateUrl: './carousel.component.html',
   styleUrls: ['./carousel.component.css'],
-  imports: [CommonModule],
+  imports: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CarouselComponent implements AfterViewInit {
