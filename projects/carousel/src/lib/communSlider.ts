@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, signal } from '@angular/core';
+import { signal } from '@angular/core';
 import { Carousel } from './carousel';
 import { CarouselService } from './carousel.service';
 
