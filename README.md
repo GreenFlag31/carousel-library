@@ -19,6 +19,7 @@ Live demonstration of the ngx-carousel-ease library [here](https://greenflag31.g
 | V17     | npm i ngx-carousel-ease@0.1.4 | Install the V17 compatible version.                                                                 |
 | V18     | npm i ngx-carousel-ease@0.1.6 | Install the V18 compatible version. This version is compatible with a zoneless Angular application. |
 | V19     | npm i ngx-carousel-ease@0.2.0 | Install the V19 compatible version. This version is RxJS-free.                                      |
+| V20     | npm i ngx-carousel-ease@0.2.1 | Install the V20 compatible version                                                                  |
 
 Then, add the `CarouselComponent` in the imports array of the hosting component (if standalone) or to your `appModule`.
 Finally, add your cards content within the `<carousel></carousel>` selector in the hosting component. Each of your card should contain the class `carousel-slide`.
@@ -177,6 +178,8 @@ Version 0.1.8: TouchEvent fix for Firefox. Thanks to @seba174.
 Version 0.1.9: Internal API refactoring, signal based template, and bug fix.
 
 Version 0.2.0: Change of the cloning process with the Angular API and SSR bug correction in the ngOnDestroy hook.
+
+Version 0.2.1: Angular 20 support.
 
 # Report a Bug
 
