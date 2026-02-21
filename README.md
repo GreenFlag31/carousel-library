@@ -184,6 +184,8 @@ Version 0.2.1: Angular 20 support.
 
 Version 0.2.2: Angular 21 support.
 
+Version 0.2.3: Fixing view not refreshed after `createEmbeddedView`.
+
 # Report a Bug
 
 Please provide a detailed description of the encountered bug, including your carousel configuration and the steps/actions that led to the issue. An accurate description will help me to reproduce the issue.
