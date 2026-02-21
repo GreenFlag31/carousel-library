@@ -1,4 +1,4 @@
-import { TemplateRef, ViewContainerRef } from '@angular/core';
+import { EmbeddedViewRef, TemplateRef, ViewContainerRef } from '@angular/core';
 import { Carousel } from './carousel';
 import { CarouselService } from './carousel.service';
 import { CommunSlider } from './communSlider';
@@ -25,7 +25,7 @@ export class InfiniteSlider extends CommunSlider {
     autoplaySlideToScroll: number,
     carouselService: CarouselService,
     readonly carouselViewContainer: ViewContainerRef,
-    readonly carouselTemplateRef: TemplateRef<any>
+    readonly carouselTemplateRef: TemplateRef<any>,
   ) {
     super(
       carousel,
@@ -43,7 +43,7 @@ export class InfiniteSlider extends CommunSlider {
       autoPlayAtStart,
       playDirection,
       autoplaySlideToScroll,
-      carouselService
+      carouselService,
     );
     this.MAX_DOM_SIZE = MAX_DOM_SIZE;
     this.initProperties();
@@ -118,7 +118,7 @@ export class InfiniteSlider extends CommunSlider {
 
     const referenceWidth = Math.min(
       this.carousel.slideWidth,
-      this.carousel.slideMaxWidth || Infinity
+      this.carousel.slideMaxWidth || Infinity,
     );
     const currentLimit = this.prevLimit + this.carousel.slideWidthWithGap;
 
@@ -216,20 +216,25 @@ export class InfiniteSlider extends CommunSlider {
    * Limit DOM growth or update last window translation if applicable.
    */
   appendOrPrependElements() {
+    let view: EmbeddedViewRef<any> | null = null;
+
     if (this.direction === 'left') {
-      this.carouselViewContainer.createEmbeddedView(
+      view = this.carouselViewContainer.createEmbeddedView(
         this.carouselTemplateRef,
         {},
-        { index: 0 }
+        { index: 0 },
       );
 
       this.accumulatedSlide += this.totalSlides;
       this.resetViewLeftDirection();
     } else {
-      this.carouselViewContainer.createEmbeddedView(this.carouselTemplateRef);
+      view = this.carouselViewContainer.createEmbeddedView(
+        this.carouselTemplateRef,
+      );
     }
 
     // Update slide widths for both directions
+    view.detectChanges();
     this.carousel.setWidthSlides();
     this.carousel.setDraggableImgToFalse();
 
@@ -307,7 +312,7 @@ export class InfiniteSlider extends CommunSlider {
   override increaseLimits() {
     this.nextLimit += Math.floor(this.carousel.slideWidthWithGap);
     this.prevLimit = Math.floor(
-      this.nextLimit - this.carousel.slideWidthWithGap * 2
+      this.nextLimit - this.carousel.slideWidthWithGap * 2,
     );
   }
 

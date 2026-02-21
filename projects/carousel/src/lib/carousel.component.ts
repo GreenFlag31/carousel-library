@@ -89,7 +89,7 @@ export class CarouselComponent implements AfterViewInit {
   constructor(
     private cd: ChangeDetectorRef,
     private carouselService: CarouselService,
-    @Inject(PLATFORM_ID) platformId: Object
+    @Inject(PLATFORM_ID) platformId: Object,
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
   }
@@ -102,7 +102,10 @@ export class CarouselComponent implements AfterViewInit {
     this.currentWidth = window.innerWidth;
 
     if (this.carouselViewContainer && this.carouselTemplateRef) {
-      this.carouselViewContainer.createEmbeddedView(this.carouselTemplateRef);
+      const view = this.carouselViewContainer.createEmbeddedView(
+        this.carouselTemplateRef,
+      );
+      view.detectChanges();
     }
 
     new Validation(
@@ -112,7 +115,7 @@ export class CarouselComponent implements AfterViewInit {
       this.gapBetweenSlides(),
       this.slideToScroll(),
       this.carouselViewContainer,
-      this.carouselTemplateRef
+      this.carouselTemplateRef,
     );
 
     this.carousel = new Carousel(
@@ -123,7 +126,7 @@ export class CarouselComponent implements AfterViewInit {
       this.slideMaxWidth(),
       this.gapBetweenSlides(),
       this.responsive(),
-      this.infinite()
+      this.infinite(),
     );
 
     this.instantiateSlider();
@@ -152,7 +155,7 @@ export class CarouselComponent implements AfterViewInit {
         this.autoPlaySlideToScroll(),
         this.carouselService,
         this.carouselViewContainer,
-        this.carouselTemplateRef
+        this.carouselTemplateRef,
       );
     } else {
       this.slider = new FiniteSlider(
@@ -171,28 +174,28 @@ export class CarouselComponent implements AfterViewInit {
         this.autoPlayAtStart(),
         this.autoPlayDirection(),
         this.autoPlaySlideToScroll(),
-        this.carouselService
+        this.carouselService,
       );
     }
 
     this.carouselDots = computed(() => this.carousel.numberDots());
     this.carouselMaxScrollableContent = computed(() =>
-      this.carousel.maxScrollableContent()
+      this.carousel.maxScrollableContent(),
     );
     this.carouselArrayNumberDots = computed(() =>
-      this.carousel.arrayNumberDots()
+      this.carousel.arrayNumberDots(),
     );
 
     this.sliderCurrentSlide = computed(() => this.slider.currentSlide());
     this.sliderCurrentTranslation = computed(() =>
-      this.slider.currentTranslation()
+      this.slider.currentTranslation(),
     );
     this.sliderCurrentTranslation = computed(() =>
-      this.slider.currentTranslation()
+      this.slider.currentTranslation(),
     );
     this.sliderPlayActive = computed(() => this.slider.playActive());
     this.sliderPlayButtonDisabled = computed(() =>
-      this.slider.playButtonDisabled()
+      this.slider.playButtonDisabled(),
     );
     this.sliderDragging = computed(() => this.slider.dragging());
   }
